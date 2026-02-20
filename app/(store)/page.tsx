@@ -8,6 +8,7 @@ import ProductCard, { type ColorVariant, getColorHex } from '@/components/Produc
 import ProductCardSkeleton from '@/components/skeletons/ProductCardSkeleton';
 import AnimatedSection, { AnimatedGrid } from '@/components/AnimatedSection';
 import NewsletterSection from '@/components/NewsletterSection';
+import WhoWeAreSection from '@/components/WhoWeAreSection';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
 export default function Home() {
@@ -303,6 +304,10 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+
+      {/* Who We Are */}
+      <WhoWeAreSection />
 
       {/* Featured Products */}
       <section className="py-16 md:py-24 bg-stone-50">
