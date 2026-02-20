@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -14,13 +14,7 @@ export default function CustomerDetailsPage() {
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        if (customerId) {
-            fetchCustomerData();
-        }
-    }, [customerId]);
-
-    const fetchCustomerData = async () => {
+    const fetchCustomerData = useCallback(async () => {
         try {
             // 1. Fetch Profile
             const { data: profile, error: profileError } = await supabase
@@ -49,7 +43,13 @@ export default function CustomerDetailsPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [customerId]);
+
+    useEffect(() => {
+        if (customerId) {
+            fetchCustomerData();
+        }
+    }, [customerId, fetchCustomerData]);
 
     if (loading) return <div className="p-8 text-center text-gray-500">Loading customer details...</div>;
     if (!customer) return <div className="p-8 text-center text-red-500">Customer not found</div>;

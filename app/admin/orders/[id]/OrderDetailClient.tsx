@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import FraudDetectionAlert from '@/components/FraudDetectionAlert';
 
@@ -44,11 +44,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
     };
   }, []);
 
-  useEffect(() => {
-    fetchOrderDetails();
-  }, [orderId]);
-
-  const fetchOrderDetails = async () => {
+  const fetchOrderDetails = useCallback(async () => {
     try {
       setLoading(true);
       // Try to fetch by ID or order_number
@@ -118,7 +114,11 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderId]);
+
+  useEffect(() => {
+    fetchOrderDetails();
+  }, [fetchOrderDetails]);
 
   const handleUpdateStatus = async (newStatus?: string) => {
     try {
@@ -284,7 +284,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
           {/* Header */}
           <div className="flex justify-between items-start border-b-2 border-gray-800 pb-4 mb-4">
             <div>
-              <h1 className="text-2xl font-bold">MultiMey Supplies</h1>
+              <h1 className="text-2xl font-bold">TIWAA PERFUME STYLE HOUSE</h1>
               <p className="text-sm text-gray-600">Order Packing Slip</p>
             </div>
             <div className="text-right">
@@ -345,8 +345,8 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
 
           {/* Footer */}
           <div className="border-t-2 border-gray-800 pt-4 text-center text-sm text-gray-600">
-            <p>Thank you for shopping with MultiMey Supplies!</p>
-            <p>Questions? Contact us at support@multimeysupplies.com</p>
+            <p>Thank you for shopping with TIWAA PERFUME STYLE HOUSE!</p>
+            <p>Questions? Call 054 501 0949 or WhatsApp 055 416 9992 · tiwaperfumestyle@gmail.com</p>
           </div>
         </div>
       </div>

@@ -26,16 +26,19 @@ function FooterSection({ title, children }: { title: string, children: React.Rea
 export default function Footer() {
   const { getSetting } = useCMS();
 
-  const siteName = getSetting('site_name') || 'MultiMey Supplies';
-  const siteTagline = getSetting('site_tagline') || 'Dresses, Electronics, Bags, Shoes & More.';
-  const contactEmail = getSetting('contact_email') || '';
-  const contactPhone = getSetting('contact_phone') || '+233209597443';
+  const siteName = getSetting('site_name') || 'TIWAA PERFUME STYLE HOUSE';
+  const siteTagline = getSetting('site_tagline') || 'I sell perfumes — Wholesale and retail.';
+  const contactEmail = getSetting('contact_email') || 'tiwaperfumestyle@gmail.com';
+  const contactPhone = getSetting('contact_phone') || '0545010949';
+  const contactWhatsapp = getSetting('contact_whatsapp') || '0554169992';
+  const contactAddress = getSetting('contact_address') || 'Satellite, Accra';
+  const siteLogo = getSetting('site_logo') || '/tiwa logo.png';
   const socialFacebook = getSetting('social_facebook') || '';
-  const socialInstagram = getSetting('social_instagram') || 'https://www.instagram.com/mey_phua';
-  const socialTwitter = getSetting('social_twitter') || 'https://x.com/mey_phua';
-  const socialTiktok = getSetting('social_tiktok') || 'https://www.tiktok.com/@mey_phua';
-  const socialSnapchat = getSetting('social_snapchat') || 'https://snapchat.com/t/eL9wfuQa';
-  const socialYoutube = getSetting('social_youtube') || 'https://youtube.com/@mey_phua';
+  const socialInstagram = getSetting('social_instagram') || '';
+  const socialTwitter = getSetting('social_twitter') || '';
+  const socialTiktok = getSetting('social_tiktok') || '';
+  const socialSnapchat = getSetting('social_snapchat') || '';
+  const socialYoutube = getSetting('social_youtube') || '';
 
   return (
     <footer className="relative mt-12 z-0">
@@ -53,10 +56,10 @@ export default function Footer() {
             {/* Brand Column */}
             <div className="lg:col-span-1 space-y-6">
               <Link href="/" className="inline-block group">
-                <img src="/logo.png" alt={siteName} className="h-16 w-auto object-contain drop-shadow-lg group-hover:scale-105 transition-transform duration-300" />
+                <img src={siteLogo} alt={siteName} className="h-16 w-auto object-contain drop-shadow-lg group-hover:scale-105 transition-transform duration-300" />
               </Link>
               <p className="text-blue-200/60 leading-relaxed text-sm">
-                Your one-stop shop for dresses, electronics, bags, shoes and more. Locally sourced and imported quality products from Accra, Ghana.
+                {siteTagline} Satellite, Accra. Call {contactPhone} · WhatsApp {contactWhatsapp}
               </p>
 
               <div className="flex gap-3 pt-2">

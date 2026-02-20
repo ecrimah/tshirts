@@ -31,7 +31,6 @@ export default function NewsletterSection() {
 
         {/* Background Image / Texture */}
         <div className="absolute inset-0 opacity-20">
-          <div className="absolute inset-0 bg-[url('/pattern-noise.png')] opacity-20"></div> {/* Fallback to simple noise if available or just raw color */}
           <div className="absolute -top-40 -right-40 w-96 h-96 bg-sky-400 rounded-full blur-[100px] opacity-30"></div>
           <div className="absolute top-40 -left-20 w-72 h-72 bg-sky-300 rounded-full blur-[100px] opacity-20"></div>
         </div>

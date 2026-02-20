@@ -25,6 +25,7 @@ export default function AccessibilityMenu() {
   useEffect(() => {
     localStorage.setItem('accessibilitySettings', JSON.stringify(settings));
     applySettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- applySettings reads settings; intentional sync to DOM
   }, [settings]);
 
   const applySettings = () => {

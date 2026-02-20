@@ -193,7 +193,7 @@ function ShopContent() {
     }
 
     fetchProducts();
-  }, [selectedCategory, priceRange, selectedRating, sortBy, page, searchParams]);
+  }, [selectedCategory, priceRange, selectedRating, sortBy, page, searchParams, categories]);
 
   const totalPages = Math.ceil(totalProducts / productsPerPage);
 
@@ -202,6 +202,7 @@ function ShopContent() {
       <PageHero
         title="Shop All Products"
         subtitle="Browse our range of dresses, electronics, bags, shoes and more"
+        backgroundImage="/Whisk_6ec7df94ec3ca85b49644810b7fab2ecdr.jpeg"
       />
 
       {/* Mobile Filter Toggle */}

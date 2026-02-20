@@ -13,6 +13,18 @@ export interface AuthResult {
 }
 
 /**
+ * Get Supabase access token from request (Authorization header or sb-access-token cookie).
+ */
+export function getAuthToken(request: Request): string | null {
+    const authHeader = request.headers.get('authorization');
+    const bearer = authHeader?.replace(/^Bearer\s+/i, '').trim();
+    if (bearer) return bearer;
+    const cookie = request.headers.get('cookie') ?? '';
+    const match = cookie.match(/\bsb-access-token=([^;]+)/);
+    return match ? decodeURIComponent(match[1].trim()) : null;
+}
+
+/**
  * Verify that the request has a valid Supabase session
  * and optionally check for admin/staff role.
  */
@@ -20,8 +32,7 @@ export async function verifyAuth(
     request: Request,
     options: { requireAdmin?: boolean } = {}
 ): Promise<AuthResult> {
-    const authHeader = request.headers.get('authorization');
-    const token = authHeader?.replace('Bearer ', '');
+    const token = getAuthToken(request);
 
     if (!token) {
         return { authenticated: false, error: 'Missing authorization token' };

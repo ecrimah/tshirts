@@ -45,7 +45,7 @@ function OrderSuccessContent() {
       }
     }
     fetchOrder();
-  }, [orderNumber]);
+  }, [orderNumber, paymentSuccess]);
 
   // Payment verification - called when user is redirected from Moolre with payment_success=true
   const verifyPayment = async (orderNum: string, initialOrder: any) => {

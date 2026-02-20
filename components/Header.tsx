@@ -18,7 +18,8 @@ export default function Header() {
   const { cartCount, isCartOpen, setIsCartOpen } = useCart();
   const { getSetting } = useCMS();
 
-  const siteName = getSetting('site_name') || 'MultiMey Supplies';
+  const siteName = getSetting('site_name') || 'TIWAA PERFUME STYLE HOUSE';
+  const headerLogo = getSetting('site_logo') || '/tiwa logo.png';
 
   useEffect(() => {
     // Wishlist logic
@@ -79,7 +80,7 @@ export default function Header() {
                   className="flex items-center select-none"
                   aria-label="Go to homepage"
                 >
-                  <img src="/logo.png" alt={siteName} className="h-9 md:h-11 w-auto object-contain" />
+                  <img src={headerLogo} alt={siteName} className="h-9 md:h-11 w-auto object-contain" />
                 </Link>
               </div>
 
@@ -213,7 +214,7 @@ export default function Header() {
           <div className="absolute top-0 left-0 bottom-0 w-4/5 max-w-xs bg-white shadow-xl flex flex-col animate-in slide-in-from-left duration-300">
             <div className="p-4 border-b border-gray-100 flex items-center justify-between">
               <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
-                <img src="/logo.png" alt={siteName} className="h-8 w-auto object-contain" />
+                <img src={headerLogo} alt={siteName} className="h-8 w-auto object-contain" />
               </Link>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}

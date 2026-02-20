@@ -16,10 +16,10 @@ interface SEOProps {
 }
 
 export function generateMetadata({
-  title = 'Premium Online Shopping in Ghana',
-  description = 'Shop dresses, electronics, bags, shoes and more at MultiMey Supplies. Locally sourced and imported quality products delivered across Ghana.',
+  title = 'TIWAA PERFUME STYLE HOUSE — Perfumes Wholesale & Retail',
+  description = 'I sell perfumes — wholesale and retail. Satellite, Accra. Call 054 501 0949 · WhatsApp 055 416 9992.',
   keywords = [],
-  ogImage = 'https://readdy.ai/api/search-image?query=modern%20premium%20ecommerce%20online%20shopping%20platform%20elegant%20design&width=1200&height=630&seq=ogimage&orientation=landscape',
+  ogImage,
   ogType = 'website',
   price,
   currency = 'GHS',
@@ -29,8 +29,10 @@ export function generateMetadata({
   author,
   noindex = false
 }: SEOProps): Metadata {
-  const siteName = 'PremiumShop Ghana';
-  const siteUrl = 'https://premiumshop.com';
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://tiwaperfumestyle.com';
+  const defaultOgImage = `${siteUrl}/tiwa%20logo.png`;
+  const resolvedOgImage = ogImage || defaultOgImage;
+  const siteName = 'TIWAA PERFUME STYLE HOUSE';
   const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
 
   const defaultKeywords = [
@@ -52,7 +54,7 @@ export function generateMetadata({
     openGraph: {
       title: fullTitle,
       description,
-      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
+      images: [{ url: resolvedOgImage, width: 1200, height: 630, alt: title }],
       type: ogType as any,
       siteName,
       locale: 'en_GH'
@@ -61,7 +63,7 @@ export function generateMetadata({
       card: 'summary_large_image',
       title: fullTitle,
       description,
-      images: [ogImage]
+      images: [resolvedOgImage]
     },
     robots: noindex ? {
       index: false,
@@ -159,38 +161,36 @@ export function generateBreadcrumbSchema(items: { name: string; url: string }[])
 }
 
 export function generateOrganizationSchema() {
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://tiwaperfumestyle.com';
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'PremiumShop Ghana',
-    url: 'https://premiumshop.com',
-    logo: 'https://readdy.ai/api/search-image?query=premium%20shop%20logo%20elegant%20modern&width=200&height=200&seq=logo&orientation=squarish',
+    name: 'TIWAA PERFUME STYLE HOUSE',
+    url: siteUrl,
+    logo: `${siteUrl}/tiwa%20logo.png`,
+    image: `${siteUrl}/tiwa%20logo.png`,
     contactPoint: {
       '@type': 'ContactPoint',
-      telephone: '+233-XX-XXX-XXXX',
+      telephone: '+233545010949',
       contactType: 'Customer Service',
       areaServed: 'GH',
       availableLanguage: ['English']
-    },
-    sameAs: [
-      'https://facebook.com/premiumshop',
-      'https://instagram.com/premiumshop',
-      'https://twitter.com/premiumshop'
-    ]
+    }
   };
 }
 
 export function generateWebsiteSchema() {
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://tiwaperfumestyle.com';
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'PremiumShop Ghana',
-    url: 'https://premiumshop.com',
+    name: 'TIWAA PERFUME STYLE HOUSE',
+    url: siteUrl,
     potentialAction: {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: 'https://premiumshop.com/shop?search={search_term_string}'
+        urlTemplate: `${siteUrl}/shop?search={search_term_string}`
       },
       'query-input': 'required name=search_term_string'
     }

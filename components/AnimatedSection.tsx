@@ -111,6 +111,7 @@ export function AnimatedGrid({
     observer.observe(container);
 
     return () => observer.unobserve(container);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- childrenArray identity changes every render; length + staggerDelay are sufficient
   }, [childrenArray.length, staggerDelay]);
 
   return (

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 
 export default function ProductsPage() {
@@ -28,17 +28,12 @@ export default function ProductsPage() {
     'archived': 'bg-amber-100 text-amber-700',
   };
 
-  useEffect(() => {
-    fetchProducts();
-    fetchCategories();
-  }, [sortBy]);
-
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     const { data } = await supabase.from('categories').select('name');
     if (data) setCategories(data);
-  };
+  }, []);
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
       let query = supabase
@@ -90,7 +85,12 @@ export default function ProductsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [sortBy]);
+
+  useEffect(() => {
+    fetchProducts();
+    fetchCategories();
+  }, [fetchProducts, fetchCategories]);
 
   const handleSelectAll = () => {
     if (selectedProducts.length === products.length) {
@@ -109,27 +109,58 @@ export default function ProductsPage() {
   };
 
   const handleDeleteProduct = async (productId: string) => {
-    if (confirm('Are you sure you want to delete this product?')) {
-      const { error } = await supabase.from('products').delete().eq('id', productId);
-      if (!error) {
-        setProducts(products.filter(p => p.id !== productId));
-        alert('Product deleted successfully');
-      } else {
-        alert('Error deleting product');
+    if (!confirm('Are you sure you want to delete this product?')) return;
+    try {
+      // Unlink from order_items so we can delete (order history keeps product_name/sku/price)
+      await supabase.from('order_items').update({ product_id: null, variant_id: null }).eq('product_id', productId);
+      // Delete in dependency order: review_images → reviews → cart_items → wishlist_items → product_images → product_variants → products
+      const { data: reviewIds } = await supabase.from('reviews').select('id').eq('product_id', productId);
+      if (reviewIds?.length) {
+        const ids = reviewIds.map((r) => r.id);
+        await supabase.from('review_images').delete().in('review_id', ids);
+        await supabase.from('reviews').delete().eq('product_id', productId);
       }
+      await supabase.from('cart_items').delete().eq('product_id', productId);
+      await supabase.from('wishlist_items').delete().eq('product_id', productId);
+      await supabase.from('product_images').delete().eq('product_id', productId);
+      await supabase.from('product_variants').delete().eq('product_id', productId);
+      const { error } = await supabase.from('products').delete().eq('id', productId);
+      if (error) throw error;
+      setProducts(products.filter((p) => p.id !== productId));
+      alert('Product deleted successfully');
+    } catch (err: any) {
+      alert('Error deleting product: ' + (err?.message || 'Please try again.'));
     }
   };
 
   const handleBulkDelete = async () => {
-    if (confirm(`Are you sure you want to delete ${selectedProducts.length} products?`)) {
-      const { error } = await supabase.from('products').delete().in('id', selectedProducts);
-      if (!error) {
-        setProducts(products.filter(p => !selectedProducts.includes(p.id)));
-        setSelectedProducts([]);
-        alert('Products deleted successfully');
-      } else {
-        alert('Error deleting products');
+    if (!confirm(`Are you sure you want to delete ${selectedProducts.length} product(s)?`)) return;
+    const failed: string[] = [];
+    for (const productId of selectedProducts) {
+      try {
+        await supabase.from('order_items').update({ product_id: null, variant_id: null }).eq('product_id', productId);
+        const { data: reviewIds } = await supabase.from('reviews').select('id').eq('product_id', productId);
+        if (reviewIds?.length) {
+          const ids = reviewIds.map((r) => r.id);
+          await supabase.from('review_images').delete().in('review_id', ids);
+          await supabase.from('reviews').delete().eq('product_id', productId);
+        }
+        await supabase.from('cart_items').delete().eq('product_id', productId);
+        await supabase.from('wishlist_items').delete().eq('product_id', productId);
+        await supabase.from('product_images').delete().eq('product_id', productId);
+        await supabase.from('product_variants').delete().eq('product_id', productId);
+        const { error } = await supabase.from('products').delete().eq('id', productId);
+        if (error) throw error;
+      } catch {
+        failed.push(products.find((p) => p.id === productId)?.name || productId.slice(0, 8));
       }
+    }
+    setProducts(products.filter((p) => !selectedProducts.includes(p.id)));
+    setSelectedProducts([]);
+    if (failed.length) {
+      alert(`Deleted ${selectedProducts.length - failed.length}. Failed: ${failed.join(', ')}`);
+    } else {
+      alert('Products deleted successfully');
     }
   };
 
@@ -147,13 +178,22 @@ export default function ProductsPage() {
           <h1 className="text-3xl font-bold text-gray-900">Products</h1>
           <p className="text-gray-600 mt-1">Manage your product catalog and inventory</p>
         </div>
-        <Link
-          href="/admin/products/new"
-          className="px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer flex items-center justify-center md:items-start"
-        >
-          <i className="ri-add-line mr-2"></i>
-          Add Product
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/admin/products/import"
+            className="px-6 py-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer flex items-center justify-center"
+          >
+            <i className="ri-upload-2-line mr-2"></i>
+            Import
+          </Link>
+          <Link
+            href="/admin/products/new"
+            className="px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer flex items-center justify-center md:items-start"
+          >
+            <i className="ri-add-line mr-2"></i>
+            Add Product
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

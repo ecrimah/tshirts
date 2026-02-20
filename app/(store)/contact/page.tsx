@@ -88,20 +88,26 @@ export default function ContactPage() {
   };
 
   // Get contact details from CMS settings
-  const contactEmail = getSetting('contact_email') || 'support@multimeysupplies.com';
-  const contactPhone = getSetting('contact_phone') || '+233209597443';
-  const contactAddress = getSetting('contact_address') || 'Accra, Ghana';
+  const contactEmail = getSetting('contact_email') || 'tiwaperfumestyle@gmail.com';
+  const contactPhone = getSetting('contact_phone') || '0545010949';
+  const contactWhatsapp = getSetting('contact_whatsapp') || '0554169992';
+  const contactAddress = getSetting('contact_address') || 'Satellite, Accra';
 
   const heroTitle = pageContent?.title || 'Get In Touch';
   const heroSubtitle = pageContent?.subtitle || 'Have a question or need assistance?';
   const heroContent = pageContent?.content || 'Our friendly team is here to help. Reach out through any of our contact channels.';
+
+  const waNumber = contactWhatsapp.replace(/[^0-9]/g, '');
+  const waLink = waNumber.startsWith('0') ? `https://wa.me/233${waNumber.slice(1)}` : `https://wa.me/${waNumber}`;
+  const telNumber = contactPhone.replace(/\s/g, '');
+  const telLink = telNumber.startsWith('0') ? `tel:+233${telNumber.slice(1)}` : `tel:${telNumber}`;
 
   const contactMethods = [
     {
       icon: 'ri-phone-line',
       title: 'Call Us',
       value: contactPhone,
-      link: `tel:${contactPhone.replace(/\s/g, '')}`,
+      link: telLink,
       description: 'Mon-Fri, 8am-6pm GMT'
     },
     {
@@ -114,8 +120,8 @@ export default function ContactPage() {
     {
       icon: 'ri-whatsapp-line',
       title: 'WhatsApp',
-      value: contactPhone,
-      link: `https://wa.me/${contactPhone.replace(/[^0-9]/g, '')}`,
+      value: contactWhatsapp,
+      link: waLink,
       description: 'Chat with us instantly'
     },
     {
@@ -123,7 +129,7 @@ export default function ContactPage() {
       title: 'Visit Us',
       value: contactAddress,
       link: 'https://maps.google.com',
-      description: 'Mon-Sat, 9am-6pm'
+      description: 'Satellite, Accra'
     }
   ];
 
@@ -138,7 +144,7 @@ export default function ContactPage() {
     },
     {
       question: 'What payment methods do you accept?',
-      answer: 'We accept mobile money (MTN, Vodafone, AirtelTigo) and credit/debit cards through our secure Moolre payment gateway.'
+      answer: 'We accept MOMO, Instant Bank Transfer, Cash (in store only), and Visa Card. Please note we do not accept payment on delivery.'
     }
   ];
 
@@ -146,7 +152,8 @@ export default function ContactPage() {
     <div className="min-h-screen bg-white">
       <PageHero
         title="Get In Touch"
-        subtitle="Have a question about our dresses, electronics, bags, or shoes? We're here to help from Accra, Ghana."
+        subtitle="Have a question or need assistance? We're here to help from Satellite, Accra."
+        backgroundImage="/Whisk_835b10a10eab0caa2c7419d4a6e01102dr.jpeg"
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -311,7 +318,7 @@ export default function ContactPage() {
                 Our customer support team is available Monday to Friday, 8am-6pm GMT. For urgent matters, reach out via WhatsApp.
               </p>
               <a
-                href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, '')}`}
+                href={waLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-white text-blue-700 px-6 py-3 rounded-full font-medium hover:bg-blue-50 transition-colors whitespace-nowrap"

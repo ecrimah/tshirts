@@ -61,15 +61,15 @@ export default function AdminCategoriesPage() {
   };
 
   const handleDelete = async (categoryId: string) => {
-    if (confirm('Are you sure you want to delete this category? This action cannot be undone.')) {
-      try {
-        const { error } = await supabase.from('categories').delete().eq('id', categoryId);
-        if (error) throw error;
-        setCategories(categories.filter(c => c.id !== categoryId));
-        alert('Category deleted successfully');
-      } catch (err: any) {
-        alert('Error deleting: ' + err.message);
-      }
+    if (!confirm('Are you sure you want to delete this category? Products in it will have no category.')) return;
+    try {
+      await supabase.from('products').update({ category_id: null }).eq('category_id', categoryId);
+      const { error } = await supabase.from('categories').delete().eq('id', categoryId);
+      if (error) throw error;
+      setCategories(categories.filter((c) => c.id !== categoryId));
+      alert('Category deleted successfully');
+    } catch (err: any) {
+      alert('Error deleting: ' + (err?.message ?? 'Please try again.'));
     }
   };
 

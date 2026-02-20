@@ -56,7 +56,7 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
-            <img src="/logo.png" alt="MultiMey Supplies" className="h-12 w-auto mx-auto" />
+            <img src="/tiwa logo.png" alt="TIWAA PERFUME STYLE HOUSE" className="h-12 w-auto mx-auto" />
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mt-6 mb-2">Admin Login</h1>
           <p className="text-gray-600">Sign in to access the admin dashboard</p>
@@ -85,7 +85,7 @@ export default function AdminLoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="admin@elegancemart.com"
+                  placeholder="tiwaperfumestyle@gmail.com"
                   required
                 />
               </div>

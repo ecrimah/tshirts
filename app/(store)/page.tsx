@@ -21,8 +21,8 @@ export default function Home() {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % 2);
-    }, 5000);
+      setCurrentSlide((prev) => (prev + 1) % 3);
+    }, 3000);
     return () => clearInterval(timer);
   }, []);
 
@@ -83,8 +83,15 @@ export default function Home() {
           (cat: any) => cat.metadata?.featured === true
         );
         setCategories(featuredCategories);
-      } catch (error) {
-        console.error('Error fetching data:', error);
+      } catch (error: unknown) {
+        const err = error as { message?: string; code?: string };
+        const msg = err?.message ?? (error instanceof Error ? error.message : String(error));
+        const code = err?.code ?? '';
+        if (code === 'PGRST205') {
+          console.warn('Products/categories tables not found. Run Supabase migrations to create the schema.');
+        } else {
+          console.error('Error fetching data:', msg, code ? `(${code})` : '');
+        }
       } finally {
         setLoading(false);
       }
@@ -96,7 +103,7 @@ export default function Home() {
 
   const getHeroImage = () => {
     if (config.hero.backgroundImage) return config.hero.backgroundImage;
-    return "/logo.png";
+    return "/tiwa logo.png";
   };
 
   const renderBanners = () => {
@@ -120,116 +127,130 @@ export default function Home() {
     <main className="flex-col items-center justify-between min-h-screen">
       {renderBanners()}
 
-      {/* Hero Section */}
-      <section className="relative w-full h-[70vh] md:h-[90vh] overflow-hidden bg-black">
+      {/* Hero Section - God Level Design */}
+      <section className="relative w-full h-[85vh] md:h-[95vh] overflow-hidden bg-black">
+
+        {/* Progress Bar */}
+        <div className="absolute top-0 left-0 right-0 z-30 h-1 bg-white/10">
+          <div
+            key={currentSlide}
+            className="h-full bg-white/80 animate-progress origin-left"
+            style={{ animationDuration: '3000ms' }}
+          ></div>
+        </div>
 
         {/* Background Slider + Per-Slide Content */}
         {[
           {
-            image: '/hero-1.png',
-            tag: 'Electronics & Appliances',
-            heading: <>Top-Quality <br /><span className="italic font-light">Electronics & Gadgets</span></>,
-            subtext: 'From smart kitchen appliances to everyday electronics — imported directly and priced to move.',
-            cta: { text: 'Shop Electronics', href: '/shop?category=electronics' },
-            cta2: { text: 'View All', href: '/shop' },
+            image: '/Whisk_4e28dc6bf0d6be98458435c0c2950e3ddr.jpeg',
+            tag: 'New Arrivals',
+            heading: <>Premium <br /><span className="italic font-light text-blue-200">Quality Collection</span></>,
+            subtext: 'Discover our latest arrivals imported directly for you. Unmatched quality at unbeatable prices.',
+            cta: { text: 'Shop Now', href: '/shop' },
+            cta2: { text: 'View Catalog', href: '/categories' },
+            position: 'object-center'
           },
           {
-            image: '/hero-2.png',
-            tag: 'Fashion & Dresses',
-            heading: <>Stunning African <br /><span className="italic font-light">Print Dresses</span></>,
-            subtext: 'Beautiful locally sourced dresses and fashion pieces — bold prints, perfect fits, unbeatable prices.',
-            cta: { text: 'Shop Dresses', href: '/shop?category=dresses' },
-            cta2: { text: 'All Fashion', href: '/shop?category=fashion' },
+            image: '/Whisk_50c2f050b440b4b95064c372c1ec7ee1dr.jpeg',
+            tag: 'Fashion & Style',
+            heading: <>Elegance <br /><span className="italic font-light text-rose-200">Redefined</span></>,
+            subtext: 'Step into the season with our exclusive fashion edits. Curated for the modern trendsetter.',
+            cta: { text: 'Shop Fashion', href: '/shop?category=fashion' },
+            cta2: { text: 'Learn More', href: '/about' },
+            position: 'object-top'
+          },
+          {
+            image: '/Whisk_64e2698834d1476801a4b505b30c324bdr.jpeg',
+            tag: 'Exclusive Deals',
+            heading: <>Limited <br /><span className="italic font-light text-amber-200">Time Offers</span></>,
+            subtext: 'Don\'t miss out on our seasonal sale. Great discounts on your favorite items.',
+            cta: { text: 'View Offers', href: '/shop?on_sale=true' },
+            cta2: { text: 'Contact Us', href: '/contact' },
+            position: 'object-center'
           },
         ].map((slide, index) => (
           <div
             key={index}
             className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
           >
-            {/* Background Image */}
-            <Image
-              src={slide.image}
-              alt={`Hero Banner ${index + 1}`}
-              fill
-              className="object-cover"
-              priority={index === 0}
-              quality={90}
-            />
-            <div className="absolute inset-0 bg-black/20"></div> {/* 20% black overlay */}
+            {/* Background Image with Ken Burns Effect */}
+            <div className={`absolute inset-0 ${index === currentSlide ? 'animate-ken-burns' : ''}`}>
+              <Image
+                src={slide.image}
+                alt={`Hero Banner ${index + 1}`}
+                fill
+                className={`object-cover ${slide.position}`}
+                priority={index === 0}
+                quality={82}
+                sizes="100vw"
+              />
+            </div>
+
+            {/* Premium Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
 
             {/* Slide Content */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 max-w-5xl mx-auto mt-[-50px]">
-              <p
-                key={`tag-${currentSlide}`}
-                className="text-white/90 text-sm md:text-base tracking-[0.2em] uppercase font-medium mb-6 animate-fade-in-up"
-              >
-                {slide.tag}
-              </p>
-
-              <h1
-                key={`heading-${currentSlide}`}
-                className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-serif text-white mb-6 leading-tight drop-shadow-lg animate-fade-in-up"
-                style={{ animationDelay: '0.1s' }}
-              >
-                {slide.heading}
-              </h1>
-
-              <p
-                key={`sub-${currentSlide}`}
-                className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-10 font-light tracking-wide animate-fade-in-up"
-                style={{ animationDelay: '0.2s' }}
-              >
-                {slide.subtext}
-              </p>
-
-              <div
-                key={`cta-${currentSlide}`}
-                className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 animate-fade-in-up"
-                style={{ animationDelay: '0.3s' }}
-              >
-                <Link
-                  href={slide.cta.href}
-                  className="bg-white text-gray-900 px-8 py-3 sm:px-10 sm:py-4 rounded-full font-medium text-base sm:text-lg hover:bg-gray-100 transition-colors shadow-lg hover:shadow-xl hover:-translate-y-1 duration-300"
+            <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6 md:px-16 max-w-7xl mx-auto h-full mt-[-20px]">
+              <div className="max-w-4xl flex flex-col items-center">
+                <div
+                  className={`overflow-hidden transition-all duration-700 delay-100 ${index === currentSlide ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
                 >
-                  {slide.cta.text}
-                </Link>
-                <Link
-                  href={slide.cta2.href}
-                  className="px-8 py-3 sm:px-10 sm:py-4 rounded-full font-medium text-base sm:text-lg text-white border border-white/40 hover:bg-white/10 transition-colors backdrop-blur-sm"
-                >
-                  {slide.cta2.text}
-                </Link>
+                  <span className="inline-block py-1 px-4 mb-6 text-white/90 text-sm md:text-base tracking-[0.3em] uppercase font-semibold border border-white/20 rounded-full backdrop-blur-md bg-white/5">
+                    {slide.tag}
+                  </span>
+                </div>
+
+                <div className={`transition-all duration-700 delay-200 ${index === currentSlide ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                  <h1 className="text-5xl sm:text-6xl md:text-8xl font-serif text-white mb-6 leading-[1.1] drop-shadow-2xl">
+                    {slide.heading}
+                  </h1>
+                </div>
+
+                <div className={`transition-all duration-700 delay-300 ${index === currentSlide ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                  <p className="text-lg md:text-2xl text-gray-200 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
+                    {slide.subtext}
+                  </p>
+                </div>
+
+                <div className={`flex flex-col sm:flex-row items-center justify-center gap-6 transition-all duration-700 delay-400 ${index === currentSlide ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                  <Link
+                    href={slide.cta.href}
+                    className="group relative px-10 py-4 bg-white text-gray-950 rounded-full font-medium text-lg overflow-hidden transition-all hover:shadow-[0_0_20px_rgba(255,255,255,0.5)] hover:bg-gray-100 hover:scale-105"
+                  >
+                    <span className="relative z-10 flex items-center gap-2">
+                      {slide.cta.text} <i className="ri-arrow-right-line transition-transform group-hover:translate-x-1"></i>
+                    </span>
+                  </Link>
+                  <Link
+                    href={slide.cta2.href}
+                    className="group px-10 py-4 bg-white/10 border border-white/30 text-white rounded-full font-medium text-lg backdrop-blur-md hover:bg-white/20 hover:border-white/50 transition-all hover:scale-105"
+                  >
+                    {slide.cta2.text}
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
         ))}
 
-        {/* Bottom Features (Desktop) */}
-        <div className="absolute bottom-12 left-0 right-0 z-20 hidden md:flex justify-center items-center gap-16 text-white text-center">
-          <div>
-            <p className="font-serif text-lg font-medium">Direct Import</p>
-            <p className="text-xs text-white/60 font-light tracking-wide uppercase mt-1">From China &amp; Local Suppliers</p>
-          </div>
-          <div className="w-px h-10 bg-white/20"></div>
-          <div>
-            <p className="font-serif text-lg font-medium">Verified Quality</p>
-            <p className="text-xs text-white/60 font-light tracking-wide uppercase mt-1">Every Item Checked</p>
-          </div>
-          <div className="w-px h-10 bg-white/20"></div>
-          <div>
-            <p className="font-serif text-lg font-medium">Best Prices</p>
-            <p className="text-xs text-white/60 font-light tracking-wide uppercase mt-1">Wholesale &amp; Retail</p>
-          </div>
+        {/* Slide Indicators */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex gap-4">
+          {[0, 1, 2].map((i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentSlide(i)}
+              className={`h-1 transition-all duration-300 ${currentSlide === i ? 'w-12 bg-white' : 'w-6 bg-white/40 hover:bg-white/60'}`}
+              aria-label={`Go to slide ${i + 1}`}
+            />
+          ))}
         </div>
 
-        {/* Floating "Exclusive Offer" Card (Bottom Left) */}
-        <div className="absolute bottom-8 left-8 md:bottom-12 md:left-12 z-20 bg-white rounded-xl p-6 shadow-2xl max-w-[280px] animate-fade-in hidden lg:block">
-          <p className="font-serif text-blue-800 text-lg italic mb-0.5">Exclusive Offer</p>
-          <h3 className="text-3xl font-bold text-gray-900 mb-1">25% Off</h3>
-          <p className="text-xs text-gray-500 font-medium leading-relaxed">
-            On your first order. <br />
-            <Link href="/shop" className="underline text-blue-700 hover:text-blue-900 mt-1 inline-block">Shop now</Link>
-          </p>
+        {/* Decoration */}
+        <div className="absolute bottom-10 right-6 md:right-16 z-20 hidden md:block">
+          <div className="text-white/40 text-sm font-light tracking-widest vertical-text transform rotate-180" style={{ writingMode: 'vertical-rl' }}>
+            EST. 2026 — COLLECTION
+          </div>
         </div>
 
       </section>
@@ -261,7 +282,7 @@ export default function Home() {
                   />
                   {/* Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
-                  
+
                   {/* Content */}
                   <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end h-full">
                     <h3 className="font-serif font-bold text-white text-xl md:text-2xl mb-1 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">{category.name}</h3>

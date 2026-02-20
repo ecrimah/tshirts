@@ -41,6 +41,7 @@ export default function FlashSaleBanner() {
     }, 1000);
 
     return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run countdown once on mount
   }, []);
 
   if (!isVisible) return null;

@@ -3,15 +3,15 @@ import { supabase } from '@/lib/supabase';
 import { escapeHtml } from '@/lib/sanitize';
 
 const resend = new Resend(process.env.RESEND_API_KEY || 'missing_api_key');
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@standardecom.com';
-const EMAIL_FROM = process.env.EMAIL_FROM || 'MultiMey Supplies <noreply@multimeysupplies.com>';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'tiwaperfumestyle@gmail.com';
+const EMAIL_FROM = process.env.EMAIL_FROM || 'TIWAA PERFUME STYLE HOUSE <tiwaperfumestyle@gmail.com>';
 const BRAND = {
-    name: 'MultiMey Supplies',
+    name: 'TIWAA PERFUME STYLE HOUSE',
     color: '#2563eb',
     colorLight: '#eff6ff',
     colorDark: '#064e3b',
     url: (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/+$/, ''),
-    phone: '+233209597443',
+    phone: '+233545010949',
 };
 
 // Reusable branded email layout
@@ -30,7 +30,7 @@ ${preheader ? `<span style="display:none;max-height:0;overflow:hidden;">${prehea
 <!-- Header -->
 <tr><td style="background:linear-gradient(135deg,${BRAND.color},${BRAND.colorDark});padding:32px 40px;text-align:center;">
 <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;letter-spacing:0.5px;">${BRAND.name}</h1>
-<p style="margin:6px 0 0;color:rgba(255,255,255,0.8);font-size:12px;letter-spacing:1.5px;text-transform:uppercase;">Premium Quality Products</p>
+<p style="margin:6px 0 0;color:rgba(255,255,255,0.8);font-size:12px;letter-spacing:1.5px;text-transform:uppercase;">Perfumes · Wholesale & Retail</p>
 </td></tr>
 
 <!-- Body -->
@@ -154,7 +154,7 @@ export async function sendSMS({ to, message }: { to: string; message: string }) 
             },
             body: JSON.stringify({
                 type: 1,
-                senderid: 'MultiMey',
+                senderid: 'TIWAA',
                 messages: [
                     {
                         recipient: recipient,
@@ -296,7 +296,7 @@ ${emailButton('View Order in Admin', `${baseUrl}/admin/orders/${id}`)}
     if (phone) {
         const smsMessage = trackingNumber
             ? `Hi ${name}, your order #${order_number || id} is confirmed! Tracking: ${trackingNumber}. Track here: ${trackingUrl}${shippingNotesSms}`
-            : `Hi ${name}, your order #${order_number || id} at MultiMey Supplies is confirmed! Track here: ${trackingUrl}${shippingNotesSms}`;
+            : `Hi ${name}, your order #${order_number || id} at TIWAA PERFUME STYLE HOUSE is confirmed! Track here: ${trackingUrl}${shippingNotesSms}`;
 
         await sendSMS({
             to: phone,
@@ -438,7 +438,7 @@ ${emailButton('Start Shopping', `${BRAND.url}/shop`)}
     if (phone) {
         await sendSMS({
             to: phone,
-            message: `Welcome ${firstName}! Thanks for joining MultiMey Supplies.`
+            message: `Welcome ${firstName}! Thanks for joining TIWAA PERFUME STYLE HOUSE.`
         });
     }
 }

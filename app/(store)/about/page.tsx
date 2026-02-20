@@ -11,7 +11,7 @@ export default function AboutPage() {
   const { getSetting } = useCMS();
   const [activeTab, setActiveTab] = useState('story');
 
-  const siteName = getSetting('site_name') || 'MultiMey Supplies';
+  const siteName = getSetting('site_name') || 'TIWAA PERFUME STYLE HOUSE';
 
   const values = [
     {
@@ -40,7 +40,8 @@ export default function AboutPage() {
     <div className="min-h-screen bg-white">
       <PageHero
         title="More Than Just A Brand"
-        subtitle="From Accra to your doorstep — quality dresses, electronics, bags, shoes and more at prices that make sense."
+        subtitle="From Satellite, Accra — perfumes wholesale and retail."
+        backgroundImage="/Whisk_743db4f33bd7ec08b0f46aec28e929cfdr.jpeg"
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -71,26 +72,26 @@ export default function AboutPage() {
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-6">How It All Started</h2>
               <div className="space-y-6 text-lg text-gray-600 leading-relaxed">
                 <p>
-                  <strong>MultiMey Supplies</strong> started with a simple idea: bring quality products to Ghanaians at fair prices. We saw how people were paying too much for items that could be sourced smarter — so we built a bridge between trusted Chinese manufacturers, local suppliers, and everyday shoppers.
+                  <strong>TIWAA PERFUME STYLE HOUSE</strong> sells perfumes — wholesale and retail. Based in Satellite, Accra, we offer a curated range of fragrances at competitive prices for both resellers and individual customers.
                 </p>
                 <p>
-                  What began as a small operation in Accra has grown into a full online store offering everything from trendy dresses and stylish bags to the latest electronics and durable shoes. We handpick every product, test it for quality, and price it fairly.
+                  We focus on quality and value. Whether you're stocking up for your business or shopping for yourself, we handpick our perfumes to deliver genuine products and great prices.
                 </p>
                 <p>
-                  Whether you are shopping for yourself, stocking your boutique, or looking for the perfect gift, <strong>MultiMey Supplies</strong> has you covered. We combine local sourcing with direct imports to give you the widest selection at the best value.
+                  Call us on <strong>054 501 0949</strong> or WhatsApp <strong>055 416 9992</strong>. We're here to help with orders and enquiries.
                 </p>
               </div>
             </div>
             <div className="relative">
               <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl bg-gray-100 relative flex items-center justify-center">
                 <img
-                  src="/logo.png"
-                  alt="MultiMey Supplies"
+                  src="/tiwa logo.png"
+                  alt="TIWAA PERFUME STYLE HOUSE"
                   className="w-2/3 h-auto object-contain opacity-80"
                 />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-8">
-                  <p className="text-white font-bold text-xl">MultiMey Supplies</p>
-                  <p className="text-blue-200">Founder & CEO</p>
+                  <p className="text-white font-bold text-xl">TIWAA PERFUME STYLE HOUSE</p>
+                  <p className="text-blue-200">Perfumes · Wholesale & Retail · Satellite, Accra</p>
                 </div>
               </div>
               {/* Decorative Element */}
@@ -107,7 +108,7 @@ export default function AboutPage() {
               </div>
               <h3 className="text-3xl font-bold text-gray-900 mb-4">Everything in One Place</h3>
               <p className="text-gray-600 text-lg leading-relaxed">
-                From fashion to electronics, bags to shoes — we aim to be the only store you need. Our catalogue is constantly expanding with new arrivals sourced from trusted local and international suppliers.
+                We stock a wide range of perfumes and fragrances. Our catalogue is constantly updated with new arrivals for both wholesale and retail customers.
               </p>
             </div>
             <div className="bg-amber-50 p-10 rounded-3xl border border-amber-100">
@@ -149,7 +150,7 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
           <h2 className="text-4xl md:text-5xl font-bold mb-8">Ready to shop smarter?</h2>
           <p className="text-xl text-blue-100 mb-10 leading-relaxed max-w-2xl mx-auto">
-            Browse our collection of dresses, electronics, bags, shoes and more. New stock arrives weekly.
+            Browse our perfumes — wholesale and retail. Call 054 501 0949 or WhatsApp 055 416 9992.
           </p>
           <Link
             href="/shop"

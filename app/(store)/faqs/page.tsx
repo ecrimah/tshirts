@@ -25,7 +25,7 @@ export default function FAQsPage() {
     {
       category: 'orders',
       question: 'Can I modify or cancel my order?',
-      answer: 'You can modify or cancel your order within 1 hour of placing it. Contact our customer service immediately via WhatsApp at +233 20 959 7443 or email support@multimeysupplies.com. Once an order is processed, modifications may not be possible.'
+      answer: 'You can modify or cancel your order within 1 hour of placing it. Contact our customer service immediately via WhatsApp 055 416 9992 or Call 054 501 0949 or email tiwaperfumestyle@gmail.com. Once an order is processed, modifications may not be possible.'
     },
     {
       category: 'orders',
@@ -80,7 +80,7 @@ export default function FAQsPage() {
     {
       category: 'payment',
       question: 'What payment methods do you accept?',
-      answer: 'We accept MTN Mobile Money, Vodafone Cash, AirtelTigo Money, and Visa/Mastercard credit and debit cards via our secure Moolre payment gateway. All transactions are encrypted and processed securely.'
+      answer: 'We accept MOMO (Mobile Money), Instant Bank Transfer, Cash (in store only), and Visa Card payment. Please note we do not accept payment on delivery.'
     },
     {
       category: 'payment',
@@ -95,7 +95,7 @@ export default function FAQsPage() {
     {
       category: 'payment',
       question: 'When will my payment be charged?',
-      answer: 'For card and mobile money payments, you\'re charged immediately. For Cash on Delivery, you pay when you receive your order. If an item is out of stock, we\'ll refund you within 24 hours.'
+      answer: 'For card and mobile money payments, you\'re charged immediately. We do not accept payment on delivery — payment must be completed before dispatch. If an item is out of stock, we\'ll refund you within 24 hours.'
     },
     {
       category: 'payment',
@@ -229,7 +229,7 @@ export default function FAQsPage() {
               Contact Support
             </Link>
             <a
-              href="https://wa.me/233209597443"
+              href="https://wa.me/233554169992"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-full font-medium hover:bg-blue-500 transition-colors whitespace-nowrap"

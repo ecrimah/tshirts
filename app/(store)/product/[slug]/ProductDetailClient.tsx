@@ -264,10 +264,10 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   });
 
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: 'Home', url: 'https://standardecom.com' },
-    { name: 'Shop', url: 'https://standardecom.com/shop' },
-    { name: product.category, url: `https://standardecom.com/shop?category=${product.category.toLowerCase().replace(/\s+/g, '-')}` },
-    { name: product.name, url: `https://standardecom.com/product/${slug}` }
+    { name: 'Home', url: 'https://tiwaperfumestyle.com' },
+    { name: 'Shop', url: 'https://tiwaperfumestyle.com/shop' },
+    { name: product.category, url: `https://tiwaperfumestyle.com/shop?category=${product.category.toLowerCase().replace(/\s+/g, '-')}` },
+    { name: product.name, url: `https://tiwaperfumestyle.com/product/${slug}` }
   ]);
 
   return (

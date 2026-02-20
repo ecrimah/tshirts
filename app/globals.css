@@ -13,6 +13,7 @@
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -21,8 +22,13 @@
 
 /* Fade In Animation */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 /* Fade In Left */
@@ -31,6 +37,7 @@
     opacity: 0;
     transform: translateX(-30px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -43,6 +50,7 @@
     opacity: 0;
     transform: translateX(30px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -55,6 +63,7 @@
     opacity: 0;
     transform: scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -66,6 +75,7 @@
   from {
     transform: translateY(100%);
   }
+
   to {
     transform: translateY(0);
   }
@@ -73,20 +83,39 @@
 
 /* Float animation for decorative elements */
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 /* Pulse glow */
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4); }
-  50% { box-shadow: 0 0 20px 10px rgba(56, 189, 248, 0); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 20px 10px rgba(56, 189, 248, 0);
+  }
 }
 
 /* Shimmer effect for loading */
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 /* ========================================
@@ -122,14 +151,37 @@
 }
 
 /* Staggered delays for lists */
-.animate-delay-100 { animation-delay: 100ms; }
-.animate-delay-200 { animation-delay: 200ms; }
-.animate-delay-300 { animation-delay: 300ms; }
-.animate-delay-400 { animation-delay: 400ms; }
-.animate-delay-500 { animation-delay: 500ms; }
-.animate-delay-600 { animation-delay: 600ms; }
-.animate-delay-700 { animation-delay: 700ms; }
-.animate-delay-800 { animation-delay: 800ms; }
+.animate-delay-100 {
+  animation-delay: 100ms;
+}
+
+.animate-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animate-delay-300 {
+  animation-delay: 300ms;
+}
+
+.animate-delay-400 {
+  animation-delay: 400ms;
+}
+
+.animate-delay-500 {
+  animation-delay: 500ms;
+}
+
+.animate-delay-600 {
+  animation-delay: 600ms;
+}
+
+.animate-delay-700 {
+  animation-delay: 700ms;
+}
+
+.animate-delay-800 {
+  animation-delay: 800ms;
+}
 
 /* Initial hidden state for scroll animations */
 .scroll-animate {
@@ -225,12 +277,10 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.3),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent);
   transition: left 0.5s ease;
   z-index: 1;
 }
@@ -305,7 +355,8 @@
 }
 
 /* Smooth color transitions for interactive elements */
-a, button {
+a,
+button {
   transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
@@ -362,19 +413,35 @@ img {
 
 /* Standalone mode - full app feel */
 @media (display-mode: standalone) {
+
   /* Remove browser-like elements, tighten the experience */
   html {
     overscroll-behavior: none;
   }
-  
+
   body {
     overscroll-behavior-y: none;
     -webkit-user-select: none;
     user-select: none;
   }
-  
+
   /* Allow text selection in inputs and text content */
-  input, textarea, [contenteditable], p, span, h1, h2, h3, h4, h5, h6, li, td, th, label, a {
+  input,
+  textarea,
+  [contenteditable],
+  p,
+  span,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  li,
+  td,
+  th,
+  label,
+  a {
     -webkit-user-select: text;
     user-select: text;
   }
@@ -397,6 +464,7 @@ img {
 
 /* Ensure bottom padding for mobile nav even in browser mode */
 @media (max-width: 1023px) {
+
   main,
   footer {
     padding-bottom: 80px;
@@ -413,6 +481,7 @@ img {
     transform: translateY(100%);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -420,8 +489,13 @@ img {
 }
 
 @keyframes backdropFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .pwa-prompt-sheet {
@@ -438,6 +512,7 @@ img {
     transform: translateY(20px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -454,6 +529,7 @@ img {
 
 /* Haptic-like active state for all tappable elements */
 @media (hover: none) and (pointer: coarse) {
+
   button:active,
   a:active,
   [role="button"]:active {
@@ -483,8 +559,13 @@ img {
    ======================================== */
 
 @keyframes pullRefreshSpin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .pull-refresh-spinner {
@@ -500,6 +581,7 @@ img {
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -515,8 +597,14 @@ img {
    ======================================== */
 
 @keyframes splashFadeOut {
-  from { opacity: 1; }
-  to { opacity: 0; visibility: hidden; }
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
 }
 
 .pwa-splash {
@@ -536,13 +624,62 @@ img {
 }
 
 @keyframes splashPulse {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
+
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 .pwa-splash-dots span {
   animation: splashPulse 1.4s ease-in-out infinite;
 }
 
-.pwa-splash-dots span:nth-child(2) { animation-delay: 0.2s; }
-.pwa-splash-dots span:nth-child(3) { animation-delay: 0.4s; }
+.pwa-splash-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.pwa-splash-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* ========================================
+   HERO SLIDER ANIMATIONS
+   ======================================== */
+
+@keyframes kenBurns {
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1.15);
+  }
+}
+
+.animate-ken-burns {
+  animation: kenBurns 8s ease-out forwards;
+}
+
+@keyframes progress {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.animate-progress {
+  animation: progress linear;
+}
+
+.vertical-text {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}

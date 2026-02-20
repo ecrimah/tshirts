@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
@@ -18,15 +18,8 @@ function OrderTrackingContent() {
 
   // Auto-track if order number AND email are in the URL
   const urlEmail = searchParams.get('email') || '';
-  
-  useEffect(() => {
-    if (urlOrderNumber && urlEmail) {
-      setEmail(urlEmail);
-      fetchOrder(urlOrderNumber, urlEmail);
-    }
-  }, [urlOrderNumber, urlEmail]);
 
-  const fetchOrder = async (orderNum: string, verifyEmail?: string) => {
+  const fetchOrder = useCallback(async (orderNum: string, verifyEmail?: string) => {
     const emailToVerify = verifyEmail || email;
     
     // SECURITY: Email is required for order tracking to prevent unauthorized access
@@ -88,7 +81,14 @@ function OrderTrackingContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [email]);
+
+  useEffect(() => {
+    if (urlOrderNumber && urlEmail) {
+      setEmail(urlEmail);
+      fetchOrder(urlOrderNumber, urlEmail);
+    }
+  }, [urlOrderNumber, urlEmail, fetchOrder]);
 
   const handleTrack = (e: React.FormEvent) => {
     e.preventDefault();

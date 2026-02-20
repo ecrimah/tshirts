@@ -12,6 +12,7 @@ export default function AdminCouponsPage() {
 
   useEffect(() => {
     fetchCoupons();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount
   }, []);
 
   const fetchCoupons = async () => {

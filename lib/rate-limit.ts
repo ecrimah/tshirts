@@ -136,6 +136,12 @@ export const RATE_LIMITS = {
     windowSeconds: 60 // 50 requests per minute
   },
   
+  // Product import - strict per user (5 per hour)
+  productImport: {
+    maxRequests: 5,
+    windowSeconds: 3600 // 5 imports per hour
+  },
+
   // General API - default limits
   default: {
     maxRequests: 100,

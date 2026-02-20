@@ -93,6 +93,7 @@ export default function AdvancedSearch() {
     } else {
       setSuggestions([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- filter by query only; allProducts is large and would trigger too often
   }, [query]);
 
   const handleSearch = (searchQuery: string) => {

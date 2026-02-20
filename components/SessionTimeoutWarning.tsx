@@ -41,7 +41,7 @@ export default function SessionTimeoutWarning() {
       });
       clearInterval(checkInterval);
     };
-  }, [lastActivity]);
+  }, [lastActivity, IDLE_TIMEOUT, WARNING_TIME]);
 
   const handleLogout = () => {
     localStorage.setItem('session_expired', 'true');
