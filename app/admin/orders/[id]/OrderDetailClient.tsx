@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 import FraudDetectionAlert from '@/components/FraudDetectionAlert';
 
 interface OrderDetailClientProps {
@@ -29,6 +29,13 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
     window.print();
   };
 
+  const getCustomerName = (o: any) => {
+    const shippingAddress = o.shipping_address || {};
+    return shippingAddress.firstName && shippingAddress.lastName
+      ? `${shippingAddress.firstName.trim()} ${shippingAddress.lastName.trim()}`
+      : shippingAddress.full_name || shippingAddress.firstName || o.email?.split('@')[0] || 'Customer';
+  };
+
   // Inject print styles
   useEffect(() => {
     const styleId = 'order-print-styles';
@@ -47,63 +54,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
   const fetchOrderDetails = useCallback(async () => {
     try {
       setLoading(true);
-      // Try to fetch by ID or order_number
-      let query = supabase
-        .from('orders')
-        .select(`
-          *,
-          order_items (
-            id,
-            product_id,
-            product_name,
-            variant_name,
-            sku,
-            quantity,
-            unit_price,
-            total_price,
-            metadata,
-            products (
-              product_images (url)
-            )
-          )
-        `)
-        .eq('id', orderId);
-
-      let { data, error } = await query.single();
-
-      if (error && error.code === 'PGRST116') {
-        // Not found by ID, try order_number
-        const { data: dataByNum, error: errorByNum } = await supabase
-          .from('orders')
-          .select(`
-            *,
-            order_items (
-              id,
-              product_id,
-              product_name,
-              variant_name,
-              sku,
-              quantity,
-              unit_price,
-              total_price,
-              metadata,
-              products (
-                product_images (url)
-              )
-            )
-          `)
-          .eq('order_number', orderId)
-          .single();
-
-        if (dataByNum) {
-          data = dataByNum;
-          error = null;
-        } else {
-          error = errorByNum;
-        }
-      }
-
-      if (error) throw error;
+      const data = await api<any>(`/api/orders/${encodeURIComponent(orderId)}`);
       setOrder(data);
       setTrackingNumber(data.metadata?.tracking_number || '');
       setAdminNotes(data.notes || '');
@@ -125,19 +76,17 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
       setStatusUpdating(true);
       const statusToUpdate = newStatus || order.status;
 
-      const { error } = await supabase
-        .from('orders')
-        .update({
+      await api(`/api/orders/${order.id}`, {
+        method: 'PATCH',
+        json: {
           status: statusToUpdate,
           notes: adminNotes,
           metadata: {
             ...order.metadata,
-            tracking_number: trackingNumber
-          }
-        })
-        .eq('id', order.id);
-
-      if (error) throw error;
+            tracking_number: trackingNumber,
+          },
+        },
+      });
 
       // Update local state
       setOrder({
@@ -153,26 +102,22 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
       const trackingChanged = trackingNumber !== order.metadata?.tracking_number;
 
       if (statusChanged || (trackingChanged && trackingNumber)) {
-        // Get auth token for notification API
-        const { data: { session } } = await supabase.auth.getSession();
-        const authToken = session?.access_token;
-
         fetch('/api/notifications', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(authToken && { 'Authorization': `Bearer ${authToken}` })
           },
+          credentials: 'include',
           body: JSON.stringify({
             type: 'order_status',
             payload: {
               email: order.email,
-              name: customerName,
+              name: getCustomerName(order),
               orderId: orderId,
               orderNumber: order.order_number || orderId,
               status: statusToUpdate,
               trackingNumber: trackingNumber,
-              phone: shippingAddress.phone || order.phone // Ensure phone is passed for SMS
+              phone: (order.shipping_address || {}).phone || order.phone
             }
           })
         }).catch(err => console.error('Notification error:', err));
@@ -196,26 +141,18 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
     try {
       setResendingNotification(true);
 
-      // Get auth token
-      const { data: { session } } = await supabase.auth.getSession();
-      const authToken = session?.access_token;
-
       const shippingAddress = order.shipping_address || {};
-      const customerName = (shippingAddress.firstName && shippingAddress.lastName)
-        ? `${shippingAddress.firstName.trim()} ${shippingAddress.lastName.trim()}`
-        : shippingAddress.full_name || shippingAddress.firstName || order.email?.split('@')[0] || 'Customer';
-
       const response = await fetch('/api/notifications', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(authToken && { 'Authorization': `Bearer ${authToken}` })
         },
+        credentials: 'include',
         body: JSON.stringify({
           type: 'order_status',
           payload: {
             email: order.email,
-            name: customerName,
+            name: getCustomerName(order),
             orderNumber: order.order_number || order.id,
             status: order.status,
             trackingNumber: order.metadata?.tracking_number || '',

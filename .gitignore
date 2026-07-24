@@ -28,5 +28,9 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# Local uploads + one-time migration artifacts
+uploads/
+migration-data/
+
 # Vercel
 .vercel

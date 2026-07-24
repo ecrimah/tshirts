@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 
 function OrderSuccessContent() {
   const searchParams = useSearchParams();
@@ -22,16 +22,7 @@ function OrderSuccessContent() {
       }
 
       try {
-        const { data: orderData, error } = await supabase
-          .from('orders')
-          .select(`
-                    *,
-                    order_items (*)
-                `)
-          .eq('order_number', orderNumber)
-          .single();
-
-        if (error) throw error;
+        const orderData = await api<any>(`/api/orders/summary?order_number=${encodeURIComponent(orderNumber)}`);
         setOrder(orderData);
 
         // If redirected from payment and order is still pending, try to verify
@@ -55,11 +46,9 @@ function OrderSuccessContent() {
     await new Promise(resolve => setTimeout(resolve, 3000));
     
     // Re-fetch order to check if callback already updated it
-    const { data: refreshed } = await supabase
-      .from('orders')
-      .select('*, order_items (*)')
-      .eq('order_number', orderNum)
-      .single();
+    const refreshed = await api<any>(
+      `/api/orders/summary?order_number=${encodeURIComponent(orderNum)}`
+    ).catch(() => null);
     
     if (refreshed?.payment_status === 'paid') {
       setOrder(refreshed);
@@ -81,11 +70,9 @@ function OrderSuccessContent() {
       
       if (result.success && result.payment_status === 'paid') {
         // Re-fetch full order data
-        const { data: updated } = await supabase
-          .from('orders')
-          .select('*, order_items (*)')
-          .eq('order_number', orderNum)
-          .single();
+        const updated = await api<any>(
+          `/api/orders/summary?order_number=${encodeURIComponent(orderNum)}`
+        ).catch(() => null);
         if (updated) setOrder(updated);
       }
     } catch (err) {

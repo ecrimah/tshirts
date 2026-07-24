@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { supabase } from '@/lib/supabase';
 import ProductCard, { type ColorVariant, getColorHex } from '@/components/ProductCard';
 import ProductCardSkeleton from '@/components/skeletons/ProductCardSkeleton';
 import AnimatedSection, { AnimatedGrid } from '@/components/AnimatedSection';
@@ -60,32 +59,19 @@ export default function Home() {
   useEffect(() => {
     async function fetchData() {
       try {
-        // Fetch featured products directly from Supabase
-        const { data: productsData, error: productsError } = await supabase
-          .from('products')
-          .select('*, product_variants(*), product_images(*)')
-          .eq('status', 'active')
-          .eq('featured', true)
-          .order('created_at', { ascending: false })
-          .limit(8);
+        const productsRes = await fetch('/api/storefront/products?featured=true&limit=8');
+        if (productsRes.ok) {
+          setFeaturedProducts(await productsRes.json());
+        }
 
-        if (productsError) throw productsError;
-        setFeaturedProducts(productsData || []);
-
-        // Fetch featured categories (featured is stored in metadata JSONB)
-        const { data: categoriesData, error: categoriesError } = await supabase
-          .from('categories')
-          .select('id, name, slug, image_url, metadata')
-          .eq('status', 'active')
-          .order('name');
-
-        if (categoriesError) throw categoriesError;
-
-        // Filter by metadata.featured = true on client side
-        const featuredCategories = (categoriesData || []).filter(
-          (cat: any) => cat.metadata?.featured === true
-        );
-        setCategories(featuredCategories);
+        const categoriesRes = await fetch('/api/storefront/categories');
+        if (categoriesRes.ok) {
+          const categoriesData = await categoriesRes.json();
+          const featuredCategories = (categoriesData || []).filter(
+            (cat: { metadata?: { featured?: boolean } }) => cat.metadata?.featured === true
+          );
+          setCategories(featuredCategories);
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {

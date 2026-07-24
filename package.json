@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "@react-google-maps/api": "^2.19.3",
-    "@supabase/supabase-js": "^2.91.1",
+    "bcryptjs": "^3.0.3",
+    "jose": "^6.2.4",
     "next": "15.5.14",
     "pg": "^8.18.0",
     "react": "^19.0.0",
@@ -12,7 +13,9 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
+    "@types/pg": "^8.20.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.21",
@@ -21,12 +24,11 @@
     "eslint-config-next": "15.5.14",
     "patch-package": "^8.0.1",
     "postcss": "^8.5.5",
-    "supabase": "^2.76.0",
     "tailwindcss": "^3.4.17",
     "typescript": "^5",
     "vercel": "^50.38.1"
   },
-  "name": "maries-hairs",
+  "name": "mamator",
   "private": true,
   "engines": {
     "node": "20.x"
@@ -34,15 +36,16 @@
   "scripts": {
     "postinstall": "patch-package",
     "build": "next build",
+    "start": "cross-env NODE_ENV=production next start -H 0.0.0.0 -p 3005",
     "clean": "node -e \"const fs=require('fs');const path=require('path');const d=path.join(process.cwd(),'.next');if(fs.existsSync(d)){fs.rmSync(d,{recursive:true});console.log('Removed .next');}const c=path.join(process.cwd(),'node_modules','.cache');if(fs.existsSync(c)){fs.rmSync(c,{recursive:true});console.log('Removed node_modules/.cache');}\"",
     "compress-images": "node scripts/compress-images.mjs",
     "dev": "cross-env NODE_ENV=development next dev -H 0.0.0.0 -p 3005",
     "lint": "next lint",
-    "supabase:link": "supabase link",
-    "supabase:push": "supabase db push",
-    "supabase:migrate": "supabase link && supabase db push",
-    "db:migrate": "node scripts/run-migration.mjs",
-    "create-admin": "node scripts/create-admin-user.mjs"
+    "db:migrate": "node scripts/migrate-db.mjs",
+    "create-admin": "node scripts/create-admin-user.mjs",
+    "db:dump-supabase": "node scripts/dump-from-supabase.mjs",
+    "db:migrate-storage-urls": "node scripts/migrate-storage-urls.mjs",
+    "db:download-storage": "node scripts/download-supabase-storage.mjs"
   },
   "version": "0.1.0"
 }

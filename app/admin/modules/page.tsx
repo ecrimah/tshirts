@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 
 interface Module {
   id: string;
@@ -113,14 +113,16 @@ export default function ModulesPage() {
 
   const fetchModuleStates = async () => {
     try {
-      const { data, error } = await supabase.from('store_modules').select('*');
-      if (error) throw error;
-
-      if (data) {
-        setModules(prev => prev.map(m => {
-          const dbState = data.find((d: any) => d.id === m.id);
-          return dbState ? { ...m, enabled: dbState.enabled } : m;
-        }));
+      const data = await api<{ modules?: { id: string; enabled: boolean }[] }>(
+        '/api/settings?include=modules'
+      );
+      if (data.modules) {
+        setModules((prev) =>
+          prev.map((m) => {
+            const dbState = data.modules!.find((d) => d.id === m.id);
+            return dbState ? { ...m, enabled: dbState.enabled } : m;
+          })
+        );
       }
     } catch (err) {
       console.error('Error fetching modules:', err);
@@ -132,22 +134,14 @@ export default function ModulesPage() {
   const toggleModule = async (id: string, currentState: boolean) => {
     const newState = !currentState;
 
-    // Optimistic Update
-    setModules(modules.map(m =>
-      m.id === id ? { ...m, enabled: newState } : m
-    ));
+    setModules(modules.map((m) => (m.id === id ? { ...m, enabled: newState } : m)));
 
     try {
-      const { error } = await supabase
-        .from('store_modules')
-        .upsert({ id, enabled: newState, updated_at: new Date().toISOString() });
-
-      if (error) {
-        throw error;
-      }
-
+      await api('/api/settings', {
+        method: 'PUT',
+        json: { modules: [{ id, enabled: newState }] },
+      });
       window.location.reload();
-
     } catch (err) {
       console.error('Error updating module:', err);
       alert('Failed to update settings');

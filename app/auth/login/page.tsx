@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 
 export default function LoginPage() {
@@ -51,22 +51,15 @@ export default function LoginPage() {
     }
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password,
+      await api('/api/auth/login', {
+        method: 'POST',
+        json: { email: formData.email, password: formData.password },
       });
-
-      if (error) {
-        throw error;
-      }
-
-      if (data.session) {
-        router.push('/account');
-        router.refresh(); // Refresh to update auth state in other components
-      }
-    } catch (error: any) {
+      router.push('/account');
+      router.refresh();
+    } catch (error: unknown) {
       console.error('Login error:', error);
-      setAuthError(error.message || 'Failed to sign in. Please check your credentials.');
+      setAuthError(error instanceof Error ? error.message : 'Failed to sign in. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }

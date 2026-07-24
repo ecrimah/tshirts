@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 import { cachedQuery } from '@/lib/query-cache';
 import ProductCard from '@/components/ProductCard';
 import ProductReviews from '@/components/ProductReviews';
@@ -50,26 +49,14 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
         const { data: productData, error } = await cachedQuery<{ data: any; error: any }>(
           `product:${slug}`,
           async () => {
-            let query = supabase
-              .from('products')
-              .select(`
-                *,
-                categories(name),
-                product_variants(*),
-                product_images(url, position, alt_text)
-              `);
-
-            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
-
-            if (isUUID) {
-              query = query.or(`id.eq.${slug},slug.eq.${slug}`);
-            } else {
-              query = query.eq('slug', slug);
+            const res = await fetch(`/api/storefront/products/${encodeURIComponent(slug)}`);
+            if (!res.ok) {
+              return { data: null, error: new Error('Not found') };
             }
-
-            return query.single() as any;
+            const data = await res.json();
+            return { data, error: null };
           },
-          2 * 60 * 1000 // 2 minutes
+          2 * 60 * 1000
         );
 
         if (error || !productData) {
@@ -134,19 +121,24 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
 
         // Fetch related products (cached for 5 minutes)
         if (productData.category_id) {
-          const { data: related } = await cachedQuery<{ data: any; error: any }>(
+          const relatedList = await cachedQuery<any[]>(
             `related:${productData.category_id}:${productData.id}`,
-            (() => supabase
-              .from('products')
-              .select('*, product_images(url, position), product_variants(id, name, price, quantity)')
-              .eq('category_id', productData.category_id)
-              .neq('id', productData.id)
-              .limit(4)) as any,
+            async () => {
+              const res = await fetch(
+                `/api/storefront/products?limit=20&category=${encodeURIComponent(productData.categories?.slug || '')}`
+              );
+              if (!res.ok) return [];
+              const all = await res.json();
+              return (all as any[])
+                .filter((p) => p.id !== productData.id)
+                .slice(0, 4);
+            },
             5 * 60 * 1000
           );
 
-          if (related) {
-            setRelatedProducts(related.map((p: any) => {
+          if (relatedList) {
+            setRelatedProducts(
+              relatedList.map((p: any) => {
               const variants = p.product_variants || [];
               const hasVariants = variants.length > 0;
               const minVariantPrice = hasVariants ? Math.min(...variants.map((v: any) => v.price || p.price)) : undefined;

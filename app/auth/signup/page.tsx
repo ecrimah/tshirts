@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import PasswordStrengthMeter from '@/components/PasswordStrengthMeter';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 
 function getFriendlyError(message: string): string {
@@ -99,46 +99,34 @@ export default function SignupPage() {
     }
 
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            phone: formData.phone,
-            newsletter: formData.newsletter
-          }
-        }
+      await api('/api/auth/signup', {
+        method: 'POST',
+        json: {
+          email: formData.email,
+          password: formData.password,
+          full_name: `${formData.firstName} ${formData.lastName}`.trim(),
+          phone: formData.phone,
+          metadata: { newsletter: formData.newsletter },
+        },
       });
 
-      if (error) throw error;
+      fetch('/api/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'welcome',
+          payload: {
+            email: formData.email,
+            firstName: formData.firstName,
+          },
+        }),
+      }).catch((err) => console.error('Welcome notification error:', err));
 
-      if (data.user) {
-        // Send Welcome Notification
-        fetch('/api/notifications', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            type: 'welcome',
-            payload: {
-              email: formData.email,
-              firstName: formData.firstName
-            }
-          })
-        }).catch(err => console.error('Welcome notification error:', err));
-        // If Supabase confirms via email, data.session might be null initially
-        if (!data.session) {
-          setSuccess(true);
-        } else {
-          // Auto-login success (if email confirming is off)
-          router.push('/account');
-          router.refresh();
-        }
-      }
-    } catch (err: any) {
+      router.push('/account');
+      router.refresh();
+    } catch (err: unknown) {
       console.error('Signup error:', err);
-      setAuthError(getFriendlyError(err.message || 'Failed to sign up. Please try again.'));
+      setAuthError(getFriendlyError(err instanceof Error ? err.message : 'Failed to sign up. Please try again.'));
     } finally {
       setIsLoading(false);
     }

@@ -6,13 +6,9 @@ import { useRouter } from 'next/navigation';
 import CheckoutSteps from '@/components/CheckoutSteps';
 import OrderSummary from '@/components/OrderSummary';
 import { useCart } from '@/context/CartContext';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
-import {
-  parseStorePricingValue,
-  resolveCartLineUnitPrice,
-} from '@/lib/pricing';
 
 export default function CheckoutPage() {
   usePageTitle('Checkout');
@@ -67,12 +63,15 @@ export default function CheckoutPage() {
   // Check auth and cart
   useEffect(() => {
     async function checkUser() {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        setUser(session.user);
-        setCheckoutType('account'); // Auto-select account checkout if logged in
-        // Pre-fill email if available
-        setShippingData(prev => ({ ...prev, email: session.user.email || '' }));
+      try {
+        const me = await api<{ user: { id: string; email: string } | null }>('/api/auth/me');
+        if (me.user) {
+          setUser(me.user);
+          setCheckoutType('account');
+          setShippingData((prev) => ({ ...prev, email: me.user!.email || '' }));
+        }
+      } catch {
+        /* guest checkout */
       }
     }
     checkUser();
@@ -147,142 +146,29 @@ export default function CheckoutPage() {
       const trackingId = Array.from({ length: 6 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 32)]).join('');
       const trackingNumber = `SLI-${trackingId}`;
 
-      const isValidUUID = (str: string) =>
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
-
-      const resolvedLines: { item: (typeof cart)[0]; productId: string }[] = [];
-      for (const item of cart) {
-        let productId = item.id;
-        if (!isValidUUID(productId)) {
-          const { data: prodRow } = await supabase
-            .from('products')
-            .select('id')
-            .or(`slug.eq.${productId},id.eq.${productId}`)
-            .single();
-          if (!prodRow) {
-            throw new Error(
-              `Product not found: ${item.name}. Please remove it from your cart and try again.`
-            );
-          }
-          productId = prodRow.id;
-        }
-        resolvedLines.push({ item, productId });
-      }
-
-      const uniqueIds = [...new Set(resolvedLines.map((l) => l.productId))];
-
-      const { data: pricingRow } = await supabase
-        .from('site_settings')
-        .select('value')
-        .eq('key', 'store_pricing')
-        .maybeSingle();
-      const salesActive = parseStorePricingValue(pricingRow?.value).sales_active;
-
-      const { data: productsFull, error: productsFullError } =
-        uniqueIds.length > 0
-          ? await supabase
-              .from('products')
-              .select(
-                'id, price, sale_price, compare_at_price, metadata, product_variants(id, name, option1, option2, price, sale_price)'
-              )
-              .in('id', uniqueIds)
-          : { data: [] as any[], error: null };
-
-      if (productsFullError) throw productsFullError;
-
-      const productMap = new Map((productsFull || []).map((p: any) => [p.id, p]));
-
-      let computedSubtotal = 0;
-      const orderItemsPayload: Record<string, unknown>[] = [];
-
-      for (const { item, productId } of resolvedLines) {
-        const p = productMap.get(productId);
-        if (!p) {
-          throw new Error(
-            `Product not found: ${item.name}. Please remove it from your cart and try again.`
-          );
-        }
-        const unit = resolveCartLineUnitPrice(p, item.variant, salesActive);
-        computedSubtotal += unit * item.quantity;
-        const prodMeta = p.metadata;
-        orderItemsPayload.push({
-          product_id: productId,
-          product_name: item.name,
-          variant_name: item.variant,
-          quantity: item.quantity,
-          unit_price: unit,
-          total_price: unit * item.quantity,
-          metadata: {
-            image: item.image,
-            slug: item.slug,
-            preorder_shipping: prodMeta?.preorder_shipping || null,
-          },
-        });
-      }
-
-      const checkoutSubtotal = computedSubtotal;
-      const checkoutTotal = checkoutSubtotal + shippingCost + tax;
-
-      // 1. Create Order (totals from DB-resolved prices)
-      const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .insert([
-          {
-            order_number: orderNumber,
-            user_id: user?.id || null,
-            email: shippingData.email,
-            phone: shippingData.phone,
-            status: 'pending',
-            payment_status: 'pending',
-            currency: 'GHS',
-            subtotal: checkoutSubtotal,
-            tax_total: tax,
-            shipping_total: shippingCost,
-            discount_total: 0,
-            total: checkoutTotal,
-            shipping_method: deliveryMethod,
-            payment_method: paymentMethod,
-            shipping_address: shippingData,
-            billing_address: shippingData,
-            metadata: {
-              guest_checkout: !user,
-              first_name: shippingData.firstName,
-              last_name: shippingData.lastName,
-              tracking_number: trackingNumber,
-            },
-          },
-        ])
-        .select()
-        .single();
-
-      if (orderError) throw orderError;
-
-      const orderItems = orderItemsPayload.map((row) => ({
-        ...row,
-        order_id: order.id,
+      const cartPayload = cart.map((item) => ({
+        id: item.id,
+        name: item.name,
+        slug: item.slug,
+        variant: item.variant,
+        quantity: item.quantity,
+        image: item.image,
       }));
 
-      const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(orderItems);
-
-      if (itemsError) throw itemsError;
-
-      // Note: Stock reduction happens in mark_order_paid when payment is confirmed
-
-      // 3. Upsert Customer Record (for both guest and registered users)
-      const fullName = `${shippingData.firstName} ${shippingData.lastName}`.trim();
-      await supabase.rpc('upsert_customer_from_order', {
-        p_email: shippingData.email,
-        p_phone: shippingData.phone,
-        p_full_name: fullName,
-        p_first_name: shippingData.firstName,
-        p_last_name: shippingData.lastName,
-        p_user_id: user?.id || null,
-        p_address: shippingData
+      const order = await api<Record<string, unknown>>('/api/orders', {
+        method: 'POST',
+        json: {
+          orderNumber,
+          trackingNumber,
+          shippingData,
+          deliveryMethod,
+          paymentMethod,
+          cart: cartPayload,
+          shippingCost,
+          tax,
+        },
       });
 
-      // 4. Handle Payment Redirects or Completion
       if (paymentMethod === 'moolre') {
         try {
           // Payment link reminder will be sent automatically after 15 mins if unpaid (via cron)
@@ -292,7 +178,6 @@ export default function CheckoutPage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               orderId: orderNumber,
-              amount: checkoutTotal,
               customerEmail: shippingData.email
             })
           });

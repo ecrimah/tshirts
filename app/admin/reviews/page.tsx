@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 
 export default function AdminReviewsPage() {
   const [statusFilter, setStatusFilter] = useState('all');
@@ -12,40 +12,26 @@ export default function AdminReviewsPage() {
   const fetchReviews = useCallback(async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('reviews')
-        .select(`
-          *,
-          profiles:user_id (full_name, email),
-          products:product_id (name, product_images (url))
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        // Graceful fallback if table doesn't exist or permissions fail
-        console.warn('Error fetching reviews:', error);
-        // setReviews([]); // Keep empty
-      } else if (data) {
-        const formatted = data.map((r: any) => ({
+      const data = await api<any[]>(`/api/admin/reviews?status=${statusFilter === 'all' ? 'all' : statusFilter}`);
+      const formatted = (data || []).map((r: any) => ({
           id: r.id,
           customer: {
-            name: r.profiles?.full_name || 'Anonymous',
-            email: r.profiles?.email || 'N/A',
-            avatar: getInitials(r.profiles?.full_name || r.profiles?.email)
+            name: r.reviewer_name || 'Anonymous',
+            email: 'N/A',
+            avatar: getInitials(r.reviewer_name || 'A')
           },
           product: {
-            name: r.products?.name || 'Unknown Product',
-            image: r.products?.product_images?.[0]?.url || 'https://via.placeholder.com/150'
+            name: r.product_name || 'Unknown Product',
+            image: 'https://via.placeholder.com/150'
           },
           rating: r.rating,
           title: r.title,
           comment: r.content,
           date: new Date(r.created_at).toLocaleDateString(),
-          status: r.status || 'Pending',
-          helpful: r.helpful || 0
+          status: r.status || 'pending',
+          helpful: r.helpful_votes || 0
         }));
-        setReviews(formatted);
-      }
+      setReviews(formatted);
     } catch (error) {
       console.error('Error fetching reviews:', error);
     } finally {
@@ -109,12 +95,10 @@ export default function AdminReviewsPage() {
       if (action === 'Reject') newStatus = 'Rejected';
 
       if (newStatus) {
-        const { error } = await supabase
-          .from('reviews')
-          .update({ status: newStatus })
-          .in('id', selectedReviews);
-
-        if (error) throw error;
+        const dbStatus = newStatus.toLowerCase();
+        for (const id of selectedReviews) {
+          await api('/api/admin/reviews', { method: 'PATCH', json: { id, status: dbStatus } });
+        }
         fetchReviews();
         setSelectedReviews([]);
       }

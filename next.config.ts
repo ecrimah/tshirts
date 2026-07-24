@@ -1,15 +1,22 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   images: {
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 2592000, // Cache optimized images for 30 days
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256],
-    remotePatterns: [
+      remotePatterns: [
       {
         protocol: 'https',
-        hostname: '*.supabase.co',
+        hostname: 'mamator.com',
+        pathname: '/uploads/**',
+      },
+      {
+        // Temporary: allow existing Supabase public image URLs until VPS /uploads cutover
+        protocol: 'https',
+        hostname: 'ueuggrixyuiviuqpecie.supabase.co',
         pathname: '/storage/v1/object/public/**',
       },
       {
@@ -38,6 +45,16 @@ const nextConfig: NextConfig = {
       ...config.infrastructureLogging,
     };
     return config;
+  },
+  // Serve local uploads through the API when nginx is not in front (dev / Vercel).
+  // On the VPS, nginx can still alias /uploads/ to disk; this rewrite is a safe fallback.
+  async rewrites() {
+    return [
+      {
+        source: '/uploads/:path*',
+        destination: '/api/uploads/:path*',
+      },
+    ];
   },
   // Security + Caching headers
   async headers() {
@@ -82,7 +99,10 @@ const nextConfig: NextConfig = {
           { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }
         ]
       },
-      // Cache optimized images for 30 days
+      {
+        source: '/uploads/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=86400' }],
+      },
       {
         source: '/_next/image',
         headers: [

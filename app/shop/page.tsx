@@ -6,7 +6,6 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import ProductCard, { type ColorVariant } from '@/components/ProductCard';
 import ProductCardSkeleton from '@/components/skeletons/ProductCardSkeleton';
 import { getColorHex } from '@/components/ProductCard';
-import { supabase } from '@/lib/supabase';
 import { cachedQuery } from '@/lib/query-cache';
 import PageHero from '@/components/PageHero';
 import { useStorePricing } from '@/context/StorePricingContext';
@@ -69,79 +68,53 @@ function ShopContent() {
         // Build cache key from all filter params
         const cacheKey = `shop:${selectedCategory}:${search || ''}:${priceRange.join('-')}:${selectedRating}:${sortBy}:${page}:sale:${salesActive}`;
 
-        const { data, count, error } = await cachedQuery<{ data: any[] | null; count: number | null; error: any }>(
+        const { data, count, error } = await cachedQuery<{ data: any[] | null; count: number | null; error: unknown }>(
           cacheKey,
           async () => {
-            let query = supabase
-              .from('products')
-              .select(`
-                *,
-                categories(name, slug),
-                product_images(url, position),
-                product_variants(id, name, price, sale_price, quantity, option1, option2, image_url)
-              `, { count: 'exact' })
-              .order('position', { foreignTable: 'product_images', ascending: true });
+            const categoryParam =
+              selectedCategory !== 'all' ? `&category=${encodeURIComponent(selectedCategory)}` : '';
+            const res = await fetch(`/api/storefront/products?limit=500${categoryParam}`);
+            if (!res.ok) {
+              return { data: null, count: 0, error: new Error('Failed to load products') };
+            }
+            let list: any[] = await res.json();
 
-            // Search
             if (search) {
-              query = query.ilike('name', `%${search}%`);
+              const q = search.toLowerCase();
+              list = list.filter((p) => p.name?.toLowerCase().includes(q) || p.slug?.toLowerCase().includes(q));
             }
 
-            // Category Filter with Subcategories
-            if (selectedCategory !== 'all') {
-              const categoryObj = categories.find((c: any) => c.slug === selectedCategory);
-
-              if (categoryObj) {
-                const targetSlugs = [selectedCategory];
-                const childSlugs = (categories as any[])
-                  .filter((c: any) => c.parent_id === categoryObj.id)
-                  .map((c: any) => c.slug);
-                targetSlugs.push(...childSlugs);
-                query = query.in('categories.slug', targetSlugs);
-              } else {
-                query = query.eq('categories.slug', selectedCategory);
-              }
-            }
-
-            // Price Filter
             if (priceRange[1] < 5000) {
-              query = query.gte('price', priceRange[0]).lte('price', priceRange[1]);
+              list = list.filter((p) => Number(p.price) >= priceRange[0] && Number(p.price) <= priceRange[1]);
             }
 
-            // Rating Filter
             if (selectedRating > 0) {
-              query = query.gte('rating_avg', selectedRating);
+              list = list.filter((p) => Number(p.rating_avg || 0) >= selectedRating);
             }
 
-            // Sorting
             switch (sortBy) {
               case 'price-low':
-                query = query.order('price', { ascending: true });
+                list.sort((a, b) => Number(a.price) - Number(b.price));
                 break;
               case 'price-high':
-                query = query.order('price', { ascending: false });
+                list.sort((a, b) => Number(b.price) - Number(a.price));
                 break;
               case 'rating':
-                query = query.order('rating_avg', { ascending: false });
+                list.sort((a, b) => Number(b.rating_avg || 0) - Number(a.rating_avg || 0));
                 break;
-              case 'new':
-                query = query.order('created_at', { ascending: false });
-                break;
-              case 'popular':
               default:
-                query = query.order('created_at', { ascending: false });
-                break;
+                list.sort(
+                  (a, b) =>
+                    new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+                );
             }
 
-            // Pagination
+            const total = list.length;
             const from = (page - 1) * productsPerPage;
-            const to = from + productsPerPage - 1;
-            query = query.range(from, to);
-
-            const result = await query;
-            return { data: result.data, count: result.count, error: result.error };
+            const pageSlice = list.slice(from, from + productsPerPage);
+            return { data: pageSlice, count: total, error: null };
           },
-          2 * 60 * 1000 // Cache for 2 minutes
+          2 * 60 * 1000
         );
 
         if (error) throw error;

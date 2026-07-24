@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, Fragment } from 'react';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 
 interface SalesStat {
     productId: string;
@@ -46,38 +46,13 @@ export default function ProductSalesStats({ isOpen, onClose }: { isOpen: boolean
         // 'all' leaves startDate as null
 
         try {
-            // We fetch order_items and filter by the parent order's created_at
-            let query = supabase
-                .from('order_items')
-                .select(`
-          quantity,
-          product_name,
-          product_id,
-          variant_name,
-          total_price,
-          orders!inner (
-            id,
-            created_at,
-            status,
-            payment_status
-          )
-        `);
+            const orders = await api<any[]>('/api/orders');
+            const map = new Map<string, SalesStat>();
 
-            // Only include paid orders (confirmed) and exclude cancelled
-            query = query.eq('orders.payment_status', 'paid').neq('orders.status', 'cancelled');
-
-            if (startDate) {
-                query = query.gte('orders.created_at', startDate);
-            }
-
-            const { data, error } = await query;
-
-            if (error) throw error;
-
-            if (data) {
-                const map = new Map<string, SalesStat>();
-
-                data.forEach((item: any) => {
+            for (const order of orders || []) {
+              if (order.payment_status !== 'paid' || order.status === 'cancelled') continue;
+              if (startDate && new Date(order.created_at) < new Date(startDate)) continue;
+              for (const item of order.order_items || []) {
                     const pid = item.product_id || item.product_name;
 
                     if (!map.has(pid)) {
@@ -93,25 +68,24 @@ export default function ProductSalesStats({ isOpen, onClose }: { isOpen: boolean
                     }
 
                     const entry = map.get(pid)!;
-                    entry.itemsSold += (item.quantity || 0);
-                    entry.totalRevenue += (item.total_price || 0);
+                    entry.itemsSold += item.quantity || 0;
+                    entry.totalRevenue += item.total_price || 0;
 
-                    // Track variants
                     const variantName = item.variant_name || 'Default';
                     const existing = entry.variants.get(variantName) || { quantity: 0, revenue: 0 };
-                    existing.quantity += (item.quantity || 0);
-                    existing.revenue += (item.total_price || 0);
+                    existing.quantity += item.quantity || 0;
+                    existing.revenue += item.total_price || 0;
                     entry.variants.set(variantName, existing);
 
-                    const orderId = item.orders?.id;
+                    const orderId = order.id;
                     if (orderId && !entry._orderIds.has(orderId)) {
                         entry.ordersCount++;
                         entry._orderIds.add(orderId);
                     }
-                });
+              }
+            }
 
-                // Convert to array and sort by items sold
-                const result = Array.from(map.values())
+            const result = Array.from(map.values())
                     .map(({ _orderIds, variants, ...rest }) => ({
                         ...rest,
                         variants: Array.from(variants.entries())
@@ -120,8 +94,7 @@ export default function ProductSalesStats({ isOpen, onClose }: { isOpen: boolean
                     }))
                     .sort((a, b) => b.itemsSold - a.itemsSold);
 
-                setStats(result);
-            }
+            setStats(result);
         } catch (err) {
             console.error('Error fetching product stats:', err);
         } finally {

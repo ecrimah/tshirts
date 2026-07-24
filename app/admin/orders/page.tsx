@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 import ProductSalesStats from './ProductSalesStats';
 
 interface Order {
@@ -67,27 +67,7 @@ export default function AdminOrdersPage() {
       setLoading(true);
 
       // Fetch orders with related data
-      const { data: ordersData, error } = await supabase
-        .from('orders')
-        .select(`
-          id,
-          order_number,
-          email,
-          total,
-          status,
-          payment_status,
-          payment_method,
-          shipping_method,
-          created_at,
-          phone,
-          shipping_address,
-          metadata,
-          order_items (
-            quantity,
-            product_name
-          )
-        `)
-        .order('created_at', { ascending: false });
+      const { data: ordersData, error } = { data: await api<Order[]>('/api/orders'), error: null as unknown };
 
       if (error) throw error;
 
@@ -212,32 +192,21 @@ export default function AdminOrdersPage() {
   const handleBulkAction = async (action: string, newStatus?: string) => {
     if (newStatus) {
       try {
-        const { error } = await supabase
-          .from('orders')
-          .update({ status: newStatus })
-          .in('id', selectedOrders);
+        for (const orderId of selectedOrders) {
+          await api(`/api/orders/${orderId}`, { method: 'PATCH', json: { status: newStatus } });
+        }
 
-        if (error) throw error;
-
-
-
-        // Send Notifications with auth token
-        const { data: { session } } = await supabase.auth.getSession();
-        const authToken = session?.access_token;
-        
-        const updatedOrders = orders.filter(o => selectedOrders.includes(o.id));
-        updatedOrders.forEach(order => {
+        const updatedOrders = orders.filter((o) => selectedOrders.includes(o.id));
+        updatedOrders.forEach((order) => {
           fetch('/api/notifications', {
             method: 'POST',
-            headers: { 
-              'Content-Type': 'application/json',
-              ...(authToken && { 'Authorization': `Bearer ${authToken}` })
-            },
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({
               type: 'order_updated',
-              payload: { order, status: newStatus }
-            })
-          }).catch(err => console.error('Notification error', err));
+              payload: { order, status: newStatus },
+            }),
+          }).catch((err) => console.error('Notification error', err));
         });
 
         await fetchOrders();

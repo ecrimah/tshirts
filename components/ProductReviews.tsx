@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 import { cachedQuery, invalidateCache } from '@/lib/query-cache';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 
@@ -39,24 +39,13 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
   const fetchReviews = useCallback(async () => {
     try {
       // Fetch approved reviews (cached for 5 minutes)
-      const { data, error } = await cachedQuery<{ data: any; error: any }>(
+      const data = await cachedQuery<any[]>(
         `reviews:${productId}`,
-        (() => supabase
-          .from('reviews')
-          .select('*')
-          .eq('product_id', productId)
-          .eq('status', 'approved')
-          .order('created_at', { ascending: false })) as any,
+        async () => api<any[]>(`/api/reviews?product_id=${encodeURIComponent(productId)}&status=approved`),
         5 * 60 * 1000
       );
 
-      if (error) throw error;
-
       if (data) {
-        // We need to fetch user names if possible. Since we don't have public profiles easily accessible 
-        // without complicated RLS/joins in client, we might fallback to generic name or metadata if stored.
-        // For this demo, we'll try to use a "clean" name or just "Verified Customer"
-
         const formattedReviews = data.map((r: any) => ({
           id: r.id,
           author: 'Verified Customer', // or fetch from profiles if we had it joined
@@ -78,9 +67,9 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
   }, [productId]);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user || null);
-    });
+    api<{ user: unknown | null }>('/api/auth/me')
+      .then((me) => setUser(me.user))
+      .catch(() => setUser(null));
     fetchReviews();
   }, [productId, fetchReviews]);
 
@@ -118,17 +107,15 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase.from('reviews').insert([{
-        product_id: productId,
-        user_id: user.id,
-        rating: reviewForm.rating,
-        title: reviewForm.title,
-        content: reviewForm.content,
-        status: 'approved', // Auto-approve for demo
-        verified_purchase: false // We could check orders here but keeping it simple
-      }]);
-
-      if (error) throw error;
+      await api('/api/reviews', {
+        method: 'POST',
+        json: {
+          product_id: productId,
+          rating: reviewForm.rating,
+          title: reviewForm.title,
+          content: reviewForm.content,
+        },
+      });
 
       alert('Review submitted successfully!');
       setShowReviewForm(false);

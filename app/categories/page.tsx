@@ -1,24 +1,18 @@
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
 import PageHero from '@/components/PageHero';
+import { listCategories } from '@/lib/data/products';
 
-export const revalidate = 0; // Ensure fresh data on every visit
+export const revalidate = 300;
 
 export default async function CategoriesPage() {
-  const { data: categoriesData } = await supabase
-    .from('categories')
-    .select(`
-      id,
-      name,
-      slug,
-      description,
-      image_url,
-      position
-    `)
-    .eq('status', 'active')
-    .order('position', { ascending: true });
+  const categoriesData = (await listCategories(true)) as Array<{
+    id: string;
+    slug: string;
+    name: string;
+    description?: string | null;
+    image_url?: string | null;
+  }>;
 
-  // Palette to cycle through for visual variety since DB doesn't have colors
   const palette = [
     { color: 'from-stone-500 to-stone-700', icon: 'ri-store-2-line' },
     { color: 'from-stone-500 to-stone-700', icon: 'ri-shopping-bag-3-line' },
@@ -35,7 +29,6 @@ export default async function CategoriesPage() {
       image: c.image_url || 'https://via.placeholder.com/600x400?text=Category',
       color: style.color,
       icon: style.icon,
-      // Optional: Fetch product count if needed, currently skipping for performance/simplicity
       productCount: 'Browse',
     };
   }) || [];

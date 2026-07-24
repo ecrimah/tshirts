@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { supabase } from '@/lib/supabase';
+import { query } from '@/lib/db';
 import { escapeHtml } from '@/lib/sanitize';
 
 const resend = new Resend(process.env.RESEND_API_KEY || 'missing_api_key');
@@ -219,11 +219,12 @@ export async function sendOrderConfirmation(order: any) {
     // Fetch order items to get preorder_shipping info
     let shippingNotes: string[] = [];
     try {
-        const { data: items } = await supabase
-            .from('order_items')
-            .select('product_name, metadata')
-            .eq('order_id', id);
-        if (items) {
+        const itemsResult = await query<{ product_name: string; metadata: Record<string, unknown> | null }>(
+            `SELECT product_name, metadata FROM order_items WHERE order_id = $1`,
+            [id]
+        );
+        const items = itemsResult.rows;
+        if (items.length) {
             for (const item of items) {
                 const preorder = item.metadata?.preorder_shipping;
                 if (preorder) {

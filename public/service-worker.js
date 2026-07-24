@@ -101,7 +101,7 @@ self.addEventListener('fetch', (event) => {
   if (
     request.destination === 'image' ||
     url.pathname.match(/\.(png|jpg|jpeg|gif|webp|svg|ico)$/) ||
-    url.hostname.includes('supabase.co') && url.pathname.includes('/storage/')
+    url.pathname.startsWith('/uploads/')
   ) {
     event.respondWith(
       caches.open(IMAGE_CACHE).then((cache) => {

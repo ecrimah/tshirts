@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import OrderHistory from './OrderHistory';
 import AddressBook from './AddressBook';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 
 function AccountContent() {
   const router = useRouter();
@@ -44,20 +44,27 @@ function AccountContent() {
 
   useEffect(() => {
     async function checkUser() {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      try {
+        const me = await api<{ user: { id: string; email: string; full_name?: string } | null }>(
+          '/api/auth/me'
+        );
+        if (!me.user) {
+          router.push('/auth/login');
+          return;
+        }
+        const names = (me.user.full_name || '').split(' ');
+        setUser(me.user);
+        setProfileData({
+          firstName: names[0] || '',
+          lastName: names.slice(1).join(' ') || '',
+          email: me.user.email || '',
+          phone: '',
+        });
+      } catch {
         router.push('/auth/login');
-        return;
+      } finally {
+        setLoading(false);
       }
-
-      setUser(session.user);
-      setProfileData({
-        firstName: session.user.user_metadata?.first_name || '',
-        lastName: session.user.user_metadata?.last_name || '',
-        email: session.user.email || '',
-        phone: session.user.phone || ''
-      });
-      setLoading(false);
     }
     checkUser();
   }, [router]);
@@ -68,18 +75,20 @@ function AccountContent() {
     setProfileMessage({ type: '', text: '' });
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        data: {
+      await api('/api/auth/profile', {
+        method: 'PATCH',
+        json: {
           first_name: profileData.firstName,
           last_name: profileData.lastName,
-          phone: profileData.phone // Storing phone in metadata for now
-        }
+          phone: profileData.phone,
+        },
       });
-
-      if (error) throw error;
       setProfileMessage({ type: 'success', text: 'Profile updated successfully!' });
-    } catch (err: any) {
-      setProfileMessage({ type: 'error', text: err.message });
+    } catch (err: unknown) {
+      setProfileMessage({
+        type: 'error',
+        text: err instanceof Error ? err.message : 'Update failed',
+      });
     } finally {
       setProfileLoading(false);
     }
@@ -100,21 +109,24 @@ function AccountContent() {
     setPasswordMessage({ type: '', text: '' });
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: passwordData.password
+      await api('/api/auth/profile', {
+        method: 'PATCH',
+        json: { password: passwordData.password },
       });
-      if (error) throw error;
       setPasswordMessage({ type: 'success', text: 'Password updated successfully!' });
       setPasswordData({ password: '', confirmPassword: '' });
-    } catch (err: any) {
-      setPasswordMessage({ type: 'error', text: err.message });
+    } catch (err: unknown) {
+      setPasswordMessage({
+        type: 'error',
+        text: err instanceof Error ? err.message : 'Update failed',
+      });
     } finally {
       setPasswordLoading(false);
     }
   };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    await api('/api/auth/logout', { method: 'POST' }).catch(() => {});
     router.push('/auth/login');
     router.refresh();
   };

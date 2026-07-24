@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function AdminDashboard() {
@@ -55,25 +55,15 @@ export default function AdminDashboard() {
     async function fetchDashboardData() {
       try {
         // 1. Fetch ALL Orders for count & customers
-        const { data: allOrdersData, error: ordersError } = await supabase
-          .from('orders')
-          .select('total, status, payment_status, created_at, email');
+        const allOrdersData = await api<any[]>('/api/orders');
 
-        if (ordersError) throw ordersError;
-
-        // Only count PAID orders for revenue & avg order value
-        const paidOrders = allOrdersData?.filter(o => o.payment_status === 'paid') || [];
+        const paidOrders = allOrdersData?.filter((o) => o.payment_status === 'paid') || [];
         const totalRevenue = paidOrders.reduce((sum, order) => sum + (order.total || 0), 0);
         const totalOrders = allOrdersData?.length || 0;
         const paidOrderCount = paidOrders.length;
         const avgOrderValue = paidOrderCount > 0 ? totalRevenue / paidOrderCount : 0;
 
-        // 2. Fetch Customers Count (approximation using orders unique emails if we don't have user metrics access)
-        // Since we can't query auth.users directly from client, we'll estimate active customers via orders or just keep it 0 if we can't.
-        // Actually, best to just show "Orders" or "Recent Signups" if we had a public profiles table.
-        // We'll use unique emails from orders as a proxy for "Customers"
-        const uniqueCustomers = new Set(allOrdersData?.map(o => o.email)).size;
-
+        const uniqueCustomers = new Set(allOrdersData?.map((o) => o.email)).size;
 
         // Process Chart Data (Last 7 Days) - only count PAID orders as revenue
         const last7Days = Array.from({ length: 7 }, (_, i) => {
@@ -135,15 +125,12 @@ export default function AdminDashboard() {
           }
         ]);
 
-        // 3. Fetch Recent Orders (only paid orders)
-        const { data: recentOrdersData } = await supabase
-          .from('orders')
-          .select('id, order_number, user_id, email, created_at, total, status, shipping_address')
-          .eq('payment_status', 'paid')
-          .order('created_at', { ascending: false })
-          .limit(5);
+        const recentOrdersData = [...(allOrdersData || [])]
+          .filter((o) => o.payment_status === 'paid')
+          .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+          .slice(0, 5);
 
-        if (recentOrdersData) {
+        if (recentOrdersData.length) {
           const formattedRecent = recentOrdersData.map((o: any) => {
             const addr = o.shipping_address || {};
             const customerName = (addr.firstName && addr.lastName)
@@ -163,14 +150,10 @@ export default function AdminDashboard() {
           setRecentOrders(formattedRecent);
         }
 
-        // 4. Fetch Low Stock Products
-        const { data: lowStockData } = await supabase
-          .from('products')
-          .select('name, quantity')
-          .lt('quantity', 10)
-          .limit(5);
+        const catalogProducts = await api<any[]>('/api/catalog/products?status=active');
+        const lowStockData = catalogProducts.filter((p) => (p.quantity ?? 0) < 10).slice(0, 5);
 
-        if (lowStockData) {
+        if (lowStockData.length) {
           setLowStockProducts(lowStockData.map((p: any) => ({
             name: p.name,
             stock: p.quantity,
@@ -178,11 +161,8 @@ export default function AdminDashboard() {
           })));
         }
 
-        // 5. Fetch Top Products (Approximation: High Price or just Random for now, 
-        // real top selling requires aggregation on order_items which is complex for client-side)
-        // real top selling requires aggregation on order_items which is complex for client-side)
-        const { data: productData } = await supabase.from('products').select('*, product_images(url)').limit(4);
-        if (productData) {
+        const productData = catalogProducts.slice(0, 4);
+        if (productData.length) {
           setTopProducts(productData.map((p: any) => ({
             id: p.slug, // Use slug for link
             name: p.name,

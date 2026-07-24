@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 
 export default function AdminCategoriesPage() {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -32,12 +32,7 @@ export default function AdminCategoriesPage() {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
+      const data = await api<any[]>('/api/catalog/categories');
       if (data) setCategories(data);
     } catch (err) {
       console.error('Error fetching categories:', err);
@@ -63,9 +58,7 @@ export default function AdminCategoriesPage() {
   const handleDelete = async (categoryId: string) => {
     if (!confirm('Are you sure you want to delete this category? Products in it will have no category.')) return;
     try {
-      await supabase.from('products').update({ category_id: null }).eq('category_id', categoryId);
-      const { error } = await supabase.from('categories').delete().eq('id', categoryId);
-      if (error) throw error;
+      await api(`/api/catalog/categories/${categoryId}`, { method: 'DELETE' });
       setCategories(categories.filter((c) => c.id !== categoryId));
       alert('Category deleted successfully');
     } catch (err: any) {
@@ -84,17 +77,12 @@ export default function AdminCategoriesPage() {
       const filePath = `${fileName}`;
 
       // Upload to 'products' bucket for simplicity, or create a 'categories' bucket
-      const { error: uploadError } = await supabase.storage
-        .from('products')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('products')
-        .getPublicUrl(filePath);
-
-      setFormData({ ...formData, image_url: publicUrl });
+      const form = new FormData();
+      form.append('file', file);
+      const uploaded = await fetch('/api/uploads', { method: 'POST', body: form, credentials: 'include' }).then(
+        (r) => (r.ok ? r.json() : Promise.reject(new Error('Upload failed')))
+      );
+      setFormData({ ...formData, image_url: uploaded.url });
 
     } catch (error: any) {
       alert('Error uploading image: ' + error.message);
@@ -124,17 +112,10 @@ export default function AdminCategoriesPage() {
       };
 
       if (showEditModal && editingCategory) {
-        const { error } = await supabase
-          .from('categories')
-          .update(payload)
-          .eq('id', editingCategory.id);
-        if (error) throw error;
+        await api(`/api/catalog/categories/${editingCategory.id}`, { method: 'PATCH', json: payload });
         alert('Category updated');
       } else {
-        const { error } = await supabase
-          .from('categories')
-          .insert([payload]);
-        if (error) throw error;
+        await api('/api/catalog/categories', { method: 'POST', json: payload });
         alert('Category created');
       }
 

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 
 function OrderTrackingContent() {
   const searchParams = useSearchParams();
@@ -32,52 +32,17 @@ function OrderTrackingContent() {
     setError('');
 
     try {
-      // Only select the fields we need — avoid exposing unnecessary data
-      const { data, error: fetchError } = await supabase
-        .from('orders')
-        .select(`
-          id,
-          order_number,
-          status,
-          payment_status,
-          total,
-          email,
-          created_at,
-          shipping_address,
-          metadata,
-          order_items (
-            id,
-            product_name,
-            variant_name,
-            quantity,
-            unit_price,
-            metadata,
-            products (
-              product_images (url)
-            )
-          )
-        `)
-        .eq('order_number', orderNum)
-        .single();
-
-      if (fetchError || !data) {
-        setError('Order not found. Please check your order number and try again.');
-        setIsTracking(false);
-        return;
-      }
-
-      // SECURITY: Always verify email matches — this is mandatory
-      if (data.email?.toLowerCase() !== emailToVerify.toLowerCase()) {
-        setError('The email address does not match this order. Please use the email you placed the order with.');
-        setIsTracking(false);
-        return;
-      }
+      const data = await api<Record<string, unknown>>('/api/orders/track', {
+        method: 'POST',
+        json: { email: emailToVerify, order_number: orderNum },
+      });
 
       setOrder(data);
       setIsTracking(true);
     } catch (err) {
       console.error('Error fetching order:', err);
-      setError('Something went wrong. Please try again.');
+      setError('Order not found or email does not match. Please check your details and try again.');
+      setIsTracking(false);
     } finally {
       setLoading(false);
     }

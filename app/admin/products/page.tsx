@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 
 const LIST_STATE_KEY = 'admin-products-list-state-v1';
 const LIST_STATE_TTL_MS = 30 * 60 * 1000;
@@ -43,69 +43,45 @@ export default function ProductsPage() {
   };
 
   const fetchCategories = useCallback(async () => {
-    const { data } = await supabase.from('categories').select('name');
+    const data = await api<{ name: string }[]>('/api/catalog/categories');
     if (data) setCategories(data);
   }, []);
 
   const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
-      let query = supabase
-        .from('products')
-        .select(`
-          *,
-          categories(name),
-          product_variants(count),
-          product_images(url, position)
-        `);
+      const sortMap: Record<string, string> = {
+        newest: 'newest',
+        price_asc: 'price_asc',
+        price_desc: 'price_desc',
+        name: 'name',
+        stock: 'stock',
+      };
+      const data = await api<any[]>(
+        `/api/catalog/products?status=${statusFilter === 'all' ? 'all' : statusFilter}&sort=${sortMap[sortBy] || 'newest'}`
+      );
 
-      if (statusFilter !== 'all') {
-        query = query.eq('status', statusFilter);
-      }
+      const transformedProducts = data.map((p: any) => ({
+        ...p,
+        category: p.categories?.name || 'Uncategorized',
+        image:
+          p.product_images?.find((img: any) => img.position === 0)?.url ||
+          p.product_images?.[0]?.url ||
+          'https://via.placeholder.com/300?text=No+Image',
+        variantsCount: p.variants_count || p.product_variants?.length || 0,
+        stock: p.quantity,
+        sales: 0,
+        rating: p.rating_avg || 0,
+      }));
 
-      // Apply sorting
-      if (sortBy === 'newest') query = query.order('created_at', { ascending: false });
-      if (sortBy === 'price_asc') query = query.order('price', { ascending: true });
-      if (sortBy === 'price_desc') query = query.order('price', { ascending: false });
-      if (sortBy === 'name') query = query.order('name', { ascending: true });
-      if (sortBy === 'stock') query = query.order('quantity', { ascending: true });
+      setProducts(transformedProducts);
 
-      const { data, error } = await query;
-
-      if (error) throw error;
-
-      if (data) {
-        // Transform data for UI
-        const transformedProducts = data.map((p: any) => ({
-          ...p,
-          category: p.categories?.name || 'Uncategorized',
-          image: p.product_images?.find((img: any) => img.position === 0)?.url
-            || p.product_images?.[0]?.url
-            || 'https://via.placeholder.com/300?text=No+Image',
-          variantsCount: p.product_variants?.[0]?.count || 0,
-          stock: p.quantity,
-          sales: 0,
-          rating: p.rating_avg || 0
-        }));
-
-        setProducts(transformedProducts);
-      }
-
-      // Stats always computed from active products only
-      const { data: allActive } = await supabase
-        .from('products')
-        .select('quantity,status')
-        .eq('status', 'active');
-      const { count: totalCount } = await supabase
-        .from('products')
-        .select('id', { count: 'exact', head: true });
-
-      const activeList = allActive || [];
+      const activeList = data.filter((p) => p.status === 'active');
       setStats({
-        total: totalCount || 0,
+        total: data.length,
         active: activeList.length,
-        lowStock: activeList.filter(p => (p.quantity || 0) > 0 && (p.quantity || 0) < 10).length,
-        outOfStock: activeList.filter(p => !p.quantity || p.quantity === 0).length,
+        lowStock: activeList.filter((p) => (p.quantity || 0) > 0 && (p.quantity || 0) < 10).length,
+        outOfStock: activeList.filter((p) => !p.quantity || p.quantity === 0).length,
       });
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -188,25 +164,11 @@ export default function ProductsPage() {
   const handleDeleteProduct = async (productId: string) => {
     if (!confirm('Are you sure you want to delete this product?')) return;
     try {
-      // Unlink from order_items so we can delete (order history keeps product_name/sku/price)
-      await supabase.from('order_items').update({ product_id: null, variant_id: null }).eq('product_id', productId);
-      // Delete in dependency order: review_images → reviews → cart_items → wishlist_items → product_images → product_variants → products
-      const { data: reviewIds } = await supabase.from('reviews').select('id').eq('product_id', productId);
-      if (reviewIds?.length) {
-        const ids = reviewIds.map((r) => r.id);
-        await supabase.from('review_images').delete().in('review_id', ids);
-        await supabase.from('reviews').delete().eq('product_id', productId);
-      }
-      await supabase.from('cart_items').delete().eq('product_id', productId);
-      await supabase.from('wishlist_items').delete().eq('product_id', productId);
-      await supabase.from('product_images').delete().eq('product_id', productId);
-      await supabase.from('product_variants').delete().eq('product_id', productId);
-      const { error } = await supabase.from('products').delete().eq('id', productId);
-      if (error) throw error;
+      await api(`/api/catalog/products/${productId}`, { method: 'DELETE' });
       setProducts(products.filter((p) => p.id !== productId));
       alert('Product deleted successfully');
-    } catch (err: any) {
-      alert('Error deleting product: ' + (err?.message || 'Please try again.'));
+    } catch (err: unknown) {
+      alert('Error deleting product: ' + (err instanceof Error ? err.message : 'Please try again.'));
     }
   };
 
@@ -215,19 +177,7 @@ export default function ProductsPage() {
     const failed: string[] = [];
     for (const productId of selectedProducts) {
       try {
-        await supabase.from('order_items').update({ product_id: null, variant_id: null }).eq('product_id', productId);
-        const { data: reviewIds } = await supabase.from('reviews').select('id').eq('product_id', productId);
-        if (reviewIds?.length) {
-          const ids = reviewIds.map((r) => r.id);
-          await supabase.from('review_images').delete().in('review_id', ids);
-          await supabase.from('reviews').delete().eq('product_id', productId);
-        }
-        await supabase.from('cart_items').delete().eq('product_id', productId);
-        await supabase.from('wishlist_items').delete().eq('product_id', productId);
-        await supabase.from('product_images').delete().eq('product_id', productId);
-        await supabase.from('product_variants').delete().eq('product_id', productId);
-        const { error } = await supabase.from('products').delete().eq('id', productId);
-        if (error) throw error;
+        await api(`/api/catalog/products/${productId}`, { method: 'DELETE' });
       } catch {
         failed.push(products.find((p) => p.id === productId)?.name || productId.slice(0, 8));
       }

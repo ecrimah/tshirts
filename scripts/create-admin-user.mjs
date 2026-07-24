@@ -1,14 +1,12 @@
 /**
- * Create an admin user in Supabase Auth and set role in profiles.
- * Uses SUPABASE_SERVICE_ROLE_KEY and NEXT_PUBLIC_SUPABASE_URL from .env.local.
+ * Create an admin user in public.users + profiles (role admin).
+ * Reads DATABASE_URL from .env.local.
  *
- * Usage:
- *   node scripts/create-admin-user.mjs <email> <password>
- * Or set env vars and run:
- *   CREATE_ADMIN_EMAIL=admin@example.com CREATE_ADMIN_PASSWORD=yourpassword node scripts/create-admin-user.mjs
+ * Usage: node scripts/create-admin-user.mjs <email> <password>
  */
 
-import { createClient } from '@supabase/supabase-js';
+import pg from 'pg';
+import bcrypt from 'bcryptjs';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -38,82 +36,68 @@ function loadEnv() {
 }
 
 const env = { ...process.env, ...loadEnv() };
-const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
-const serviceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY;
-
+const databaseUrl = env.DATABASE_URL;
 const email = process.argv[2] || env.CREATE_ADMIN_EMAIL;
 const password = process.argv[3] || env.CREATE_ADMIN_PASSWORD;
 
-if (!supabaseUrl || !serviceRoleKey) {
-  console.error('Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in .env.local');
+if (!databaseUrl) {
+  console.error('Missing DATABASE_URL in .env.local');
   process.exit(1);
 }
 
 if (!email || !password) {
   console.error('Usage: node scripts/create-admin-user.mjs <email> <password>');
-  console.error('   Or set CREATE_ADMIN_EMAIL and CREATE_ADMIN_PASSWORD in .env.local');
   process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, serviceRoleKey, {
-  auth: { autoRefreshToken: false, persistSession: false },
-});
+const pool = new pg.Pool({ connectionString: databaseUrl });
 
 async function main() {
+  const client = await pool.connect();
   try {
-    const { data: user, error: createError } = await supabase.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-    });
+    const normalized = email.toLowerCase();
+    const existing = await client.query(`SELECT id FROM users WHERE lower(email) = lower($1)`, [normalized]);
 
-    if (createError) {
-      if (createError.message?.includes('already been registered')) {
-        console.log('User already exists. Updating profile to admin...');
-        const { data: profile, error: fetchErr } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('email', email)
-          .single();
+    const hash = await bcrypt.hash(password, 12);
 
-        if (fetchErr || !profile) {
-          console.error('Could not find profile for that email:', fetchErr?.message || 'Not found');
-          process.exit(1);
-        }
-
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({ role: 'admin' })
-          .eq('id', profile.id);
-
-        if (updateError) {
-          console.error('Failed to update profile:', updateError.message);
-          process.exit(1);
-        }
-        console.log('Profile updated. Admin user:', email);
-        return;
-      }
-      console.error('Failed to create user:', createError.message);
-      process.exit(1);
+    if (existing.rows.length) {
+      const userId = existing.rows[0].id;
+      await client.query(`UPDATE users SET encrypted_password = $2, updated_at = now() WHERE id = $1`, [
+        userId,
+        hash,
+      ]);
+      await client.query(
+        `UPDATE profiles SET role = 'admin'::user_role, email = $2, updated_at = now() WHERE id = $1`,
+        [userId, normalized]
+      );
+      console.log('Existing user updated to admin:', normalized);
+      return;
     }
 
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .update({ role: 'admin' })
-      .eq('id', user.user.id);
-
-    if (updateError) {
-      console.error('User created but failed to set admin role:', updateError.message);
-      console.log('User id:', user.user.id, '- you can set role manually in Supabase Dashboard.');
-      process.exit(1);
-    }
-
-    console.log('Admin user created successfully.');
-    console.log('  Email:', email);
-    console.log('  Login at: /admin/login');
+    await client.query('BEGIN');
+    const inserted = await client.query(
+      `INSERT INTO users (email, encrypted_password, email_confirmed_at, raw_user_meta_data)
+       VALUES ($1, $2, now(), '{}'::jsonb)
+       RETURNING id`,
+      [normalized, hash]
+    );
+    const userId = inserted.rows[0].id;
+    await client.query(
+      `INSERT INTO profiles (id, email, role, full_name)
+       VALUES ($1, $2, 'admin'::user_role, $3)
+       ON CONFLICT (id) DO UPDATE SET role = 'admin'::user_role, email = EXCLUDED.email, updated_at = now()`,
+      [userId, normalized, 'Admin']
+    );
+    await client.query('COMMIT');
+    console.log('Admin user created:', normalized);
+    console.log('Login at: /admin/login');
   } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
     console.error(err);
     process.exit(1);
+  } finally {
+    client.release();
+    await pool.end();
   }
 }
 

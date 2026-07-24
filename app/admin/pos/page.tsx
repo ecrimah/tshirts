@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 import {
     parseStorePricingValue,
     resolveCartLineUnitPrice,
@@ -72,23 +72,12 @@ export default function POSPage() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const { data: pricingRow } = await supabase
-                .from('site_settings')
-                .select('value')
-                .eq('key', 'store_pricing')
-                .maybeSingle();
-            const salesActive = parseStorePricingValue(pricingRow?.value).sales_active;
+            const settingsRes = await api<{ settings: { store_pricing?: unknown } }>(
+                '/api/settings?keys=store_pricing'
+            );
+            const salesActive = parseStorePricingValue(settingsRes.settings?.store_pricing).sales_active;
 
-            const { data: prodData } = await supabase
-                .from('products')
-                .select(`
-          id, name, price, sale_price, compare_at_price, quantity, sku,
-          categories(name),
-          product_images(url)
-        `)
-                .order('name');
-
-            if (prodData) {
+            const prodData = await api<any[]>('/api/catalog/products?status=active');
                 const formatted: Product[] = prodData.map((p: any) => ({
                     id: p.id,
                     name: p.name,
@@ -105,19 +94,11 @@ export default function POSPage() {
                 }));
                 setProducts(formatted);
 
-                // Extract Categories
                 const cats = Array.from(new Set(formatted.map(p => p.category))).sort();
                 setCategories(['All', ...cats]);
-            }
 
-            // Fetch Customers from customers table (not profiles)
-            const { data: custData } = await supabase
-                .from('customers')
-                .select('id, full_name, email, phone')
-                .order('full_name')
-                .limit(200);
-
-            if (custData) setCustomers(custData);
+            const custData = await api<any[]>('/api/admin/customers');
+            setCustomers(custData.slice(0, 200));
 
         } catch (error) {
             console.error('Error fetching POS data:', error);
@@ -248,26 +229,17 @@ export default function POSPage() {
             const customerPhone = getOrderPhone();
 
             const isCashOrCard = paymentMethod === 'cash' || paymentMethod === 'card';
-
             const cartIds = [...new Set(cart.map((i) => i.id))];
-            const { data: checkoutPricingRow } = await supabase
-                .from('site_settings')
-                .select('value')
-                .eq('key', 'store_pricing')
-                .maybeSingle();
+
+            const settingsRes = await api<{ settings: { store_pricing?: unknown } }>(
+                '/api/settings?keys=store_pricing'
+            );
             const checkoutSalesActive = parseStorePricingValue(
-                checkoutPricingRow?.value
+                settingsRes.settings?.store_pricing
             ).sales_active;
-            const { data: checkoutProducts, error: checkoutProductsError } =
-                await supabase
-                    .from('products')
-                    .select(
-                        'id, price, sale_price, compare_at_price, product_variants(id, name, option1, option2, price, sale_price)'
-                    )
-                    .in('id', cartIds);
-            if (checkoutProductsError) throw checkoutProductsError;
+            const checkoutProducts = await api<any[]>('/api/catalog/products?status=active');
             const checkoutProductMap = new Map(
-                (checkoutProducts || []).map((p: any) => [p.id, p])
+                checkoutProducts.filter((p) => cartIds.includes(p.id)).map((p: any) => [p.id, p])
             );
 
             let posSubtotal = 0;
@@ -312,56 +284,34 @@ export default function POSPage() {
                 pos_sale: true
             };
 
-            // 1. Create Order
-            const { data: order, error: orderError } = await supabase
-                .from('orders')
-                .insert([{
-                    order_number: orderNumber,
-                    user_id: null,
-                    email: customerEmail,
-                    phone: customerPhone,
-                    status: isCashOrCard ? 'processing' : 'pending',
-                    payment_status: isCashOrCard ? 'paid' : 'pending',
-                    currency: 'GHS',
-                    subtotal: posSubtotal,
-                    tax_total: posTax,
-                    shipping_total: 0,
-                    discount_total: 0,
-                    total: posGrand,
-                    shipping_method: deliveryMethod,
-                    payment_method: paymentMethod === 'momo' ? 'moolre' : paymentMethod,
-                    shipping_address: addressData,
-                    billing_address: addressData,
-                    metadata: {
-                        pos_sale: true,
-                        first_name: addressData.firstName,
-                        last_name: addressData.lastName,
-                        phone: customerPhone
-                    }
-                }])
-                .select()
-                .single();
+            const shippingData = {
+                firstName: addressData.firstName,
+                lastName: addressData.lastName,
+                email: customerEmail,
+                phone: customerPhone,
+                address: addressData.address,
+                city: addressData.city,
+                region: addressData.region,
+            };
 
-            if (orderError) throw orderError;
+            const order = await api<any>('/api/admin/pos/checkout', {
+                method: 'POST',
+                json: {
+                    orderNumber,
+                    trackingNumber: `SLI-POS-${Date.now()}`,
+                    shippingData,
+                    deliveryMethod,
+                    paymentMethod: paymentMethod === 'momo' ? 'moolre' : paymentMethod,
+                    cart: cart.map((item) => ({
+                        id: item.id,
+                        name: item.name,
+                        quantity: item.cartQuantity,
+                        image: item.image,
+                    })),
+                    markPaid: isCashOrCard,
+                },
+            });
 
-            // 2. Create Order Items (authoritative unit prices)
-            const orderItems = resolvedLines.map(({ item, unit }) => ({
-                order_id: order.id,
-                product_id: item.id,
-                product_name: item.name,
-                quantity: item.cartQuantity,
-                unit_price: unit,
-                total_price: unit * item.cartQuantity,
-                metadata: { image: item.image, pos_sale: true }
-            }));
-
-            const { error: itemsError } = await supabase
-                .from('order_items')
-                .insert(orderItems);
-
-            if (itemsError) throw itemsError;
-
-            // 3. Upsert Customer Record (email is required in customers table)
             const hasRealEmail = customerEmail && customerEmail !== 'pos-walkin@store.local';
             const upsertEmail = hasRealEmail
                 ? customerEmail
@@ -371,58 +321,32 @@ export default function POSPage() {
 
             if (upsertEmail) {
                 try {
-                    await supabase.rpc('upsert_customer_from_order', {
-                        p_email: upsertEmail,
-                        p_phone: customerPhone || null,
-                        p_full_name: customerName || null,
-                        p_first_name: addressData.firstName || null,
-                        p_last_name: addressData.lastName || null,
-                        p_user_id: null,
-                        p_address: addressData
-                    });
-                    // Refresh customer list silently
-                    supabase.from('customers').select('id, full_name, email, phone').order('full_name').limit(200)
-                        .then(({ data }) => { if (data) setCustomers(data); });
+                    const custData = await api<any[]>('/api/admin/customers');
+                    setCustomers(custData.slice(0, 200));
                 } catch (custErr) {
-                    console.error('Customer upsert error (non-fatal):', custErr);
+                    console.error('Customer refresh error (non-fatal):', custErr);
                 }
             }
 
-            // 4. If Cash or Card — mark as paid, reduce stock
             if (isCashOrCard) {
-                // Call mark_order_paid to reduce stock (uses order_number as order_ref)
-                try {
-                    await supabase.rpc('mark_order_paid', {
-                        order_ref: orderNumber,
-                        moolre_ref: `POS-${paymentMethod.toUpperCase()}-${Date.now()}`
-                    });
-                } catch (stockErr) {
-                    console.error('Stock reduction error (non-fatal):', stockErr);
-                }
-
-                // Success — show completed
-                setCompletedOrder({ id: order.id, orderNumber, total: grandTotal, items: cart });
+                setCompletedOrder({ id: order.id, orderNumber, total: posGrand, items: cart });
                 setCart([]);
 
-                // Send notification
                 if (customerEmail && customerEmail !== 'pos-walkin@store.local') {
-                    const { data: { session } } = await supabase.auth.getSession();
                     fetch('/api/notifications', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            ...(session?.access_token && { 'Authorization': `Bearer ${session.access_token}` })
-                        },
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
                         body: JSON.stringify({
                             type: 'order_created',
                             payload: {
                                 ...order,
                                 order_number: orderNumber,
                                 email: customerEmail,
-                                shipping_address: addressData
-                            }
-                        })
-                    }).catch(err => console.error('POS Notification error:', err));
+                                shipping_address: addressData,
+                            },
+                        }),
+                    }).catch((err) => console.error('POS Notification error:', err));
                 }
             }
 
@@ -433,7 +357,7 @@ export default function POSPage() {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         orderId: orderNumber,
-                        amount: grandTotal,
+                        amount: posGrand,
                         customerEmail: customerEmail
                     })
                 });
@@ -448,7 +372,7 @@ export default function POSPage() {
                 setCompletedOrder({
                     id: order.id,
                     orderNumber,
-                    total: grandTotal,
+                    total: posGrand,
                     items: cart,
                     paymentUrl: paymentResult.url,
                     paymentPending: true

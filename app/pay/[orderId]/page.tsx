@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
 export default function PaymentPage() {
@@ -20,16 +20,13 @@ export default function PaymentPage() {
   useEffect(() => {
     async function fetchOrder() {
       try {
-        // Fetch order by ID (UUID) or order_number
-        let query = supabase
-          .from('orders')
-          .select('*')
-          .or(`id.eq.${orderId},order_number.eq.${orderId}`)
-          .single();
+        const data = await api<any>(
+          `/api/orders/summary?order_number=${encodeURIComponent(orderId)}`
+        ).catch(async () => {
+          return api<any>(`/api/orders/${encodeURIComponent(orderId)}`);
+        });
 
-        const { data, error: fetchError } = await query;
-
-        if (fetchError || !data) {
+        if (!data) {
           setError('Order not found. Please check your link and try again.');
           setLoading(false);
           return;

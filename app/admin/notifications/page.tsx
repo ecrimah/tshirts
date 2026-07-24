@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 
 export default function NotificationsPage() {
     const [loading, setLoading] = useState(false);
@@ -22,18 +22,7 @@ export default function NotificationsPage() {
         setSuccess('');
 
         try {
-            // 1. Get auth token for admin verification
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session?.access_token) {
-                throw new Error('You must be logged in as admin to send campaigns');
-            }
-
-            // 2. Fetch Recipients from the customers table (includes secondary contacts)
-            const { data: customers, error: fetchError } = await supabase
-                .from('customers')
-                .select('email, phone, full_name, secondary_phone, secondary_email');
-
-            if (fetchError) throw fetchError;
+            const customers = await api<any[]>('/api/admin/customers');
 
             // Build recipients with deduplication
             const seenPhones = new Set<string>();
@@ -42,7 +31,7 @@ export default function NotificationsPage() {
             const normalizePhone = (p: string) => p.replace(/[\s\-\(\)\.]+/g, '').replace(/^00/, '+');
 
             const recipients: any[] = [];
-            for (const c of (customers || [])) {
+            for (const c of customers || []) {
                 const phones = [c.phone, c.secondary_phone].filter(Boolean).map((p: string) => normalizePhone(p));
                 const emails = [c.email, c.secondary_email].filter(Boolean).map((e: string) => e.toLowerCase().trim());
 
@@ -95,8 +84,8 @@ export default function NotificationsPage() {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${session.access_token}`
                     },
+                    credentials: 'include',
                     body: JSON.stringify({
                         type: 'campaign',
                         payload: {

@@ -35,10 +35,22 @@ export default function ForgotPasswordPage() {
       return;
     }
 
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Request failed');
+      }
       setIsSubmitted(true);
-    }, 1500);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Request failed');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isSubmitted) {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, AreaChart, Area, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function AnalyticsPage() {
@@ -39,48 +39,18 @@ export default function AnalyticsPage() {
 
       const isoStart = startDate.toISOString();
 
-      // Fetch Orders for Revenue & Count - only PAID orders count as revenue
-      const { data: orders, error: orderError } = await supabase
-        .from('orders')
-        .select('id, created_at, total, payment_status')
-        .gte('created_at', isoStart)
-        .eq('payment_status', 'paid') // Only count paid orders as revenue
-        .neq('status', 'cancelled')
-        .order('created_at');
+      const orders = (await api<any[]>('/api/orders')).filter(
+        (o) =>
+          new Date(o.created_at) >= startDate &&
+          o.payment_status === 'paid' &&
+          o.status !== 'cancelled'
+      );
 
-      if (orderError) throw orderError;
-
-      // Fetch Order Items for Products & Categories
-      // This might be heavy for large DBs, but fine for typical small shop admin
-      const { data: items, error: itemError } = await supabase
-        .from('order_items')
-        .select(`
-            *,
-            products (name, categories(name))
-         `)
-        .gte('created_at', isoStart); // Assuming order_items has created_at or join orders.. 
-      // Actually order_items usually doesn't have created_at directly in some schemas, 
-      // so we should join orders to filter by date.
-      // Simpler: fetch order_items for the fetched orders IDs.
-
-      let validItems: any[] = [];
-      if (orders && orders.length > 0) {
-        const orderIds = orders.map(o => o.id);
-        const { data: fetchedItems, error: itemFetchError } = await supabase
-          .from('order_items')
-          .select(`
-            quantity, 
-            unit_price, 
-            total_price,
-            product_id,
-            products!inner(name, category_id, categories(name))
-          `)
-          .in('order_id', orderIds);
-
-        if (itemFetchError) {
-          console.error('Error fetching order items:', itemFetchError);
+      const validItems: any[] = [];
+      for (const o of orders) {
+        for (const item of o.order_items || []) {
+          validItems.push({ ...item, order_id: o.id });
         }
-        if (fetchedItems) validItems = fetchedItems;
       }
 
       // Process Metrics

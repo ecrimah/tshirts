@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 
 // Helper for currency formatting
 const formatCurrency = (amount: number) => {
@@ -35,23 +35,11 @@ export default function CustomerInsightsPage() {
     try {
       setLoading(true);
 
-      // 1. Fetch Profiles
-      const { data: profiles, error: profileError } = await supabase
-        .from('profiles')
-        .select('*');
+      const rows = await api<any[]>('/api/admin/customers');
+      const orders = await api<any[]>('/api/orders');
 
-      if (profileError) throw profileError;
-
-      // 2. Fetch Orders for calculations
-      const { data: orders, error: orderError } = await supabase
-        .from('orders')
-        .select('user_id, total, created_at, status');
-
-      if (orderError) throw orderError;
-
-      // 3. Aggregate Data
-      const aggregated = profiles.map((profile: any) => {
-        const userOrders = orders?.filter(o => o.user_id === profile.id) || [];
+      const aggregated = rows.map((profile: any) => {
+        const userOrders = orders?.filter((o) => o.user_id === profile.user_id || o.email === profile.email) || [];
         const totalSpent = userOrders.reduce((sum, o) => sum + (o.total || 0), 0);
         const orderCount = userOrders.length;
 

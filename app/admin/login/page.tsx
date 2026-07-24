@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 
 export default function AdminLoginPage() {
@@ -29,23 +29,17 @@ export default function AdminLoginPage() {
     }
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) throw error;
-
-      if (data.session) {
-        // Set auth cookie so middleware can verify the session server-side
-        document.cookie = `sb-access-token=${data.session.access_token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax; Secure`;
-        document.cookie = `sb-refresh-token=${data.session.refresh_token}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax; Secure`;
-
-        router.push('/admin');
-        router.refresh();
+      await api('/api/auth/login', { method: 'POST', json: { email, password } });
+      const me = await api<{ user: { role: string } }>('/api/auth/me');
+      const role = me.user?.role;
+      if (role !== 'admin' && role !== 'staff') {
+        await api('/api/auth/logout', { method: 'POST' }).catch(() => {});
+        throw new Error('You do not have permission to access the admin area.');
       }
-    } catch (err: any) {
-      setError(err.message || 'Login failed');
+      router.push('/admin');
+      router.refresh();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
       setIsLoading(false);
     }

@@ -8,7 +8,6 @@ import {
   useState,
   ReactNode,
 } from 'react';
-import { supabase } from '@/lib/supabase';
 import { parseStorePricingValue } from '@/lib/pricing';
 
 type StorePricingContextType = {
@@ -29,19 +28,11 @@ export function StorePricingProvider({ children }: { children: ReactNode }) {
 
   const refresh = useCallback(async () => {
     try {
-      const { data, error } = await supabase
-        .from('site_settings')
-        .select('value')
-        .eq('key', 'store_pricing')
-        .maybeSingle();
-
-      if (error) {
-        console.warn('[StorePricing] fetch error:', error.message);
-        setSalesActive(false);
-        return;
-      }
-
-      const parsed = parseStorePricingValue(data?.value);
+      const data = await fetch('/api/settings?keys=store_pricing', { credentials: 'include' }).then((r) =>
+        r.ok ? r.json() : null
+      );
+      const value = data?.settings?.store_pricing;
+      const parsed = parseStorePricingValue(value);
       setSalesActive(parsed.sales_active);
     } catch {
       setSalesActive(false);

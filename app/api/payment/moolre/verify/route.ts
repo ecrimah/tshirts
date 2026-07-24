@@ -1,178 +1,156 @@
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-admin';
+import { query, queryOne } from '@/lib/db';
 import { sendOrderConfirmation } from '@/lib/notifications';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
 
-/**
- * Payment verification endpoint.
- * Called from the order-success page after the user completes payment on Moolre.
- * 
- * SECURITY: We ONLY trust Moolre's API response for payment verification.
- * The `fromRedirect` flag is NO LONGER trusted as proof of payment,
- * because anyone could forge that request.
- */
+type OrderRow = {
+  id: string;
+  order_number: string;
+  payment_status: string;
+  status: string;
+  total: number;
+  email: string;
+  phone: string | null;
+  shipping_address: unknown;
+  metadata: Record<string, unknown> | null;
+};
+
+type OrderJson = Record<string, unknown>;
+
 export async function POST(req: Request) {
-    try {
-        // Rate limiting
-        const clientId = getClientIdentifier(req);
-        const rateLimitResult = checkRateLimit(`verify:${clientId}`, RATE_LIMITS.payment);
+  try {
+    const clientId = getClientIdentifier(req);
+    const rateLimitResult = checkRateLimit(`verify:${clientId}`, RATE_LIMITS.payment);
 
-        if (!rateLimitResult.success) {
-            return NextResponse.json(
-                { success: false, message: 'Too many requests' },
-                { status: 429 }
-            );
-        }
-
-        const { orderNumber } = await req.json();
-
-        if (!orderNumber || typeof orderNumber !== 'string') {
-            return NextResponse.json({ success: false, message: 'Missing or invalid orderNumber' }, { status: 400 });
-        }
-
-        // Sanitize: only allow expected order number format
-        if (!/^ORD-\d+-\d+$/.test(orderNumber)) {
-            return NextResponse.json({ success: false, message: 'Invalid order number format' }, { status: 400 });
-        }
-
-        console.log('[Verify] Checking payment for:', orderNumber);
-
-        // 1. Check current order status
-        const { data: order, error: fetchError } = await supabaseAdmin
-            .from('orders')
-            .select('id, order_number, payment_status, status, total, email, phone, shipping_address, metadata')
-            .eq('order_number', orderNumber)
-            .single();
-
-        if (fetchError || !order) {
-            console.error('[Verify] Order not found:', orderNumber);
-            return NextResponse.json({ success: false, message: 'Order not found' }, { status: 404 });
-        }
-
-        // Already paid - no action needed
-        if (order.payment_status === 'paid') {
-            console.log('[Verify] Order already paid:', orderNumber);
-            return NextResponse.json({
-                success: true,
-                status: order.status,
-                payment_status: order.payment_status,
-                message: 'Order already paid'
-            });
-        }
-
-        // 2. Verify payment method is moolre
-        if (order.metadata?.payment_method && order.metadata.payment_method !== 'moolre') {
-            return NextResponse.json({
-                success: false,
-                message: 'This order does not use Moolre payment'
-            }, { status: 400 });
-        }
-
-        // 3. ONLY verify with Moolre's API — no more trusting client-side flags
-        let moolreApiVerified = false;
-
-        if (!process.env.MOOLRE_API_USER || !process.env.MOOLRE_API_PUBKEY) {
-            console.error('[Verify] Missing Moolre API credentials');
-            return NextResponse.json({
-                success: false,
-                status: order.status,
-                payment_status: order.payment_status,
-                message: 'Payment verification unavailable'
-            }, { status: 503 });
-        }
-
-        try {
-            const checkResponse = await fetch('https://api.moolre.com/embed/status', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-API-USER': process.env.MOOLRE_API_USER,
-                    'X-API-PUBKEY': process.env.MOOLRE_API_PUBKEY
-                },
-                body: JSON.stringify({ externalref: orderNumber })
-            });
-
-            const checkResult = await checkResponse.json();
-            console.log('[Verify] Moolre API response:', JSON.stringify(checkResult));
-
-            // Strict verification: require explicit success status
-            const statusStr = String(checkResult.data?.status || '').toLowerCase();
-            moolreApiVerified =
-                (checkResult.status === 1 && checkResult.data) &&
-                (statusStr === 'success' || statusStr === 'successful' || statusStr === 'completed' || statusStr === 'paid');
-
-            // Also verify the amount matches
-            if (moolreApiVerified && checkResult.data?.amount) {
-                const paidAmount = parseFloat(checkResult.data.amount);
-                const expectedAmount = Number(order.total);
-                if (Math.abs(paidAmount - expectedAmount) > 0.01) {
-                    console.error('[Verify] AMOUNT MISMATCH! Expected:', expectedAmount, 'Got:', paidAmount);
-                    moolreApiVerified = false;
-                }
-            }
-
-        } catch (moolreError: any) {
-            console.warn('[Verify] Moolre API check failed:', moolreError.message);
-        }
-
-        // 4. Only proceed if Moolre API confirmed payment
-        if (!moolreApiVerified) {
-            console.log('[Verify] Cannot verify payment for:', orderNumber);
-            return NextResponse.json({
-                success: false,
-                status: order.status,
-                payment_status: order.payment_status,
-                message: 'Payment not yet confirmed by payment provider'
-            });
-        }
-
-        console.log('[Verify] Marking order paid via moolre-api for:', orderNumber);
-
-        // 5. Mark as paid
-        const { data: orderJson, error: updateError } = await supabaseAdmin
-            .rpc('mark_order_paid', {
-                order_ref: orderNumber,
-                moolre_ref: 'moolre-api-verify'
-            });
-
-        if (updateError) {
-            console.error('[Verify] RPC Error:', updateError.message);
-            return NextResponse.json({ success: false, message: 'Failed to update order' }, { status: 500 });
-        }
-
-        console.log('[Verify] Order marked as paid:', orderNumber);
-
-        // 6. Update customer stats
-        if (orderJson?.email) {
-            try {
-                await supabaseAdmin.rpc('update_customer_stats', {
-                    p_customer_email: orderJson.email,
-                    p_order_total: orderJson.total
-                });
-            } catch (statsError: any) {
-                console.error('[Verify] Customer stats failed:', statsError.message);
-            }
-        }
-
-        // 7. Send notifications (SMS + Email)
-        if (orderJson) {
-            try {
-                await sendOrderConfirmation(orderJson);
-                console.log('[Verify] Notifications sent for:', orderNumber);
-            } catch (notifyError: any) {
-                console.error('[Verify] Notification failed:', notifyError.message);
-            }
-        }
-
-        return NextResponse.json({
-            success: true,
-            status: 'processing',
-            payment_status: 'paid',
-            message: 'Payment verified and order updated'
-        });
-
-    } catch (error: any) {
-        console.error('[Verify] Error:', error.message);
-        return NextResponse.json({ success: false, message: 'Internal error' }, { status: 500 });
+    if (!rateLimitResult.success) {
+      return NextResponse.json({ success: false, message: 'Too many requests' }, { status: 429 });
     }
+
+    const { orderNumber } = await req.json();
+
+    if (!orderNumber || typeof orderNumber !== 'string') {
+      return NextResponse.json({ success: false, message: 'Missing or invalid orderNumber' }, { status: 400 });
+    }
+
+    if (!/^ORD-\d+-\d+$/.test(orderNumber)) {
+      return NextResponse.json({ success: false, message: 'Invalid order number format' }, { status: 400 });
+    }
+
+    const order = await queryOne<OrderRow>(
+      `SELECT id, order_number, payment_status::text AS payment_status, status::text AS status,
+              total, email, phone, shipping_address, metadata
+       FROM orders WHERE order_number = $1`,
+      [orderNumber]
+    );
+
+    if (!order) {
+      return NextResponse.json({ success: false, message: 'Order not found' }, { status: 404 });
+    }
+
+    if (order.payment_status === 'paid') {
+      return NextResponse.json({
+        success: true,
+        status: order.status,
+        payment_status: order.payment_status,
+        message: 'Order already paid',
+      });
+    }
+
+    const meta = order.metadata || {};
+    if (meta.payment_method && meta.payment_method !== 'moolre') {
+      return NextResponse.json({
+        success: false,
+        message: 'This order does not use Moolre payment',
+      }, { status: 400 });
+    }
+
+    if (!process.env.MOOLRE_API_USER || !process.env.MOOLRE_API_PUBKEY) {
+      return NextResponse.json({
+        success: false,
+        status: order.status,
+        payment_status: order.payment_status,
+        message: 'Payment verification unavailable',
+      }, { status: 503 });
+    }
+
+    let moolreApiVerified = false;
+
+    try {
+      const checkResponse = await fetch('https://api.moolre.com/embed/status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-USER': process.env.MOOLRE_API_USER,
+          'X-API-PUBKEY': process.env.MOOLRE_API_PUBKEY,
+        },
+        body: JSON.stringify({ externalref: orderNumber }),
+      });
+
+      const checkResult = await checkResponse.json();
+      const statusStr = String(checkResult.data?.status || '').toLowerCase();
+      moolreApiVerified =
+        checkResult.status === 1 &&
+        checkResult.data &&
+        (statusStr === 'success' ||
+          statusStr === 'successful' ||
+          statusStr === 'completed' ||
+          statusStr === 'paid');
+
+      if (moolreApiVerified && checkResult.data?.amount) {
+        const paidAmount = parseFloat(checkResult.data.amount);
+        if (Math.abs(paidAmount - Number(order.total)) > 0.01) {
+          moolreApiVerified = false;
+        }
+      }
+    } catch (moolreError: unknown) {
+      console.warn('[Verify] Moolre API check failed:', moolreError);
+    }
+
+    if (!moolreApiVerified) {
+      return NextResponse.json({
+        success: false,
+        status: order.status,
+        payment_status: order.payment_status,
+        message: 'Payment not yet confirmed by payment provider',
+      });
+    }
+
+    const paidRow = await queryOne<{ result: OrderJson }>(
+      `SELECT mark_order_paid($1, $2) AS result`,
+      [orderNumber, 'moolre-api-verify']
+    );
+    const orderJson = paidRow?.result;
+
+    if (!orderJson) {
+      return NextResponse.json({ success: false, message: 'Failed to update order' }, { status: 500 });
+    }
+
+    if (orderJson.email) {
+      try {
+        await query(`SELECT update_customer_stats($1, $2)`, [
+          String(orderJson.email),
+          Number(orderJson.total),
+        ]);
+      } catch (statsError: unknown) {
+        console.error('[Verify] Customer stats failed:', statsError);
+      }
+    }
+
+    try {
+      await sendOrderConfirmation(orderJson);
+    } catch (notifyError: unknown) {
+      console.error('[Verify] Notification failed:', notifyError);
+    }
+
+    return NextResponse.json({
+      success: true,
+      status: 'processing',
+      payment_status: 'paid',
+      message: 'Payment verified and order updated',
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Internal error';
+    console.error('[Verify] Error:', message);
+    return NextResponse.json({ success: false, message: 'Internal error' }, { status: 500 });
+  }
 }

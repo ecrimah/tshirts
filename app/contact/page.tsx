@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useCMS } from '@/context/CMSContext';
-import { supabase } from '@/lib/supabase';
 import PageHero from '@/components/PageHero';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
@@ -25,19 +24,7 @@ export default function ContactPage() {
   const { getToken, verifying } = useRecaptcha();
 
   useEffect(() => {
-    async function fetchContactContent() {
-      const { data } = await supabase
-        .from('cms_content')
-        .select('*')
-        .eq('section', 'contact')
-        .eq('block_key', 'main')
-        .single();
-
-      if (data) {
-        setPageContent(data);
-      }
-    }
-    fetchContactContent();
+    /* CMS contact block is managed in code — no remote fetch */
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,24 +41,7 @@ export default function ContactPage() {
     }
 
     try {
-      // Store in Supabase
-      const { error } = await supabase
-        .from('contact_submissions')
-        .insert({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          subject: formData.subject,
-          message: formData.message,
-        });
-
-      if (error) {
-        // Table might not exist, still show success
-        console.log('Note: contact_submissions table may not exist');
-      }
-
-      // Send Contact Notification
-      fetch('/api/notifications', {
+      await fetch('/api/notifications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

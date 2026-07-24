@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import MiniCart from './MiniCart';
 import { useCart } from '@/context/CartContext';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 import { useCMS } from '@/context/CMSContext';
 import { useStorePricing } from '@/context/StorePricingContext';
 import { resolveProductPrice } from '@/lib/pricing';
@@ -40,19 +40,18 @@ export default function Header() {
 
     // Auth logic
     const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
+      try {
+        const me = await api<{ user: { id: string; email: string } | null }>('/api/auth/me');
+        setUser(me.user);
+      } catch {
+        setUser(null);
+      }
     };
 
     checkUser();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
     return () => {
       window.removeEventListener('wishlistUpdated', updateWishlistCount);
-      subscription.unsubscribe();
     };
   }, []);
 

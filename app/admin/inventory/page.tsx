@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 
 export default function InventoryManagementPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,24 +20,10 @@ export default function InventoryManagementPage() {
   const fetchInventory = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('products')
-        .select(`
-          id,
-          name,
-          sku,
-          price,
-          quantity,
-          status,
-          categories(name)
-        `)
-        .neq('status', 'archived')
-        .order('name');
-
-      if (error) throw error;
-
-      if (data) {
-        const mapped = data.map((p: any) => {
+      const data = await api<any[]>('/api/catalog/products?status=all');
+      const mapped = data
+        .filter((p) => p.status !== 'archived')
+        .map((p: any) => {
           const stock = p.quantity || 0;
           let status = 'good';
           if (stock === 0) status = 'out';
@@ -59,8 +45,7 @@ export default function InventoryManagementPage() {
             supplier: 'Standard Supplier' // Default
           };
         });
-        setProducts(mapped);
-      }
+      setProducts(mapped);
     } catch (error) {
       console.error('Error fetching inventory:', error);
     } finally {

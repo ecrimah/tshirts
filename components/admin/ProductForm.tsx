@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { api } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 
 interface ProductFormProps {
@@ -230,7 +230,7 @@ export default function ProductForm({ initialData, isEditMode = false }: Product
     // Fetch categories on mount
     useEffect(() => {
         async function fetchCategories() {
-            const { data } = await supabase.from('categories').select('id, name').eq('status', 'active');
+            const data = await api<{ id: string; name: string }[]>('/api/catalog/categories');
             if (data) {
                 setCategories(data);
                 if (data.length > 0 && !categoryId) {
@@ -265,17 +265,12 @@ export default function ProductForm({ initialData, isEditMode = false }: Product
             const fileName = `${Math.random()}.${fileExt}`;
             const filePath = `${fileName}`;
 
-            const { error: uploadError } = await supabase.storage
-                .from('products')
-                .upload(filePath, file);
-
-            if (uploadError) throw uploadError;
-
-            const { data: { publicUrl } } = supabase.storage
-                .from('products')
-                .getPublicUrl(filePath);
-
-            setImages([...images, { url: publicUrl, position: images.length }]);
+            const form = new FormData();
+            form.append('file', file);
+            const uploaded = await fetch('/api/uploads', { method: 'POST', body: form, credentials: 'include' }).then(
+                (r) => (r.ok ? r.json() : Promise.reject(new Error('Upload failed')))
+            );
+            setImages([...images, { url: uploaded.url, position: images.length }]);
 
         } catch (error: any) {
             alert('Error uploading image: ' + error.message);
@@ -325,77 +320,38 @@ export default function ProductForm({ initialData, isEditMode = false }: Product
             };
 
             let productId = initialData?.id;
-            let error;
+
+            const payload = {
+                ...productData,
+                images: images.map((img, idx) => ({
+                    url: img.url,
+                    position: idx,
+                    alt_text: productName,
+                })),
+                variants: variants.map((v) => {
+                    const colorHex = selectedColors.find((c) => c.name === v.color)?.hex || null;
+                    const vSale = v.salePrice?.trim() ? parseFloat(v.salePrice) : NaN;
+                    return {
+                        name: v.name || v.color || 'Default',
+                        sku: v.sku || null,
+                        price: parseFloat(v.price) || 0,
+                        sale_price: !Number.isNaN(vSale) && vSale > 0 ? vSale : null,
+                        quantity: parseInt(v.stock) || 0,
+                        option1: v.name || null,
+                        option2: v.color?.trim() || null,
+                        metadata: colorHex ? { color_hex: colorHex } : {},
+                    };
+                }),
+            };
 
             if (isEditMode && productId) {
-                // Update existing
-                const { error: updateError } = await supabase
-                    .from('products')
-                    .update(productData)
-                    .eq('id', productId);
-                error = updateError;
+                await api(`/api/catalog/products/${productId}`, { method: 'PATCH', json: payload });
             } else {
-                // Create new
-                const { data: newProduct, error: insertError } = await supabase
-                    .from('products')
-                    .insert([productData])
-                    .select()
-                    .single();
-
-                if (newProduct) productId = newProduct.id;
-                error = insertError;
-            }
-
-            if (error) throw error;
-
-            // Update Images
-            if (productId) {
-                // Strategy: We will just delete all old images/variants and recreate them for simplicity in this MVP.
-                // In a clearer implementation, we would diff them.
-
-                // 1. Images
-                if (isEditMode) {
-                    await supabase.from('product_images').delete().eq('product_id', productId);
-                }
-                if (images.length > 0) {
-                    const imageInserts = images.map((img, idx) => ({
-                        product_id: productId,
-                        url: img.url,
-                        position: idx,
-                        alt_text: productName
-                    }));
-                    await supabase.from('product_images').insert(imageInserts);
-                }
-
-                // 2. Variants
-                if (isEditMode) {
-                    // Be careful not to delete ALL variants if we want to preserve IDs etc, 
-                    // but for now, full replacement is safer to ensure sync.
-                    // Note: This might break order-item references if they rely on variant_id hard constraints without cascading.
-                    // Our Schema migration has ON DELETE SET NULL for order_items -> variant_id, so this is safe for now (but distinct from "archiving").
-                    await supabase.from('product_variants').delete().eq('product_id', productId);
-                }
-
-                if (variants.length > 0) {
-                    const variantInserts = variants.map(v => {
-                        const colorHex = selectedColors.find(c => c.name === v.color)?.hex || null;
-                        const vSale = v.salePrice?.trim() ? parseFloat(v.salePrice) : NaN;
-                        return {
-                            product_id: productId,
-                            name: v.name || v.color || 'Default',
-                            sku: v.sku || null,
-                            price: parseFloat(v.price) || 0,
-                            sale_price:
-                                !Number.isNaN(vSale) && vSale > 0 ? vSale : null,
-                            quantity: parseInt(v.stock) || 0,
-                            option1: v.name || null,
-                            option2: v.color?.trim() || null,
-                            metadata: colorHex ? { color_hex: colorHex } : {}
-                        };
-                    });
-                    const { error: varError } = await supabase.from('product_variants').insert(variantInserts);
-                    if (varError) throw varError;
-                }
+                const created = await api<{ id: string }>('/api/catalog/products', {
+                    method: 'POST',
+                    json: payload,
+                });
+                productId = created.id;
             }
 
             alert(isEditMode ? 'Product updated successfully!' : 'Product created successfully!');
