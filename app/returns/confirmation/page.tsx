@@ -1,15 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 
 export default function ReturnConfirmationPage() {
   const returnId = `RET-2024-${Math.floor(Math.random() * 10000)}`;
 
   return (
-    <>
-      <Header />
       <main className="min-h-screen bg-gray-50 flex items-center justify-center py-12">
         <div className="max-w-2xl mx-auto px-4">
           <div className="bg-white rounded-xl shadow-lg p-8 text-center">
@@ -134,7 +130,5 @@ export default function ReturnConfirmationPage() {
           </div>
         </div>
       </main>
-      <Footer />
-    </>
   );
 }

@@ -36,7 +36,7 @@ export async function listProducts(options: ProductListOptions = {}) {
     SELECT
       p.id, p.name, p.slug, p.price, p.sale_price, p.compare_at_price, p.quantity,
       p.description, p.short_description, p.metadata, p.featured, p.status,
-      p.category_id, p.created_at,
+      p.category_id, p.created_at, p.rating_avg, p.review_count,
       CASE WHEN c.id IS NULL THEN NULL ELSE jsonb_build_object('id', c.id, 'name', c.name, 'slug', c.slug) END AS categories,
       COALESCE(
         (SELECT jsonb_agg(jsonb_build_object('url', pi.url, 'position', pi.position, 'alt_text', pi.alt_text) ORDER BY pi.position)

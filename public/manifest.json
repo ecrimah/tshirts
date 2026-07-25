@@ -1,1 +1,74 @@
-{"name":"Maries Hair","short_name":"Maries Hair","description":"Maries Hair – hair care and beauty at Kpakpo mankralo road 55, Mataheko. Call 0547742920.","start_url":"/?source=pwa","scope":"/","display":"standalone","orientation":"portrait","background_color":"#ffffff","theme_color":"#2563eb","dir":"ltr","lang":"en","categories":["shopping","lifestyle","fashion"],"icons":[{"src":"/logo.png","sizes":"any","type":"image/png","purpose":"any"},{"src":"/logo.png","sizes":"192x192","type":"image/png","purpose":"any"},{"src":"/logo.png","sizes":"512x512","type":"image/png","purpose":"any"},{"src":"/logo.png","sizes":"192x192","type":"image/png","purpose":"maskable"},{"src":"/logo.png","sizes":"512x512","type":"image/png","purpose":"maskable"}],"shortcuts":[{"name":"Shop Products","short_name":"Shop","description":"Browse all products","url":"/shop?source=pwa-shortcut","icons":[{"src":"/logo.png","sizes":"96x96"}]},{"name":"My Cart","short_name":"Cart","description":"View your shopping cart","url":"/cart?source=pwa-shortcut","icons":[{"src":"/logo.png","sizes":"96x96"}]},{"name":"Track Order","short_name":"Track","description":"Track your order status","url":"/order-tracking?source=pwa-shortcut","icons":[{"src":"/logo.png","sizes":"96x96"}]},{"name":"My Account","short_name":"Account","description":"View your account","url":"/account?source=pwa-shortcut","icons":[{"src":"/logo.png","sizes":"96x96"}]}],"screenshots":[],"prefer_related_applications":false,"related_applications":[]}
+{
+  "name": "Mamator Trading Enterprise",
+  "short_name": "Mamator",
+  "description": "Shop graphic tees, polos & performance shirts online in Ghana.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "id": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a1931",
+  "theme_color": "#0a1931",
+  "dir": "ltr",
+  "lang": "en-GH",
+  "categories": ["shopping", "lifestyle", "fashion"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Shop Products",
+      "short_name": "Shop",
+      "description": "Browse all products",
+      "url": "/shop?source=pwa-shortcut",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "My Cart",
+      "short_name": "Cart",
+      "description": "View your shopping cart",
+      "url": "/cart?source=pwa-shortcut",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Track Order",
+      "short_name": "Track",
+      "description": "Track your order status",
+      "url": "/order-tracking?source=pwa-shortcut",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "My Account",
+      "short_name": "Account",
+      "description": "View your account",
+      "url": "/account?source=pwa-shortcut",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false,
+  "related_applications": []
+}

@@ -3,6 +3,74 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --store-navy: #0a1931;
+    --store-accent: #6ab0ff;
+    --store-muted: #5e76a6;
+  }
+}
+
+@keyframes headerMarquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-header-marquee {
+  animation: headerMarquee 35s linear infinite;
+}
+
+.animate-header-marquee:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-header-marquee {
+    animation: none;
+  }
+}
+
+@keyframes heroSlideProgress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.hero-slide-progress {
+  animation: heroSlideProgress 6s linear forwards;
+}
+
+@keyframes productMarquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-product-marquee {
+  animation: productMarquee 40s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-product-marquee {
+    animation: none;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+}
+
 /* ========================================
    ANIMATIONS & EFFECTS
    ======================================== */
@@ -615,7 +683,7 @@ img {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #0c4a6e 100%);
+  background: linear-gradient(135deg, #0a1931 0%, #122547 50%, #0a1931 100%);
   animation: splashFadeOut 0.5s ease-out 1.5s forwards;
 }
 

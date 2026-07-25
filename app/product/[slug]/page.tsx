@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import { getProductBySlug } from '@/lib/data/products';
 import { stripHtml } from '@/lib/product-seo';
+import { absoluteAsset, BRAND_ASSETS, getSiteUrl } from '@/lib/site-brand';
 import ProductDetailClient from './ProductDetailClient';
 
 const siteName = process.env.NEXT_PUBLIC_SITE_NAME || 'Mamator';
-const siteUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://mamator.com').replace(/\/+$/, '');
+const siteUrl = getSiteUrl();
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -22,18 +23,26 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       `Shop ${product.name} at ${siteName}.`;
     const image =
       (Array.isArray(product.product_images) && product.product_images[0]?.url) ||
-      `${siteUrl}/logo.png`;
+      absoluteAsset(BRAND_ASSETS.ogImage);
 
     return {
       title,
       description,
+      alternates: { canonical: `${siteUrl}/product/${slug}` },
       openGraph: {
         title,
         description,
         url: `${siteUrl}/product/${slug}`,
         siteName,
-        images: [{ url: image }],
+        locale: 'en_GH',
+        images: [{ url: image, width: 1200, height: 630, alt: product.name }],
         type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: [image],
       },
     };
   } catch {

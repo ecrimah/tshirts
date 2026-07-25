@@ -4,13 +4,16 @@ import { useState, useEffect } from 'react';
 import { useCMS } from '@/context/CMSContext';
 import PageHero from '@/components/PageHero';
 import { usePageTitle } from '@/hooks/usePageTitle';
+import ContactInfoCards from '@/components/contact/ContactInfoCards';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 
 export default function ContactPage() {
   usePageTitle('Contact Us');
   const { getSetting } = useCMS();
-  const contactPhone = getSetting('contact_phone') || '0547742920';
-  const contactAddress = getSetting('contact_address') || 'Kpakpo mankralo road 55, Mataheko';
+  const contactPhone = getSetting('contact_phone') || '0249628324';
+  const contactEmail = getSetting('contact_email') || 'info@mamator.com';
+  const contactAddress = getSetting('contact_address') || 'Accra, Kasoa, Koforidua';
+  const contactWhatsapp = getSetting('contact_whatsapp') || getSetting('contact_phone') || '0249628324';
   const [pageContent, setPageContent] = useState<any>(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -66,7 +69,7 @@ export default function ContactPage() {
   const faqs = [
     {
       question: 'What are your delivery times?',
-      answer: 'Standard delivery takes 2-5 business days within Ghana. Express delivery is available for Accra and Kumasi. We ship wigs, extensions, closures, frontals and all other items with care.'
+      answer: 'Standard delivery takes 2-5 business days within Ghana. Express delivery is available for Accra and Kumasi. We pack every tee order with care.'
     },
     {
       question: 'Do you offer international shipping?',
@@ -83,10 +86,19 @@ export default function ContactPage() {
       <PageHero
         title="Get In Touch"
         subtitle="Have a question about our collections or your order? We’re here to help."
-        backgroundImage="/hero_contact_1772075143648.png"
+        backgroundImage="/hero-tee-graphic.jpg"
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10 pb-4">
+        <ContactInfoCards
+          phone={contactPhone}
+          email={contactEmail}
+          address={contactAddress}
+          whatsapp={contactWhatsapp}
+        />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
         <div className="grid lg:grid-cols-2 gap-12">
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">Send Us a Message</h2>
@@ -106,7 +118,7 @@ export default function ContactPage() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-stone-500 focus:border-transparent text-sm"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-store-primary/40 focus:border-store-primary text-sm"
                   placeholder="John Doe"
                 />
               </div>
@@ -122,7 +134,7 @@ export default function ContactPage() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-stone-500 focus:border-transparent text-sm"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-store-primary/40 focus:border-store-primary text-sm"
                   placeholder="john@example.com"
                 />
               </div>
@@ -137,7 +149,7 @@ export default function ContactPage() {
                   name="phone"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-stone-500 focus:border-transparent text-sm"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-store-primary/40 focus:border-store-primary text-sm"
                   placeholder="+233 XX XXX XXXX"
                 />
               </div>
@@ -153,7 +165,7 @@ export default function ContactPage() {
                   required
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-stone-500 focus:border-transparent text-sm"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-store-primary/40 focus:border-store-primary text-sm"
                   placeholder="Order inquiry, product question, etc."
                 />
               </div>
@@ -170,7 +182,7 @@ export default function ContactPage() {
                   maxLength={500}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-stone-500 focus:border-transparent resize-none text-sm"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-store-primary/40 focus:border-store-primary resize-none text-sm"
                   placeholder="Tell us how we can help you..."
                 ></textarea>
                 <p className="text-xs text-gray-500 mt-1">{formData.message.length}/500 characters</p>
@@ -193,7 +205,7 @@ export default function ContactPage() {
               <button
                 type="submit"
                 disabled={isSubmitting || verifying}
-                className="w-full bg-stone-700 text-white py-4 rounded-xl font-medium hover:bg-stone-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer"
+                className="w-full bg-store-navy text-white py-4 rounded-xl font-medium hover:bg-store-navy-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap cursor-pointer"
               >
                 {isSubmitting || verifying ? (verifying ? 'Verifying...' : 'Sending...') : 'Send Message'}
               </button>
@@ -217,28 +229,6 @@ export default function ContactPage() {
                   </div>
                 </details>
               ))}
-            </div>
-
-            <div className="bg-gradient-to-br from-stone-700 to-stone-900 p-8 rounded-2xl text-white">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-4">
-                <i className="ri-customer-service-2-line text-2xl"></i>
-              </div>
-              <h3 className="text-2xl font-bold mb-3">Need Immediate Help?</h3>
-              <p className="text-stone-100 mb-4 leading-relaxed">
-                Our customer support team reviews all messages and will get back to you as soon as possible.
-              </p>
-              <div className="space-y-2 text-stone-100">
-                <p className="flex items-center gap-2">
-                  <i className="ri-phone-line"></i>
-                  <a href={`tel:${contactPhone}`} className="hover:text-white font-medium">{contactPhone || '0547742920'}</a>
-                </p>
-                {contactAddress && (
-                  <p className="flex items-start gap-2">
-                    <i className="ri-map-pin-line mt-0.5 shrink-0"></i>
-                    <span>{contactAddress}</span>
-                  </p>
-                )}
-              </div>
             </div>
           </div>
         </div>

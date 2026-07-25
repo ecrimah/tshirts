@@ -39,6 +39,7 @@
     "start": "cross-env NODE_ENV=production next start -H 0.0.0.0 -p 3005",
     "clean": "node -e \"const fs=require('fs');const path=require('path');const d=path.join(process.cwd(),'.next');if(fs.existsSync(d)){fs.rmSync(d,{recursive:true});console.log('Removed .next');}const c=path.join(process.cwd(),'node_modules','.cache');if(fs.existsSync(c)){fs.rmSync(c,{recursive:true});console.log('Removed node_modules/.cache');}\"",
     "compress-images": "node scripts/compress-images.mjs",
+    "brand:assets": "node scripts/generate-brand-assets.mjs",
     "dev": "cross-env NODE_ENV=development next dev -H 0.0.0.0 -p 3005",
     "lint": "next lint",
     "db:migrate": "node scripts/migrate-db.mjs",

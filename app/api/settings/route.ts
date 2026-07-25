@@ -9,6 +9,8 @@ const PUBLIC_KEYS = new Set([
   'site_logo',
   'contact_email',
   'contact_phone',
+  'contact_phone_secondary',
+  'contact_whatsapp',
   'contact_address',
   'social_facebook',
   'social_instagram',

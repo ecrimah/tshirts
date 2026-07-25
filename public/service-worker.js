@@ -1,5 +1,5 @@
 // Service Worker
-const CACHE_VERSION = 'sw-v2.2';
+const CACHE_VERSION = 'sw-v2.3';
 const STATIC_CACHE = `static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `dynamic-${CACHE_VERSION}`;
 const IMAGE_CACHE = `images-${CACHE_VERSION}`;
@@ -15,6 +15,10 @@ const STATIC_ASSETS = [
   '/categories',
   '/offline',
   '/logo.png',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/og-image.png',
+  '/manifest.json',
 ];
 
 // Cache size limits

@@ -1,113 +1,192 @@
 "use client";
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { useCMS } from '@/context/CMSContext';
 
-function FooterSection({ title, children }: { title: string, children: React.ReactNode }) {
-  const [isOpen, setIsOpen] = useState(false);
+const footerLinkClass =
+  'text-white/90 hover:text-store-primary transition-colors text-sm leading-relaxed';
 
-  return (
-    <div className="border-b border-stone-800/50 lg:border-none last:border-0">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between py-4 text-left lg:py-0 lg:cursor-default lg:mb-6"
+function SocialButton({ href, label, icon }: { href: string; label: string; icon: string }) {
+  if (!href || href === '#') {
+    return (
+      <span
+        className="flex h-9 w-9 items-center justify-center rounded-full bg-store-navy-light text-white/70"
+        aria-hidden
       >
-        <h4 className="font-bold text-lg text-white">{title}</h4>
-        <i className={`ri-arrow-down-s-line text-stone-400 text-xl transition-transform duration-300 lg:hidden ${isOpen ? 'rotate-180' : ''}`}></i>
-      </button>
-      <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96 pb-6' : 'max-h-0 lg:max-h-full lg:overflow-visible'}`}>
-        {children}
-      </div>
-    </div>
+        <i className={`${icon} text-lg`} />
+      </span>
+    );
+  }
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={label}
+      className="flex h-9 w-9 items-center justify-center rounded-full bg-store-navy-light text-white hover:bg-store-primary hover:text-store-navy transition-colors"
+    >
+      <i className={`${icon} text-lg`} />
+    </a>
   );
+}
+
+function formatGhanaPhoneDisplay(raw: string): string {
+  const digits = raw.replace(/\D/g, '');
+  if (digits.length === 10 && digits.startsWith('0')) {
+    return `${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6)}`;
+  }
+  if (digits.length === 12 && digits.startsWith('233')) {
+    const local = `0${digits.slice(3)}`;
+    return `${local.slice(0, 3)} ${local.slice(3, 6)} ${local.slice(6)}`;
+  }
+  return raw;
+}
+
+function phoneTelHref(raw: string): string {
+  const digits = raw.replace(/\D/g, '');
+  if (digits.startsWith('0')) return `tel:+233${digits.slice(1)}`;
+  if (digits.startsWith('233')) return `tel:+${digits}`;
+  return `tel:${digits}`;
 }
 
 export default function Footer() {
   const { getSetting } = useCMS();
+  const pathname = usePathname();
 
-  const siteName = getSetting('site_name') || process.env.NEXT_PUBLIC_SITE_NAME || 'Mamator';
-  const siteTagline = getSetting('site_tagline') || 'Hair care and beauty.';
+  const siteName = getSetting('site_name') || 'Mamator';
+  const legalName = getSetting('company_legal_name') || 'Mamator Trading Enterprise';
   const siteLogo = getSetting('site_logo') || '/logo.png';
+  const address = getSetting('contact_address') || 'Accra, Kasoa, Koforidua';
+  const email = getSetting('contact_email') || 'info@mamator.com';
+  const phonePrimary = formatGhanaPhoneDisplay(getSetting('contact_phone') || '0249628324');
+  const phoneSecondary = formatGhanaPhoneDisplay(
+    getSetting('contact_phone_secondary') || '0553188619'
+  );
+  const tagline =
+    getSetting('site_tagline') || `Quality products from ${legalName}.`;
+
+  const socials = [
+    { href: getSetting('social_instagram'), label: 'Instagram', icon: 'ri-instagram-line' },
+    { href: getSetting('social_tiktok'), label: 'TikTok', icon: 'ri-tiktok-line' },
+    { href: getSetting('social_snapchat'), label: 'Snapchat', icon: 'ri-snapchat-line' },
+    { href: getSetting('social_youtube'), label: 'YouTube', icon: 'ri-youtube-line' },
+    {
+      href: getSetting('social_twitter') || getSetting('social_x'),
+      label: 'X',
+      icon: 'ri-twitter-x-line',
+    },
+  ];
 
   return (
-    <footer className="relative mt-12 z-0">
+    <footer className="relative mt-8 bg-store-navy text-white rounded-t-[2.5rem] overflow-hidden">
+      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 pt-14 pb-10 md:pt-16 md:pb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8">
+          <div className="lg:col-span-4 space-y-6">
+            <Link href="/" className="inline-flex items-center gap-3 group">
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/15 overflow-hidden">
+                <img src={siteLogo} alt="" className="h-10 w-10 object-contain" />
+              </span>
+              <span>
+                <span className="block font-serif text-xl font-bold tracking-wide uppercase">
+                  {siteName.replace(/\s+/g, ' ')}
+                  <sup className="text-[10px] align-super ml-0.5">®</sup>
+                </span>
+                <span className="block text-[10px] tracking-[0.2em] uppercase text-white/70 mt-0.5">
+                  Trading Enterprise
+                </span>
+              </span>
+            </Link>
 
-      {/* Footer Background Shape */}
-      <div className="absolute inset-0 bg-stone-950 rounded-t-[3rem] -z-10 overflow-hidden">
-        {/* Decorative elements inside footer bg */}
-        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-stone-800 to-transparent opacity-30"></div>
-      </div>
-
-      <div className="text-white pt-16 pb-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-
-            {/* Brand Column */}
-            <div className="lg:col-span-1 space-y-6">
-              <Link href="/" className="inline-block group">
-                <img src={siteLogo} alt={siteName} className="h-16 w-auto object-contain drop-shadow-lg group-hover:scale-105 transition-transform duration-300" />
-              </Link>
-              <p className="text-stone-200/60 leading-relaxed text-sm">
-                {siteTagline}
+            <div className="text-sm text-white/80 leading-relaxed max-w-sm space-y-1.5">
+              <p>{tagline}</p>
+              <p>{address}.</p>
+              <p>
+                Call{' '}
+                <a
+                  href={phoneTelHref(getSetting('contact_phone') || '0249628324')}
+                  className="hover:text-store-primary transition-colors"
+                >
+                  {phonePrimary}
+                </a>
+                {' / '}
+                <a
+                  href={phoneTelHref(getSetting('contact_phone_secondary') || '0553188619')}
+                  className="hover:text-store-primary transition-colors"
+                >
+                  {phoneSecondary}
+                </a>
+                .
               </p>
-
-              <div className="flex flex-wrap gap-6 pt-4">
-                <a href="#" aria-label="Instagram" className="text-stone-500 hover:text-white transition-transform hover:scale-110">
-                  <i className="ri-instagram-line text-2xl"></i>
+              <p>
+                <a
+                  href={`mailto:${email}`}
+                  className="hover:text-store-primary transition-colors"
+                >
+                  {email}
                 </a>
-                <a href="#" aria-label="Twitter" className="text-stone-500 hover:text-white transition-transform hover:scale-110">
-                  <i className="ri-twitter-x-line text-2xl"></i>
-                </a>
-                <a href="#" aria-label="Facebook" className="text-stone-500 hover:text-white transition-transform hover:scale-110">
-                  <i className="ri-facebook-circle-line text-2xl"></i>
-                </a>
-              </div>
+              </p>
             </div>
 
-            {/* Links Sections */}
-            <div className="lg:col-span-3 grid md:grid-cols-3 gap-8 lg:gap-12 pl-0 lg:pl-12">
-
-              <div className="space-y-6">
-                <h4 className="font-serif text-xl font-bold text-white">Shop</h4>
-                <ul className="space-y-3 text-stone-100/60 text-sm">
-                  <li><Link href="/shop" className="hover:text-stone-300 transition-colors">All Products</Link></li>
-                  <li><Link href="/categories" className="hover:text-stone-300 transition-colors">Collections</Link></li>
-                  <li><Link href="/shop?sort=newest" className="hover:text-stone-300 transition-colors">New Arrivals</Link></li>
-                  <li><Link href="/shop?sort=bestsellers" className="hover:text-stone-300 transition-colors">Best Sellers</Link></li>
-                </ul>
-              </div>
-
-              <div className="space-y-6">
-                <h4 className="font-serif text-xl font-bold text-white">Support</h4>
-                <ul className="space-y-3 text-stone-100/60 text-sm">
-                  <li><Link href="/contact" className="hover:text-stone-300 transition-colors">Contact Us</Link></li>
-                  <li><Link href="/order-tracking" className="hover:text-stone-300 transition-colors">Track Order</Link></li>
-                  <li><Link href="/shipping" className="hover:text-stone-300 transition-colors">Shipping & Delivery</Link></li>
-                  <li><Link href="/returns" className="hover:text-stone-300 transition-colors">Returns & Exchange</Link></li>
-                </ul>
-              </div>
-
-              <div className="space-y-6">
-                <h4 className="font-serif text-xl font-bold text-white">Company</h4>
-                <ul className="space-y-3 text-stone-100/60 text-sm">
-                  <li><Link href="/about" className="hover:text-stone-300 transition-colors">Our Story</Link></li>
-                  <li><Link href="/privacy" className="hover:text-stone-300 transition-colors">Privacy Policy</Link></li>
-                  <li><Link href="/terms" className="hover:text-stone-300 transition-colors">Terms of Service</Link></li>
-                  <li><Link href="/admin" className="hover:text-stone-300 transition-colors">Admin Access</Link></li>
-                </ul>
-              </div>
-
+            <div className="flex flex-wrap gap-2.5 pt-1">
+              {socials.map((s) => (
+                <SocialButton key={s.label} href={s.href} label={s.label} icon={s.icon} />
+              ))}
             </div>
           </div>
 
-          <div className="border-t border-stone-900/50 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-stone-500/40">
-            <p>&copy; {new Date().getFullYear()} {siteName}. All rights reserved.</p>
-            <div className="flex gap-4 opacity-40">
-              <i className="ri-visa-line text-2xl"></i>
-              <i className="ri-mastercard-line text-2xl"></i>
-              <i className="ri-paypal-line text-2xl"></i>
+          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-8 lg:pl-8">
+            <div>
+              <h4 className="font-serif text-lg font-bold text-white mb-5">Shop</h4>
+              <ul className="space-y-3">
+                <li><Link href="/shop" className={footerLinkClass}>All Products</Link></li>
+                <li><Link href="/categories" className={footerLinkClass}>Collections</Link></li>
+                <li><Link href="/shop?sort=newest" className={footerLinkClass}>New Arrivals</Link></li>
+                <li><Link href="/shop?sort=bestsellers" className={footerLinkClass}>Best Sellers</Link></li>
+              </ul>
             </div>
+
+            <div>
+              <h4 className="font-serif text-lg font-bold text-white mb-5">Support</h4>
+              <ul className="space-y-3">
+                <li><Link href="/contact" className={footerLinkClass}>Contact Us</Link></li>
+                <li><Link href="/order-tracking" className={footerLinkClass}>Track Order</Link></li>
+                <li><Link href="/shipping" className={footerLinkClass}>Shipping &amp; Delivery</Link></li>
+                <li>
+                  <Link
+                    href="/returns"
+                    className={`text-sm leading-relaxed transition-colors ${
+                      pathname === '/returns'
+                        ? 'text-store-primary'
+                        : 'text-white/90 hover:text-store-primary'
+                    }`}
+                  >
+                    Returns &amp; Exchange
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-serif text-lg font-bold text-white mb-5">Company</h4>
+              <ul className="space-y-3">
+                <li><Link href="/about" className={footerLinkClass}>Our Story</Link></li>
+                <li><Link href="/privacy" className={footerLinkClass}>Privacy Policy</Link></li>
+                <li><Link href="/terms" className={footerLinkClass}>Terms of Service</Link></li>
+                <li><Link href="/admin" className={footerLinkClass}>Admin Access</Link></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-xs text-store-muted text-center md:text-left">
+            &copy; {new Date().getFullYear()} {legalName}. All rights reserved.
+          </p>
+          <div className="flex gap-4 text-store-muted text-2xl" aria-label="Accepted payment methods">
+            <i className="ri-visa-line" aria-hidden />
+            <i className="ri-mastercard-line" aria-hidden />
+            <i className="ri-paypal-line" aria-hidden />
           </div>
         </div>
       </div>

@@ -50,7 +50,15 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
-            <img src="/logo.png" alt="Mamator" className="h-12 w-auto mx-auto rounded-full object-cover" />
+            <span className="inline-flex h-24 w-24 items-center justify-center rounded-full bg-[#0a1931] shadow-lg ring-1 ring-black/10">
+              <img
+                src="/logo.png"
+                alt="Mamator Trading Enterprise"
+                width={96}
+                height={96}
+                className="h-20 w-20 object-contain"
+              />
+            </span>
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mt-6 mb-2">Admin Login</h1>
           <p className="text-gray-600">Sign in to access the admin dashboard</p>

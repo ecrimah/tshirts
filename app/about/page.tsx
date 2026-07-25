@@ -12,22 +12,24 @@ export default function AboutPage() {
   const [activeTab, setActiveTab] = useState('story');
 
   const siteName = getSetting('site_name') || process.env.NEXT_PUBLIC_SITE_NAME || 'Mamator';
+  const companyName =
+    getSetting('company_legal_name') || 'Mamator Trading Enterprise';
 
   const values = [
     {
       icon: 'ri-verified-badge-line',
       title: 'Verified Quality',
-      description: 'Every product is personally inspected before it reaches you. Whether sourced locally or imported from China, quality comes first.'
+      description: 'Every tee is checked for fabric, fit, and finish — from plain crew necks to graphic prints and polos.'
     },
     {
       icon: 'ri-money-dollar-circle-line',
       title: 'Unbeatable Prices',
-      description: 'By sourcing directly from manufacturers and local suppliers, we cut out the middleman and pass the savings to you.'
+      description: 'Direct sourcing on blanks and imports means better prices on the shirts you wear every day.'
     },
     {
       icon: 'ri-global-line',
       title: 'Local & Imported',
-      description: 'The best of both worlds — handpicked local products alongside carefully selected imports from trusted Chinese suppliers.'
+      description: 'Graphic, plain, polo, and performance tees — curated from trusted factories and local partners.'
     },
     {
       icon: 'ri-truck-line',
@@ -40,8 +42,8 @@ export default function AboutPage() {
     <div className="min-h-screen bg-white">
       <PageHero
         title="Our Story"
-        subtitle="Premium wigs and luxury extensions designed to make every moment feel special."
-        backgroundImage="/hero_about_1772074892869.png"
+        subtitle="Ghana’s home for quality t-shirts, polos, and performance tees."
+        backgroundImage="/hero-fashion-bg.jpg"
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -49,7 +51,7 @@ export default function AboutPage() {
           <button
             onClick={() => setActiveTab('story')}
             className={`px-4 py-2 sm:px-8 sm:py-4 font-medium transition-colors text-lg cursor-pointer ${activeTab === 'story'
-              ? 'text-stone-700 border-b-4 border-stone-700 font-bold'
+              ? 'text-store-navy border-b-4 border-store-primary font-bold'
               : 'text-gray-500 hover:text-gray-700'
               }`}
           >
@@ -58,7 +60,7 @@ export default function AboutPage() {
           <button
             onClick={() => setActiveTab('mission')}
             className={`px-4 py-2 sm:px-8 sm:py-4 font-medium transition-colors text-lg cursor-pointer ${activeTab === 'mission'
-              ? 'text-stone-700 border-b-4 border-stone-700 font-bold'
+              ? 'text-store-navy border-b-4 border-store-primary font-bold'
               : 'text-gray-500 hover:text-gray-700'
               }`}
           >
@@ -67,38 +69,28 @@ export default function AboutPage() {
         </div>
 
         {activeTab === 'story' && (
-          <div className="grid md:grid-cols-2 gap-16 lg:gap-24 items-center animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="order-2 md:order-1">
-              <div className="flex items-center gap-4 mb-8">
-                <span className="h-[1px] w-12 bg-stone-300"></span>
-                <span className="text-stone-500 text-sm tracking-[0.3em] uppercase font-medium">Our Story</span>
-              </div>
-              <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-gray-900 mb-8 leading-[1.1] tracking-tight">
-                How It All <span className="italic font-light text-stone-500">Started</span>
-              </h2>
-              <div className="space-y-6 text-lg text-gray-600 font-light leading-[1.8]">
-                <p>
-                  <strong>{siteName}</strong> started with a simple idea: bring beautifully curated pieces together in one place, so getting dressed feels effortless and exciting.
-                </p>
-                <p>
-                  From statement wigs and luxurious extensions to everyday essentials, every item is carefully selected for quality, comfort, and style. We believe great hair should feel accessible, inspiring, and uniquely you.
-                </p>
-                <p>
-                  Whether you are refreshing your wardrobe, shopping for a special occasion, or styling content for your brand, <strong>{siteName}</strong> is here to make every look feel intentional and complete.
-                </p>
-              </div>
-            </div>
-
-            <div className="relative order-1 md:order-2 group">
-              <div className="aspect-[4/5] bg-stone-50 relative flex items-center justify-center overflow-hidden transition-transform duration-1000 ease-[cubic-bezier(0.25,0.1,0.25,1)]">
-                <img
-                  src={getSetting('site_logo') || '/logo.png'}
-                  alt={siteName}
-                  className="w-3/5 h-auto object-contain mix-blend-multiply opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-1000 ease-[cubic-bezier(0.25,0.1,0.25,1)] relative z-10"
-                />
-              </div>
-              {/* Architectural offset shadow element instead of heavy glowing shadows */}
-              <div className="absolute -z-10 -bottom-6 -right-6 w-full h-full bg-stone-100/80 transition-transform duration-1000 group-hover:-translate-y-2 group-hover:-translate-x-2 ease-[cubic-bezier(0.25,0.1,0.25,1)]"></div>
+          <div className="max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <h2 className="text-3xl sm:text-4xl font-bold text-store-ink mb-8 tracking-tight">
+              How It All Started
+            </h2>
+            <div className="space-y-6 text-base sm:text-lg text-gray-600 leading-relaxed">
+              <p>
+                <strong className="font-semibold text-gray-800">{companyName}</strong> started with a
+                simple idea: bring quality t-shirts to Ghanaians at fair prices. We saw how people were
+                paying too much for tees that could be sourced smarter — so we built a bridge between
+                trusted Chinese manufacturers, local suppliers, and everyday shoppers.
+              </p>
+              <p>
+                What began as a small operation in Accra has grown into a focused online store for
+                t-shirts — graphic prints, plain crew necks, polos, and performance styles. We
+                handpick every shirt, test the fabric and fit, and price it fairly.
+              </p>
+              <p>
+                Whether you are shopping for yourself, stocking your boutique, or looking for the perfect
+                gift, <strong className="font-semibold text-gray-800">{companyName}</strong> has you
+                covered. We combine local sourcing with direct imports to give you the widest selection
+                at the best value.
+              </p>
             </div>
           </div>
         )}
@@ -111,7 +103,8 @@ export default function AboutPage() {
               </div>
               <h3 className="text-3xl font-bold text-gray-900 mb-4">Mission Statement</h3>
               <p className="text-gray-600 leading-relaxed text-sm lg:text-base">
-                To provide quality products, expert guidance, fast and reliable services to beauty enthusiasts and professionals.
+                To connect Ghanaians with quality t-shirts at fair prices — through trusted imports,
+                local partnerships, and a shopping experience you can rely on.
               </p>
             </div>
             <div className="bg-amber-50 p-10 rounded-3xl border border-amber-100">
@@ -120,7 +113,8 @@ export default function AboutPage() {
               </div>
               <h3 className="text-3xl font-bold text-gray-900 mb-4">Vision Statement</h3>
               <p className="text-gray-600 text-lg leading-relaxed">
-                To be the one stop beauty store delivering quality, comfort and reliability without compromise.
+                To become Ghana&apos;s go-to online store for t-shirts and polos — known for value,
+                trust, and nationwide delivery.
               </p>
             </div>
           </div>
@@ -149,15 +143,15 @@ export default function AboutPage() {
       </div>
 
       {/* CTA */}
-      <div className="bg-stone-900 py-24">
+      <div className="bg-store-navy py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
           <h2 className="text-4xl md:text-5xl font-bold mb-8">Ready to shop smarter?</h2>
-          <p className="text-xl text-stone-100 mb-10 leading-relaxed max-w-2xl mx-auto">
-            Browse our collection of premium wigs, extensions, closures, frontals and more. New stock arrives weekly.
+          <p className="text-xl text-white/85 mb-10 leading-relaxed max-w-2xl mx-auto">
+            Browse graphic tees, plain basics, polos, and performance shirts — handpicked and fairly priced.
           </p>
           <Link
             href="/shop"
-            className="inline-flex items-center gap-3 bg-white text-stone-900 px-10 py-5 rounded-full font-bold text-lg hover:bg-stone-50 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
+            className="inline-flex items-center gap-3 bg-store-primary text-store-navy px-10 py-5 rounded-full font-bold text-lg hover:bg-store-primary-dark transition-colors shadow-lg"
           >
             Start Shopping
             <i className="ri-arrow-right-line"></i>

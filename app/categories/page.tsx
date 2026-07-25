@@ -37,8 +37,8 @@ export default async function CategoriesPage() {
     <div className="min-h-screen bg-white">
       <PageHero
         title="Shop by Category"
-        subtitle="Browse wigs, extensions, closures, frontals and everything in between"
-        backgroundImage="/hero_categories_1772074805656.png"
+        subtitle="Graphic tees, plain basics, polos & performance shirts — shop by category."
+        backgroundImage="/hero-fashion-bg.jpg"
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

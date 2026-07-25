@@ -1,6 +1,28 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import { settingValueToString } from '@/lib/settings-value';
+
+const PUBLIC_SETTINGS_KEYS = [
+    'site_name',
+    'site_tagline',
+    'site_logo',
+    'contact_email',
+    'contact_phone',
+    'contact_phone_secondary',
+    'contact_whatsapp',
+    'contact_address',
+    'social_facebook',
+    'social_instagram',
+    'social_twitter',
+    'social_tiktok',
+    'social_snapchat',
+    'social_youtube',
+    'primary_color',
+    'secondary_color',
+    'currency',
+    'currency_symbol',
+] as const;
 
 interface SiteSettings {
     site_name: string;
@@ -9,6 +31,8 @@ interface SiteSettings {
     contact_email: string;
     contact_phone: string;
     contact_address: string;
+    contact_whatsapp: string;
+    contact_phone_secondary: string;
     social_facebook: string;
     social_instagram: string;
     social_twitter: string;
@@ -66,11 +90,13 @@ interface CMSContextType {
 
 const defaultSettings: SiteSettings = {
     site_name: process.env.NEXT_PUBLIC_SITE_NAME || 'Mamator',
-    site_tagline: 'Hair care and beauty.',
+    site_tagline: 'Quality products from Mamator Trading Enterprise.',
     site_logo: '/logo.png',
-    contact_email: '',
-    contact_phone: '0547742920',
-    contact_address: 'Kpakpo mankralo road 55, Mataheko',
+    contact_email: 'info@mamator.com',
+    contact_phone: '0249628324',
+    contact_address: 'Accra, Kasoa, Koforidua',
+    contact_whatsapp: '0249628324',
+    contact_phone_secondary: '0553188619',
     social_facebook: '',
     social_instagram: '',
     social_twitter: '',
@@ -97,32 +123,55 @@ const CMSContext = createContext<CMSContextType>({
 export function CMSProvider({ children }: { children: ReactNode }) {
     const [settings, setSettings] = useState<SiteSettings>({
         site_name: process.env.NEXT_PUBLIC_SITE_NAME || 'Mamator',
-        site_tagline: 'Hair care and beauty.',
+        site_tagline: 'Quality products from Mamator Trading Enterprise.',
         site_logo: '/logo.png',
-        contact_email: '',
-        contact_phone: '0547742920',
-        contact_address: 'Kpakpo mankralo road 55, Mataheko',
+        contact_email: 'info@mamator.com',
+        contact_phone: '0249628324',
+        contact_address: 'Accra, Kasoa, Koforidua',
+        contact_whatsapp: '0249628324',
+    contact_phone_secondary: '0553188619',
         social_facebook: '',
         social_instagram: '',
         social_twitter: '',
         social_tiktok: '',
         social_snapchat: '',
         social_youtube: '',
-        primary_color: '#2563eb',
-        secondary_color: '#FBF6F2',
+        primary_color: '#6ab0ff',
+        secondary_color: '#0a1931',
         currency: 'GHS',
         currency_symbol: 'GH₵',
     });
     const [content, setContent] = useState<CMSContent[]>([]);
     const [banners, setBanners] = useState<Banner[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-    // CMS Fetching Logic Removed - Content is now managed in code.
-    const fetchCMSData = async () => { };
-
-    // Initial load handled by state defaults
-    useEffect(() => {
+    const fetchCMSData = useCallback(async () => {
+        setLoading(true);
+        try {
+            const keys = PUBLIC_SETTINGS_KEYS.join(',');
+            const res = await fetch(`/api/settings?keys=${encodeURIComponent(keys)}`);
+            if (!res.ok) return;
+            const data = (await res.json()) as { settings?: Record<string, unknown> };
+            const raw = data.settings ?? {};
+            setSettings((prev) => {
+                const next = { ...prev };
+                for (const key of PUBLIC_SETTINGS_KEYS) {
+                    if (key in raw) {
+                        next[key] = settingValueToString(raw[key]);
+                    }
+                }
+                return next;
+            });
+        } catch (err) {
+            console.error('[CMSProvider] settings fetch failed', err);
+        } finally {
+            setLoading(false);
+        }
     }, []);
+
+    useEffect(() => {
+        void fetchCMSData();
+    }, [fetchCMSData]);
 
     const getContent = (section: string, blockKey: string): CMSContent | undefined => {
         return content.find(c => c.section === section && c.block_key === blockKey);

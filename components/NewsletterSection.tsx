@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 
-// Newsletter Component
 export default function NewsletterSection() {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,70 +32,93 @@ export default function NewsletterSection() {
   };
 
   return (
-    <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 mb-12">
-      <div className="bg-stone-950 rounded-[2rem] overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] border border-stone-800 relative">
+    <section className="relative z-10 py-12 md:py-16 bg-white">
+      <div className="max-w-[1320px] mx-auto px-4 sm:px-6">
+        <div className="relative overflow-hidden rounded-3xl bg-store-navy shadow-[0_24px_80px_-20px_rgba(0,0,0,0.55)] border border-store-navy-light">
+          <div
+            className="pointer-events-none absolute inset-0 opacity-90"
+            aria-hidden
+            style={{
+              background:
+                'radial-gradient(ellipse 70% 80% at 18% 50%, rgba(56, 189, 248, 0.14) 0%, transparent 55%), radial-gradient(ellipse 50% 60% at 85% 50%, rgba(56, 189, 248, 0.08) 0%, transparent 50%)',
+            }}
+          />
 
-        {/* Premium Background Textures & Lighting */}
-        <div className="absolute inset-0 opacity-40 pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-96 h-96 bg-stone-700 rounded-full blur-[120px] opacity-30"></div>
-          <div className="absolute top-40 -left-20 w-72 h-72 bg-stone-600 rounded-full blur-[100px] opacity-20"></div>
-          {/* Subtle top edge highlight */}
-          <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-stone-500/50 to-transparent"></div>
-        </div>
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10 lg:gap-12 p-8 md:p-10 lg:p-14">
+            <div className="text-center lg:text-left lg:max-w-[58%]">
+              <div className="inline-flex items-center gap-2.5 rounded-full border border-store-primary/35 bg-store-navy-light/90 px-4 py-2 shadow-[0_0_20px_rgba(106,176,255,0.15)] mb-6">
+                <span className="h-2 w-2 shrink-0 rounded-full bg-store-primary shadow-[0_0_8px_rgba(106,176,255,0.9)]" />
+                <span className="text-[11px] font-semibold tracking-[0.22em] uppercase text-white/95">
+                  The Insider Club
+                </span>
+              </div>
 
-        <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between p-8 md:p-10 lg:p-12 gap-8">
+              <h2 className="font-serif text-3xl sm:text-4xl lg:text-[2.75rem] leading-[1.15] text-white tracking-tight">
+                Unlock{' '}
+                <span className="italic text-store-primary font-normal">10% Off</span>
+                <br className="hidden sm:block" />
+                {' '}
+                Your First Order
+              </h2>
 
-          {/* Left Content */}
-          <div className="text-center lg:text-left max-w-xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-stone-900 border border-stone-800 text-stone-300 text-xs font-semibold tracking-[0.2em] uppercase mb-4 shadow-inner">
-              <span className="w-1.5 h-1.5 rounded-full bg-stone-400 animate-pulse"></span>
-              The Insider Club
+              <p className="mt-5 text-sm md:text-base text-white/75 leading-relaxed max-w-xl mx-auto lg:mx-0">
+                Be the first to know about new tee drops, restocks, and exclusive deals. Graphic,
+                plain, polo, and performance styles — all in one place.
+              </p>
             </div>
 
-            <h3 className="text-3xl md:text-4xl lg:text-5xl font-serif text-white mb-4 leading-tight tracking-tight">
-              Unlock <span className="italic text-stone-400 font-light">10% Off</span> <br /> Your First Order
-            </h3>
-
-            <p className="text-stone-400 text-base leading-relaxed tracking-wide">
-              Be the first to know about new arrivals, restocks, and exclusive deals. From premium wigs to luxurious extensions, we keep you updated on the latest products.
-            </p>
-          </div>
-
-          {/* Right Form */}
-          <div className="w-full max-w-md bg-stone-900/50 backdrop-blur-md p-1.5 rounded-2xl border border-stone-800 pwa-submit-form shadow-inner">
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="flex-1 bg-transparent border-none text-white placeholder-stone-500 px-5 py-3 focus:ring-0 text-base font-medium tracking-wide"
-              />
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="bg-stone-200 hover:bg-white text-stone-950 font-bold px-8 py-3 rounded-[14px] transition-all duration-300 hover:scale-[1.02] active:scale-95 disabled:opacity-75 disabled:cursor-not-allowed shadow-lg whitespace-nowrap text-sm"
+            <div className="w-full lg:max-w-md lg:shrink-0">
+              <form
+                onSubmit={handleSubmit}
+                className="flex items-stretch rounded-2xl border border-[#243352] bg-[#060b16]/80 p-1.5 shadow-[inset_0_0_0_1px_rgba(56,189,248,0.06),0_0_40px_rgba(56,189,248,0.06)]"
               >
-                {isSubmitting ? (
-                  <i className="ri-loader-4-line animate-spin text-lg"></i>
-                ) : (
-                  <span className="flex items-center gap-2 tracking-wide">
-                    Join <i className="ri-arrow-right-line"></i>
-                  </span>
-                )}
-              </button>
-            </form>
+                <label htmlFor="newsletter-email" className="sr-only">
+                  Email address
+                </label>
+                <input
+                  id="newsletter-email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  className="min-w-0 flex-1 bg-transparent border-none text-white placeholder:text-gray-500 px-4 py-3.5 text-base focus:outline-none focus:ring-0"
+                />
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-store-primary px-6 py-3.5 text-sm font-bold text-store-navy transition-colors hover:bg-store-primary-dark disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? (
+                    <i className="ri-loader-4-line animate-spin text-lg" aria-hidden />
+                  ) : (
+                    <>
+                      Join <span aria-hidden>→</span>
+                    </>
+                  )}
+                </button>
+              </form>
+
+              {submitStatus === 'error' && (
+                <p className="mt-3 text-center lg:text-left text-sm text-red-400">
+                  Something went wrong. Please try again.
+                </p>
+              )}
+            </div>
           </div>
 
+          {submitStatus === 'success' && (
+            <div
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-full bg-store-primary px-5 py-2 text-sm font-bold text-store-navy shadow-lg"
+              role="status"
+            >
+              <i className="ri-checkbox-circle-fill" aria-hidden />
+              Welcome to the club!
+            </div>
+          )}
         </div>
-
-        {submitStatus === 'success' && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-stone-200 text-stone-950 px-6 py-2 rounded-full font-bold shadow-2xl animate-in fade-in slide-in-from-bottom-2 border border-stone-300">
-            <i className="ri-checkbox-circle-fill mr-2"></i> Welcome to the club!
-          </div>
-        )}
       </div>
-    </div>
+    </section>
   );
 }

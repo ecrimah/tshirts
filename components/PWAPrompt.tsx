@@ -56,8 +56,8 @@ export default function PWAPrompt() {
               <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-lg flex-shrink-0 bg-stone-50 flex items-center justify-center">
                 <img
                   src="/logo.png"
-                  alt="Mamator"
-                  className="w-14 h-14 object-cover"
+                  alt="Mamator Trading Enterprise"
+                  className="w-14 h-14 object-contain"
                 />
               </div>
               <div className="flex-1 min-w-0">

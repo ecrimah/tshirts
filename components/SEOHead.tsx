@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { absoluteAsset, BRAND_ASSETS, getSiteUrl, SITE_CONTACT, SITE_LEGAL_NAME } from '@/lib/site-brand';
 
 interface SEOProps {
   title?: string;
@@ -29,8 +30,8 @@ export function generateMetadata({
   author,
   noindex = false
 }: SEOProps): Metadata {
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://mamator.com';
-  const defaultOgImage = `${siteUrl}/logo.png`;
+  const siteUrl = getSiteUrl();
+  const defaultOgImage = absoluteAsset(BRAND_ASSETS.ogImage);
   const resolvedOgImage = ogImage || defaultOgImage;
   const siteName = 'Mamator';
   const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
@@ -116,7 +117,7 @@ export function generateProductSchema(product: {
     sku: product.sku,
     brand: {
       '@type': 'Brand',
-      name: product.brand || 'PremiumShop'
+      name: product.brand || SITE_LEGAL_NAME
     },
     offers: {
       '@type': 'Offer',
@@ -161,27 +162,29 @@ export function generateBreadcrumbSchema(items: { name: string; url: string }[])
 }
 
 export function generateOrganizationSchema() {
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://mamator.com';
+  const siteUrl = getSiteUrl();
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Mamator',
+    name: SITE_LEGAL_NAME,
+    alternateName: 'Mamator',
     url: siteUrl,
-    logo: `${siteUrl}/logo.png`,
-    image: `${siteUrl}/logo.png`,
+    logo: absoluteAsset(BRAND_ASSETS.logo),
+    image: absoluteAsset(BRAND_ASSETS.ogImage),
+    email: SITE_CONTACT.email,
     contactPoint: {
       '@type': 'ContactPoint',
-      telephone: '+233547742920',
+      telephone: SITE_CONTACT.phonePrimary,
       contactType: 'Customer Service',
       areaServed: 'GH',
-      availableLanguage: ['English']
+      availableLanguage: ['English'],
     },
-    sameAs: []
+    sameAs: [],
   };
 }
 
 export function generateWebsiteSchema() {
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://mamator.com';
+  const siteUrl = getSiteUrl();
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',

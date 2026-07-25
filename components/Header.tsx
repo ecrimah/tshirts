@@ -27,6 +27,8 @@ export default function Header() {
 
   const siteName = getSetting('site_name') || process.env.NEXT_PUBLIC_SITE_NAME || 'Mamator';
   const headerLogo = getSetting('site_logo') || '/logo.png';
+  const contactEmail = getSetting('contact_email') || 'info@mamator.com';
+  const contactPhone = getSetting('contact_phone') || '';
 
   useEffect(() => {
     // Wishlist logic
@@ -98,7 +100,23 @@ export default function Header() {
 
   return (
     <>
-      <header className="bg-white sticky top-0 z-50 border-b border-gray-100 transition-all duration-300">
+      <div className="hidden md:block bg-store-navy text-white text-xs">
+        <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
+            <a href={`mailto:${contactEmail}`} className="hover:underline opacity-95">
+              {contactEmail}
+            </a>
+            {contactPhone ? (
+              <a href={`tel:${contactPhone.replace(/\s/g, '')}`} className="hover:underline opacity-95">
+                {contactPhone}
+              </a>
+            ) : null}
+          </div>
+          <p className="opacity-95">Welcome to {siteName}!</p>
+        </div>
+      </div>
+
+      <header className="bg-white sticky top-0 z-50 border-b border-gray-200 transition-all duration-300">
         <div className="safe-area-top" />
         <nav aria-label="Main navigation" className="relative">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -115,28 +133,32 @@ export default function Header() {
                 </button>
                 <Link
                   href="/"
-                  className="flex items-center select-none"
+                  className="flex items-center select-none shrink-0"
                   aria-label="Go to homepage"
                 >
-                  <img src={headerLogo} alt={siteName} className="h-14 md:h-16 w-auto object-contain drop-shadow-md" style={{ filter: 'contrast(1.2) brightness(0.95)' }} />
+                  <span className="text-2xl md:text-3xl font-bold text-store-ink tracking-tight">
+                    {siteName}
+                    <span className="text-store-primary">.</span>
+                  </span>
                 </Link>
               </div>
 
               {/* Center: Navigation Links (Desktop) */}
-              <div className="hidden lg:flex items-center justify-center space-x-12">
+              <div className="hidden lg:flex items-center justify-center gap-8 xl:gap-10">
                 {[
+                  { label: 'Home', href: '/' },
                   { label: 'Shop', href: '/shop' },
                   { label: 'Categories', href: '/categories' },
+                  { label: 'Blog', href: '/blog' },
                   { label: 'About', href: '/about' },
                   { label: 'Contact', href: '/contact' },
                 ].map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="group relative py-2 text-sm uppercase tracking-widest font-medium text-gray-900 transition-colors hover:text-gray-600"
+                    className="py-2 text-sm font-semibold text-store-ink hover:text-store-primary transition-colors"
                   >
                     {link.label}
-                    <span className="absolute inset-x-0 bottom-0 h-px scale-x-0 bg-gray-900 transition-transform duration-300 ease-out group-hover:scale-x-100" />
                   </Link>
                 ))}
               </div>
@@ -184,13 +206,13 @@ export default function Header() {
 
                 <div className="relative">
                   <button
-                    className="p-2 text-gray-900 hover:text-gray-600 transition-transform hover:scale-105"
+                    className="relative p-2 text-store-ink hover:text-store-primary transition-colors"
                     onClick={() => setIsCartOpen(!isCartOpen)}
                     aria-label="Cart"
                   >
-                    <i className="ri-shopping-bag-line text-xl"></i>
+                    <i className="ri-shopping-cart-2-line text-xl"></i>
                     {cartCount > 0 && (
-                      <span className="absolute top-1 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[10px] font-bold text-white">
+                      <span className="absolute -top-0.5 -right-0.5 flex h-5 min-w-[1.25rem] px-1 items-center justify-center rounded-full bg-store-primary text-[10px] font-bold text-store-navy">
                         {cartCount}
                       </span>
                     )}

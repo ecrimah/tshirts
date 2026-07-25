@@ -178,8 +178,8 @@ function ShopContent() {
     <main className="min-h-screen bg-white">
       <PageHero
         title="Shop All Products"
-        subtitle="Browse our range of premium wigs, extensions, closures, frontals and more"
-        backgroundImage="/hero_shop_1772074647318.png"
+        subtitle="Shop graphic, plain, polo, and performance t-shirts for men and women."
+        backgroundImage="/hero-fashion-bg.jpg"
       />
 
       {/* Mobile Filter Toggle */}
