@@ -40,7 +40,7 @@ export const BRAND_ASSETS = {
 } as const;
 
 export function absoluteAsset(path: string): string {
-  return `${getSiteUrl()}${path.startsWith('/') ? path : `/${path}`}`}`;
+  return `${getSiteUrl()}${path.startsWith('/') ? path : `/${path}`}`;
 }
 
 /** Prefer bundled Mamator logo; ignore legacy CMS paths until admin uploads a new one. */
