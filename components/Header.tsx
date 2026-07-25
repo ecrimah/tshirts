@@ -135,7 +135,7 @@ export default function Header() {
                 <Link
                   href="/"
                   className="flex items-center select-none shrink-0"
-                  aria-label={`${siteName} — home`}
+                  aria-label="Go to homepage"
                 >
                   <img
                     src={headerLogo}
@@ -234,7 +234,7 @@ export default function Header() {
         <div className="fixed inset-0 z-[100] flex items-start sm:items-center justify-center pt-16 sm:pt-0 px-3 opacity-0 animate-fade-in overflow-y-auto" style={{ animationFillMode: 'forwards' }}>
           {/* Blurred Dark Backdrop */}
           <div
-            className="absolute inset-0 bg-stone-950/90 backdrop-blur-xl"
+            className="absolute inset-0 bg-store-navy/90 backdrop-blur-xl"
             onClick={closeSearchOverlay}
             aria-hidden="true"
           />
@@ -248,7 +248,7 @@ export default function Header() {
             <button
               type="button"
               onClick={closeSearchOverlay}
-              className="absolute -top-14 sm:-top-20 right-0 w-12 h-12 flex items-center justify-center text-stone-400 hover:text-white hover:rotate-90 transition-all duration-500 group"
+              className="absolute -top-14 sm:-top-20 right-0 w-12 h-12 flex items-center justify-center text-store-muted hover:text-white hover:rotate-90 transition-all duration-500 group"
               aria-label="Close search"
             >
               <i className="ri-close-line text-4xl"></i>
@@ -256,7 +256,7 @@ export default function Header() {
 
             <form onSubmit={handleSearch} className="relative group">
               <div className="relative flex items-center">
-                <i className="ri-search-line text-2xl sm:text-3xl md:text-4xl text-stone-500 group-focus-within:text-white transition-colors duration-500 absolute left-0"></i>
+                <i className="ri-search-line text-2xl sm:text-3xl md:text-4xl text-store-muted group-focus-within:text-white transition-colors duration-500 absolute left-0"></i>
                 <input
                   type="text"
                   value={searchQuery}
@@ -265,24 +265,24 @@ export default function Header() {
                   autoComplete="off"
                   aria-autocomplete="list"
                   aria-controls="storefront-search-results"
-                  className="w-full bg-transparent border-none pl-10 sm:pl-12 md:pl-16 py-3 sm:py-4 md:py-6 text-xl sm:text-3xl md:text-5xl lg:text-6xl text-white placeholder-stone-600 focus:outline-none focus:ring-0 font-serif tracking-wide transition-all"
+                  className="w-full bg-transparent border-none pl-10 sm:pl-12 md:pl-16 py-3 sm:py-4 md:py-6 text-xl sm:text-3xl md:text-5xl lg:text-6xl text-white placeholder-store-muted focus:outline-none focus:ring-0 font-serif tracking-wide transition-all"
                   autoFocus
                 />
               </div>
 
-              <div className="absolute bottom-0 left-0 w-full h-[1px] bg-stone-800">
+              <div className="absolute bottom-0 left-0 w-full h-[1px] bg-store-navy-light">
                 <div className="h-full bg-white w-0 group-focus-within:w-full transition-all duration-700 ease-in-out" />
               </div>
             </form>
 
             <div
               id="storefront-search-results"
-              className="mt-6 sm:mt-8 rounded-2xl border border-white/10 bg-stone-900/80 backdrop-blur-md shadow-2xl overflow-hidden max-h-[min(55vh,420px)] overflow-y-auto"
+              className="mt-6 sm:mt-8 rounded-2xl border border-white/10 bg-store-navy/80 backdrop-blur-md shadow-2xl overflow-hidden max-h-[min(55vh,420px)] overflow-y-auto"
               role="listbox"
               aria-label="Matching products"
             >
               {searchLoading && searchQuery.trim() && (
-                <div className="p-6 flex items-center justify-center gap-3 text-stone-400 text-sm">
+                <div className="p-6 flex items-center justify-center gap-3 text-store-muted text-sm">
                   <i className="ri-loader-4-line text-xl animate-spin" aria-hidden />
                   Finding products…
                 </div>
@@ -292,7 +292,7 @@ export default function Header() {
                 searchQuery.trim() &&
                 debouncedSearch.trim() &&
                 searchHits.length === 0 && (
-                  <div className="p-8 text-center text-stone-500 text-sm">No products match that yet — try another letter or press Enter to search the shop.</div>
+                  <div className="p-8 text-center text-store-muted text-sm">No products match that yet — try another letter or press Enter to search the shop.</div>
                 )}
 
               {!searchLoading && searchHits.length > 0 && (
@@ -312,7 +312,7 @@ export default function Header() {
                           onClick={closeSearchOverlay}
                           className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-white/5 transition-colors text-left"
                         >
-                          <div className="w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-xl overflow-hidden bg-stone-800 ring-1 ring-white/10">
+                          <div className="w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-xl overflow-hidden bg-store-navy-light ring-1 ring-white/10">
                             <img
                               src={img}
                               alt=""
@@ -323,13 +323,13 @@ export default function Header() {
                           <div className="flex-1 min-w-0">
                             <p className="text-white font-medium text-sm sm:text-base leading-snug line-clamp-2">{p.name}</p>
                             {p.categoryName && (
-                              <p className="text-stone-500 text-xs mt-0.5 truncate">{p.categoryName}</p>
+                              <p className="text-store-muted text-xs mt-0.5 truncate">{p.categoryName}</p>
                             )}
                           </div>
                           <div className="shrink-0 text-right">
                             <p className="text-white font-semibold text-sm sm:text-base whitespace-nowrap">GH₵{effective.toFixed(2)}</p>
                             {originalDisplay != null && originalDisplay > effective && (
-                              <p className="text-stone-500 text-xs line-through">GH₵{originalDisplay.toFixed(2)}</p>
+                              <p className="text-store-muted text-xs line-through">GH₵{originalDisplay.toFixed(2)}</p>
                             )}
                           </div>
                         </Link>
@@ -340,15 +340,15 @@ export default function Header() {
               )}
 
               {!searchQuery.trim() && (
-                <div className="p-6 text-center text-stone-500 text-sm">Type a letter to see products that start with it.</div>
+                <div className="p-6 text-center text-store-muted text-sm">Type a letter to see products that start with it.</div>
               )}
             </div>
 
             <div className="mt-6 opacity-0 animate-fade-in" style={{ animationDelay: '300ms', animationFillMode: 'forwards' }}>
-              <p className="text-stone-500 text-xs sm:text-sm tracking-[0.15em] uppercase text-center flex items-center justify-center gap-3">
-                <span className="w-8 h-px bg-stone-800" />
+              <p className="text-store-muted text-xs sm:text-sm tracking-[0.15em] uppercase text-center flex items-center justify-center gap-3">
+                <span className="w-8 h-px bg-store-navy-light" />
                 Enter — search shop
-                <span className="w-8 h-px bg-stone-800" />
+                <span className="w-8 h-px bg-store-navy-light" />
               </p>
             </div>
           </div>
@@ -388,7 +388,7 @@ export default function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="block px-4 py-3 text-lg font-medium text-gray-700 hover:bg-stone-50 hover:text-stone-700 rounded-lg transition-colors"
+                  className="block px-4 py-3 text-lg font-medium text-gray-700 hover:bg-store-surface hover:text-store-ink rounded-lg transition-colors"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.label}

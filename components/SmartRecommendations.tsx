@@ -91,7 +91,7 @@ export default function SmartRecommendations({ productId, type, title }: SmartRe
           <h2 className="text-2xl font-bold text-gray-900">{getTitleByType()}</h2>
           <Link
             href="/shop"
-            className="flex items-center justify-center w-10 h-10 rounded-full border border-stone-200 hover:border-stone-900 hover:bg-stone-900 text-stone-900 hover:text-white transition-all duration-500 group"
+            className="flex items-center justify-center w-10 h-10 rounded-full border border-gray-200 hover:border-store-navy hover:bg-store-navy text-store-ink hover:text-white transition-all duration-500 group"
           >
             <i className="ri-arrow-right-line text-lg group-hover:translate-x-1 transition-transform"></i>
           </Link>
@@ -117,7 +117,7 @@ export default function SmartRecommendations({ productId, type, title }: SmartRe
                 )}
               </div>
               <div className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-stone-700 transition-colors">
+                <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-store-ink transition-colors">
                   {product.name}
                 </h3>
                 <div className="flex items-center space-x-2 mb-3">

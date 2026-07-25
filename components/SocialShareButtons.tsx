@@ -48,7 +48,7 @@ export default function SocialShareButtons({ url, title, description, image }: S
     <div className="relative">
       <button
         onClick={() => setShowShareMenu(!showShareMenu)}
-        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:border-stone-500 hover:bg-stone-50 transition-colors"
+        className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:border-store-primary hover:bg-store-surface transition-colors"
       >
         <i className="ri-share-line text-lg"></i>
         <span className="font-medium">Share</span>
@@ -68,9 +68,9 @@ export default function SocialShareButtons({ url, title, description, image }: S
             <div className="p-4 grid grid-cols-4 gap-3">
               <button
                 onClick={() => handleShare('facebook')}
-                className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-stone-50 transition-colors group"
+                className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-store-surface transition-colors group"
               >
-                <div className="w-12 h-12 flex items-center justify-center bg-stone-500 text-white rounded-full group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 flex items-center justify-center bg-store-primary-dark text-white rounded-full group-hover:scale-110 transition-transform">
                   <i className="ri-facebook-fill text-xl"></i>
                 </div>
                 <span className="text-xs text-gray-600">Facebook</span>
@@ -98,9 +98,9 @@ export default function SocialShareButtons({ url, title, description, image }: S
 
               <button
                 onClick={() => handleShare('whatsapp')}
-                className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-green-50 transition-colors group"
+                className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-store-surface transition-colors group"
               >
-                <div className="w-12 h-12 flex items-center justify-center bg-green-500 text-white rounded-full group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 flex items-center justify-center bg-store-primary text-white rounded-full group-hover:scale-110 transition-transform">
                   <i className="ri-whatsapp-fill text-xl"></i>
                 </div>
                 <span className="text-xs text-gray-600">WhatsApp</span>
@@ -108,9 +108,9 @@ export default function SocialShareButtons({ url, title, description, image }: S
 
               <button
                 onClick={() => handleShare('telegram')}
-                className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-stone-50 transition-colors group"
+                className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-store-surface transition-colors group"
               >
-                <div className="w-12 h-12 flex items-center justify-center bg-stone-400 text-white rounded-full group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 flex items-center justify-center bg-store-muted text-white rounded-full group-hover:scale-110 transition-transform">
                   <i className="ri-telegram-fill text-xl"></i>
                 </div>
                 <span className="text-xs text-gray-600">Telegram</span>
@@ -118,9 +118,9 @@ export default function SocialShareButtons({ url, title, description, image }: S
 
               <button
                 onClick={() => handleShare('linkedin')}
-                className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-stone-50 transition-colors group"
+                className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-store-surface transition-colors group"
               >
-                <div className="w-12 h-12 flex items-center justify-center bg-stone-700 text-white rounded-full group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 flex items-center justify-center bg-store-navy text-white rounded-full group-hover:scale-110 transition-transform">
                   <i className="ri-linkedin-fill text-xl"></i>
                 </div>
                 <span className="text-xs text-gray-600">LinkedIn</span>
@@ -157,7 +157,7 @@ export default function SocialShareButtons({ url, title, description, image }: S
                 />
                 <button
                   onClick={handleCopyLink}
-                  className="px-4 py-2 bg-stone-600 hover:bg-stone-700 text-white rounded-lg font-medium transition-colors whitespace-nowrap"
+                  className="px-4 py-2 bg-store-navy-light hover:bg-store-navy-light text-white rounded-lg font-medium transition-colors whitespace-nowrap"
                 >
                   {copied ? (
                     <>

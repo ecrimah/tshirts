@@ -139,7 +139,7 @@ export default function FAQsPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-gradient-to-br from-stone-50 via-white to-amber-50 py-16">
+      <div className="bg-gradient-to-br from-store-surface via-white to-amber-50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
@@ -155,7 +155,7 @@ export default function FAQsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search for answers..."
-                className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-full focus:ring-2 focus:ring-stone-500 focus:border-transparent text-sm shadow-lg"
+                className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-full focus:ring-2 focus:ring-store-primary focus:border-store-primary text-sm shadow-lg"
               />
               <i className="ri-search-line absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl"></i>
             </div>
@@ -171,7 +171,7 @@ export default function FAQsPage() {
               onClick={() => setActiveCategory(category.id)}
               className={`flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-all whitespace-nowrap ${
                 activeCategory === category.id
-                  ? 'bg-stone-700 text-white shadow-lg'
+                  ? 'bg-store-navy text-white shadow-lg'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -211,19 +211,19 @@ export default function FAQsPage() {
         )}
       </div>
 
-      <div className="bg-gradient-to-br from-stone-700 to-stone-900 py-16">
+      <div className="bg-gradient-to-br from-store-navy to-store-navy-light py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
             <i className="ri-customer-service-2-line text-3xl text-white"></i>
           </div>
           <h2 className="text-3xl font-bold text-white mb-4">Still Have Questions?</h2>
-          <p className="text-xl text-stone-100 mb-8 leading-relaxed">
+          <p className="text-xl text-white/90 mb-8 leading-relaxed">
             Our customer service team is ready to help. Contact us and we'll respond within 24 hours.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-white text-stone-700 px-8 py-4 rounded-full font-medium hover:bg-stone-50 transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-2 bg-white text-store-ink px-8 py-4 rounded-full font-medium hover:bg-store-surface transition-colors whitespace-nowrap"
             >
               <i className="ri-mail-line text-lg"></i>
               Contact Support
@@ -240,8 +240,8 @@ export default function FAQsPage() {
 
         <div className="grid md:grid-cols-3 gap-6">
           <Link href="/shipping" className="bg-gray-50 p-8 rounded-2xl hover:shadow-lg transition-all cursor-pointer">
-            <div className="w-12 h-12 bg-stone-100 rounded-full flex items-center justify-center mb-4">
-              <i className="ri-truck-line text-2xl text-stone-700"></i>
+            <div className="w-12 h-12 bg-store-surface rounded-full flex items-center justify-center mb-4">
+              <i className="ri-truck-line text-2xl text-store-ink"></i>
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">Shipping Policy</h3>
             <p className="text-gray-600 leading-relaxed">
@@ -250,8 +250,8 @@ export default function FAQsPage() {
           </Link>
 
           <Link href="/returns" className="bg-gray-50 p-8 rounded-2xl hover:shadow-lg transition-all cursor-pointer">
-            <div className="w-12 h-12 bg-stone-100 rounded-full flex items-center justify-center mb-4">
-              <i className="ri-arrow-go-back-line text-2xl text-stone-700"></i>
+            <div className="w-12 h-12 bg-store-surface rounded-full flex items-center justify-center mb-4">
+              <i className="ri-arrow-go-back-line text-2xl text-store-ink"></i>
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">Returns Policy</h3>
             <p className="text-gray-600 leading-relaxed">
@@ -260,8 +260,8 @@ export default function FAQsPage() {
           </Link>
 
           <Link href="/privacy" className="bg-gray-50 p-8 rounded-2xl hover:shadow-lg transition-all cursor-pointer">
-            <div className="w-12 h-12 bg-stone-100 rounded-full flex items-center justify-center mb-4">
-              <i className="ri-shield-check-line text-2xl text-stone-700"></i>
+            <div className="w-12 h-12 bg-store-surface rounded-full flex items-center justify-center mb-4">
+              <i className="ri-shield-check-line text-2xl text-store-ink"></i>
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">Privacy & Security</h3>
             <p className="text-gray-600 leading-relaxed">

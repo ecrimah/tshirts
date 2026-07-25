@@ -73,7 +73,7 @@ export default function CartPage() {
               </div>
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Your cart is empty</h2>
               <p className="text-gray-600 mb-8 text-lg">Looks like you&#39;t added anything to your cart yet</p>
-              <Link href="/shop" className="inline-block bg-gray-900 hover:bg-stone-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors whitespace-nowrap">
+              <Link href="/shop" className="inline-block bg-store-navy hover:bg-store-navy-light text-white px-8 py-4 rounded-lg font-semibold transition-colors whitespace-nowrap">
                 Continue Shopping
               </Link>
             </div>
@@ -87,7 +87,7 @@ export default function CartPage() {
                     <div className="flex items-center justify-between mb-6">
                       <h2 className="text-2xl font-bold text-gray-900">Cart Items ({cartItems.length})</h2>
                       {savings > 0 && (
-                        <span className="text-stone-700 font-semibold">You save GH₵{savings.toFixed(2)}</span>
+                        <span className="text-store-ink font-semibold">You save GH₵{savings.toFixed(2)}</span>
                       )}
                     </div>
 
@@ -100,7 +100,7 @@ export default function CartPage() {
 
                           <div className="flex-1">
                             <div className="flex justify-between mb-2">
-                              <Link href={`/product/${item.slug || item.id}`} className="text-lg font-semibold text-gray-900 hover:text-stone-700 transition-colors line-clamp-2">
+                              <Link href={`/product/${item.slug || item.id}`} className="text-lg font-semibold text-gray-900 hover:text-store-ink transition-colors line-clamp-2">
                                 {item.name}
                               </Link>
                               <button
@@ -114,7 +114,7 @@ export default function CartPage() {
                             <div className="text-sm text-gray-600 mb-3 space-y-1">
                               {item.variant && <p>Variant: {item.variant}</p>}
                               {/* Stock status assuming always available if in cart for now */}
-                              <p className="text-stone-600 font-medium">In Stock</p>
+                              <p className="text-store-muted font-medium">In Stock</p>
                             </div>
 
                             <div className="flex items-center justify-between flex-wrap gap-4">
@@ -164,7 +164,7 @@ export default function CartPage() {
                             {/*
                             <button
                               onClick={() => saveForLater(item.id)}
-                              className="mt-3 text-sm text-stone-700 hover:text-stone-900 font-medium whitespace-nowrap"
+                              className="mt-3 text-sm text-store-ink hover:text-store-ink font-medium whitespace-nowrap"
                             >
                               Save for Later
                             </button>
@@ -207,7 +207,7 @@ export default function CartPage() {
                       </div>
 
                       {appliedCoupon && (
-                        <div className="flex justify-between text-stone-700">
+                        <div className="flex justify-between text-store-ink">
                           <div className="flex items-center space-x-2">
                             <span>Coupon ({appliedCoupon.code})</span>
                           </div>
@@ -243,29 +243,29 @@ export default function CartPage() {
 
                     <Link
                       href="/checkout"
-                      className="block w-full bg-stone-700 hover:bg-stone-800 text-white py-4 rounded-lg font-semibold text-center transition-colors mt-6 mb-3 whitespace-nowrap"
+                      className="block w-full bg-store-navy hover:bg-store-navy-light text-white py-4 rounded-lg font-semibold text-center transition-colors mt-6 mb-3 whitespace-nowrap"
                     >
                       Proceed to Checkout
                     </Link>
 
                     <Link
                       href="/shop"
-                      className="block w-full text-center text-stone-700 hover:text-stone-900 font-semibold py-2 whitespace-nowrap"
+                      className="block w-full text-center text-store-ink hover:text-store-ink font-semibold py-2 whitespace-nowrap"
                     >
                       Continue Shopping
                     </Link>
 
                     <div className="mt-6 pt-6 border-t border-gray-200 space-y-3">
                       <div className="flex items-center text-sm text-gray-600">
-                        <i className="ri-shield-check-line text-stone-700 mr-2"></i>
+                        <i className="ri-shield-check-line text-store-ink mr-2"></i>
                         <span>Secure checkout</span>
                       </div>
                       <div className="flex items-center text-sm text-gray-600">
-                        <i className="ri-arrow-left-right-line text-stone-700 mr-2"></i>
+                        <i className="ri-arrow-left-right-line text-store-ink mr-2"></i>
                         <span>30-day returns</span>
                       </div>
                       <div className="flex items-center text-sm text-gray-600">
-                        <i className="ri-customer-service-line text-stone-700 mr-2"></i>
+                        <i className="ri-customer-service-line text-store-ink mr-2"></i>
                         <span>24/7 support</span>
                       </div>
                     </div>

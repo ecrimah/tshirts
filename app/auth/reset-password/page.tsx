@@ -80,13 +80,13 @@ function ResetPasswordForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-stone-800 text-white py-3 rounded-lg font-semibold disabled:opacity-60"
+          className="w-full bg-store-navy-light text-white py-3 rounded-lg font-semibold disabled:opacity-60"
         >
           {loading ? 'Saving…' : 'Update password'}
         </button>
       </form>
       <p className="mt-4 text-sm text-center text-gray-600">
-        <Link href="/auth/login" className="text-stone-800 font-semibold">
+        <Link href="/auth/login" className="text-store-ink font-semibold">
           Back to login
         </Link>
       </p>

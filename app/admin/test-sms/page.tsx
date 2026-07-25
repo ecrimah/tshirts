@@ -32,7 +32,7 @@ export default function TestSmsPage() {
                             </label>
                             <input
                                 type="text"
-                                className="w-full border rounded-md p-2 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-stone-500 outline-none"
+                                className="w-full border rounded-md p-2 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-store-primary outline-none"
                                 placeholder="e.g. 024XXXXXXX"
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value)}
@@ -47,7 +47,7 @@ export default function TestSmsPage() {
                                 Message
                             </label>
                             <textarea
-                                className="w-full border rounded-md p-2 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-stone-500 outline-none h-24"
+                                className="w-full border rounded-md p-2 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-store-primary outline-none h-24"
                                 placeholder="Type your message..."
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
@@ -59,7 +59,7 @@ export default function TestSmsPage() {
                             disabled={isPending}
                             className={`w-full py-2 px-4 rounded-md text-white font-medium transition-colors ${isPending
                                     ? 'bg-gray-400 cursor-not-allowed'
-                                    : 'bg-stone-600 hover:bg-stone-700'
+                                    : 'bg-store-navy-light hover:bg-store-navy'
                                 }`}
                         >
                             {isPending ? 'Sending...' : 'Send SMS'}

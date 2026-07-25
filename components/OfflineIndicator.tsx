@@ -44,13 +44,13 @@ export default function OfflineIndicator() {
       <div
         className={`${
           isOnline
-            ? 'bg-stone-600'
-            : 'bg-gray-900'
+            ? 'bg-store-navy-light'
+            : 'bg-store-navy'
         } text-white`}
       >
         <div className="safe-area-top" />
         <div className="flex items-center justify-center gap-2 py-3 px-4">
-          <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-stone-300 animate-pulse' : 'bg-red-400'}`} />
+          <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-store-primary animate-pulse' : 'bg-red-400'}`} />
           <i className={`text-lg ${isOnline ? 'ri-wifi-line' : 'ri-wifi-off-line'}`} />
           <span className="font-medium text-sm">
             {isOnline ? 'Back online' : 'No internet connection'}

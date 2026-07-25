@@ -56,7 +56,7 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
             <Link
               href="/shop"
               onClick={onClose}
-              className="px-6 py-3 bg-stone-700 text-white rounded-lg font-semibold hover:bg-stone-800 transition-colors whitespace-nowrap cursor-pointer"
+              className="px-6 py-3 bg-store-navy text-white rounded-lg font-semibold hover:bg-store-navy-light transition-colors whitespace-nowrap cursor-pointer"
             >
               Continue Shopping
             </Link>
@@ -84,7 +84,7 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
                       )}
 
                       <div className="flex items-center justify-between mt-2">
-                        <span className="text-lg font-bold text-stone-700">
+                        <span className="text-lg font-bold text-store-ink">
                           GH₵{item.price.toFixed(2)}
                         </span>
 
@@ -139,7 +139,7 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
                 <Link
                   href="/checkout"
                   onClick={onClose}
-                  className="block w-full py-4 bg-stone-700 text-white text-center rounded-lg font-semibold hover:bg-stone-800 transition-colors whitespace-nowrap cursor-pointer"
+                  className="block w-full py-4 bg-store-navy text-white text-center rounded-lg font-semibold hover:bg-store-navy-light transition-colors whitespace-nowrap cursor-pointer"
                 >
                   Proceed to Checkout
                 </Link>

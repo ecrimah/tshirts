@@ -106,11 +106,11 @@ export default function AdvancedCouponSystem({
                   setError('');
                 }}
                 placeholder="Enter code"
-                className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-stone-500 text-sm"
+                className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-store-primary focus:border-store-primary text-sm"
               />
               <button
                 onClick={handleApply}
-                className="bg-gray-900 hover:bg-stone-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap"
+                className="bg-store-navy hover:bg-store-navy-light text-white px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap"
               >
                 Apply
               </button>
@@ -125,7 +125,7 @@ export default function AdvancedCouponSystem({
 
           <button
             onClick={() => setShowAvailable(!showAvailable)}
-            className="text-sm text-stone-700 hover:text-stone-900 font-medium flex items-center whitespace-nowrap"
+            className="text-sm text-store-ink hover:text-store-ink font-medium flex items-center whitespace-nowrap"
           >
             <i className={`ri-arrow-${showAvailable ? 'up' : 'down'}-s-line mr-1`}></i>
             {showAvailable ? 'Hide' : 'View'} available coupons
@@ -142,13 +142,13 @@ export default function AdvancedCouponSystem({
                     key={coupon.code}
                     className={`bg-white rounded-lg p-4 border-2 transition-all ${
                       isEligible
-                        ? 'border-stone-200 hover:border-stone-300'
+                        ? 'border-gray-200 hover:border-gray-300'
                         : 'border-gray-200 opacity-60'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center space-x-2">
-                        <span className="bg-stone-100 text-stone-800 px-3 py-1 rounded-lg font-bold text-sm">
+                        <span className="bg-store-surface text-store-ink px-3 py-1 rounded-lg font-bold text-sm">
                           {coupon.code}
                         </span>
                         {!isEligible && (
@@ -160,7 +160,7 @@ export default function AdvancedCouponSystem({
                       {isEligible && (
                         <button
                           onClick={() => handleQuickApply(coupon)}
-                          className="text-stone-700 hover:text-stone-900 font-semibold text-sm whitespace-nowrap"
+                          className="text-store-ink hover:text-store-ink font-semibold text-sm whitespace-nowrap"
                         >
                           Apply
                         </button>
@@ -174,18 +174,18 @@ export default function AdvancedCouponSystem({
           )}
         </>
       ) : (
-        <div className="bg-stone-50 border-2 border-stone-200 rounded-lg p-4">
+        <div className="bg-store-surface border-2 border-gray-200 rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center space-x-2 mb-1">
-                <i className="ri-price-tag-3-fill text-stone-700"></i>
-                <span className="font-bold text-stone-800">{appliedCoupon.code}</span>
+                <i className="ri-price-tag-3-fill text-store-ink"></i>
+                <span className="font-bold text-store-ink">{appliedCoupon.code}</span>
               </div>
-              <p className="text-sm text-stone-700">{appliedCoupon.description}</p>
+              <p className="text-sm text-store-ink">{appliedCoupon.description}</p>
             </div>
             <button
               onClick={onRemove}
-              className="w-8 h-8 flex items-center justify-center text-stone-700 hover:text-stone-900 transition-colors"
+              className="w-8 h-8 flex items-center justify-center text-store-ink hover:text-store-ink transition-colors"
             >
               <i className="ri-close-line text-xl"></i>
             </button>

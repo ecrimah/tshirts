@@ -78,7 +78,7 @@ export default function HomePromoGrid({ categories = [] }: { categories?: HomeCa
             {wide ? (
               <Link
                 href={categoryShopHref(wide.slug)}
-                className="sm:col-span-2 relative min-h-[160px] rounded-sm overflow-hidden group bg-stone-800"
+                className="sm:col-span-2 relative min-h-[160px] rounded-sm overflow-hidden group bg-store-navy-light"
               >
                 <PromoImage
                   src={categoryImageUrl(wide, 3)}

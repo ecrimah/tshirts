@@ -14,12 +14,12 @@ export default async function CategoriesPage() {
   }>;
 
   const palette = [
-    { color: 'from-stone-500 to-stone-700', icon: 'ri-store-2-line' },
-    { color: 'from-stone-500 to-stone-700', icon: 'ri-shopping-bag-3-line' },
-    { color: 'from-purple-500 to-purple-700', icon: 'ri-t-shirt-line' },
-    { color: 'from-amber-500 to-amber-700', icon: 'ri-home-smile-line' },
-    { color: 'from-rose-500 to-rose-700', icon: 'ri-heart-line' },
-    { color: 'from-indigo-500 to-indigo-700', icon: 'ri-star-smile-line' },
+    { color: 'from-store-navy-light to-store-navy', icon: 'ri-store-2-line' },
+    { color: 'from-store-navy-light to-store-navy', icon: 'ri-shopping-bag-3-line' },
+    { color: 'from-store-muted to-store-navy', icon: 'ri-t-shirt-line' },
+    { color: 'from-store-primary to-store-navy-light', icon: 'ri-home-smile-line' },
+    { color: 'from-store-muted to-store-navy', icon: 'ri-heart-line' },
+    { color: 'from-store-primary to-store-navy', icon: 'ri-star-smile-line' },
   ];
 
   const categories = categoriesData?.map((c, i) => {
@@ -71,7 +71,7 @@ export default async function CategoriesPage() {
                   <p className="text-gray-600 leading-relaxed text-sm mb-4 line-clamp-2">
                     {category.description || 'Explore our exclusive collection in this category.'}
                   </p>
-                  <div className="flex items-center text-stone-700 font-medium text-sm group-hover:gap-2 transition-all">
+                  <div className="flex items-center text-store-ink font-medium text-sm group-hover:gap-2 transition-all">
                     <span>Browse Collection</span>
                     <i className="ri-arrow-right-line ml-2"></i>
                   </div>
@@ -87,23 +87,23 @@ export default async function CategoriesPage() {
         )}
       </div>
 
-      <div className="bg-gradient-to-br from-stone-700 to-stone-900 py-16">
+      <div className="bg-gradient-to-br from-store-navy to-store-navy-light py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold text-white mb-4">Can't Find What You're Looking For?</h2>
-          <p className="text-xl text-stone-100 mb-8 leading-relaxed">
+          <p className="text-xl text-white/90 mb-8 leading-relaxed">
             Try our advanced search or contact our team for personalised product recommendations
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/shop"
-              className="inline-flex items-center gap-2 bg-white text-stone-700 px-8 py-4 rounded-full font-medium hover:bg-stone-50 transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-2 bg-white text-store-ink px-8 py-4 rounded-full font-medium hover:bg-store-surface transition-colors whitespace-nowrap"
             >
               <i className="ri-search-line"></i>
               Search All Products
             </Link>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-stone-600 text-white px-8 py-4 rounded-full font-medium hover:bg-stone-500 transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-2 bg-store-navy-light text-white px-8 py-4 rounded-full font-medium hover:bg-store-surface0 transition-colors whitespace-nowrap"
             >
               <i className="ri-customer-service-line"></i>
               Contact Support

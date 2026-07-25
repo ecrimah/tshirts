@@ -97,8 +97,8 @@ export default function AboutPage() {
 
         {activeTab === 'mission' && (
           <div className="grid md:grid-cols-2 gap-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="bg-stone-50 p-10 rounded-3xl border border-stone-100">
-              <div className="w-16 h-16 bg-stone-700 rounded-2xl flex items-center justify-center mb-8 shadow-lg">
+            <div className="bg-store-surface p-10 rounded-3xl border border-gray-100">
+              <div className="w-16 h-16 bg-store-navy rounded-2xl flex items-center justify-center mb-8 shadow-lg">
                 <i className="ri-focus-3-line text-3xl text-white"></i>
               </div>
               <h3 className="text-3xl font-bold text-gray-900 mb-4">Mission Statement</h3>
@@ -131,8 +131,8 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {values.map((value, index) => (
               <div key={index} className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <div className="w-14 h-14 bg-stone-100 rounded-full flex items-center justify-center mb-6">
-                  <i className={`${value.icon} text-2xl text-stone-700`}></i>
+                <div className="w-14 h-14 bg-store-surface rounded-full flex items-center justify-center mb-6">
+                  <i className={`${value.icon} text-2xl text-store-ink`}></i>
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{value.title}</h3>
                 <p className="text-gray-600 leading-relaxed">{value.description}</p>

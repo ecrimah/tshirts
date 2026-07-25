@@ -68,7 +68,7 @@ export default function InstallInstructions() {
     <>
       <button
         onClick={() => setShowModal(true)}
-        className="flex items-center gap-2 px-4 py-2 bg-stone-100 text-stone-700 rounded-lg hover:bg-stone-200 transition-colors whitespace-nowrap"
+        className="flex items-center gap-2 px-4 py-2 bg-store-surface text-store-ink rounded-lg hover:bg-gray-200 transition-colors whitespace-nowrap"
       >
         <i className="ri-information-line"></i>
         <span className="font-medium">How to Install</span>
@@ -90,12 +90,12 @@ export default function InstallInstructions() {
             <div className="space-y-4 mb-6">
               {instructions.steps.map((step, index) => (
                 <div key={index} className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-stone-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <i className={`${step.icon} text-stone-700`}></i>
+                  <div className="w-10 h-10 bg-store-surface rounded-full flex items-center justify-center flex-shrink-0">
+                    <i className={`${step.icon} text-store-ink`}></i>
                   </div>
                   <div className="flex-1 pt-2">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="w-6 h-6 bg-stone-700 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                      <span className="w-6 h-6 bg-store-navy text-white rounded-full flex items-center justify-center text-xs font-bold">
                         {index + 1}
                       </span>
                       <span className="font-medium text-gray-900">{step.text}</span>
@@ -105,26 +105,26 @@ export default function InstallInstructions() {
               ))}
             </div>
 
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
+            <div className="bg-store-surface border border-gray-200 rounded-xl p-4 mb-6">
               <div className="flex items-center gap-2 mb-2">
-                <i className="ri-lightbulb-line text-green-700"></i>
-                <span className="font-semibold text-green-900">Why Install?</span>
+                <i className="ri-lightbulb-line text-store-primary"></i>
+                <span className="font-semibold text-store-ink">Why Install?</span>
               </div>
-              <ul className="space-y-1 text-sm text-green-800">
+              <ul className="space-y-1 text-sm text-store-muted">
                 <li className="flex items-center gap-2">
-                  <i className="ri-check-line"></i>
+                  <i className="ri-check-line text-store-primary"></i>
                   <span>Lightning fast performance</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="ri-check-line"></i>
+                  <i className="ri-check-line text-store-primary"></i>
                   <span>Works offline</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="ri-check-line"></i>
+                  <i className="ri-check-line text-store-primary"></i>
                   <span>Push notifications for deals</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <i className="ri-check-line"></i>
+                  <i className="ri-check-line text-store-primary"></i>
                   <span>One-tap access from home screen</span>
                 </li>
               </ul>
@@ -132,7 +132,7 @@ export default function InstallInstructions() {
 
             <button
               onClick={() => setShowModal(false)}
-              className="w-full bg-stone-700 hover:bg-stone-800 text-white py-3 rounded-lg font-semibold transition-colors whitespace-nowrap"
+              className="w-full bg-store-navy hover:bg-store-navy-light text-white py-3 rounded-lg font-semibold transition-colors whitespace-nowrap"
             >
               Got It!
             </button>

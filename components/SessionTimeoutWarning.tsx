@@ -95,7 +95,7 @@ export default function SessionTimeoutWarning() {
           </button>
           <button
             onClick={handleStayLoggedIn}
-            className="flex-1 px-4 py-2.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-medium whitespace-nowrap"
+            className="flex-1 px-4 py-2.5 bg-black text-white rounded-lg hover:bg-store-navy-light transition-colors font-medium whitespace-nowrap"
           >
             Stay Logged In
           </button>

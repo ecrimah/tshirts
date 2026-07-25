@@ -189,7 +189,7 @@ export default function ContactPage() {
               </div>
 
               {submitStatus === 'success' && (
-                <div className="bg-stone-50 border border-stone-200 text-stone-700 px-4 py-3 rounded-xl">
+                <div className="bg-store-surface border border-gray-200 text-store-ink px-4 py-3 rounded-xl">
                   <i className="ri-check-line mr-2"></i>
                   Message sent successfully! We'll respond within 24 hours.
                 </div>

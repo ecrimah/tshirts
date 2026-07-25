@@ -137,9 +137,9 @@ function OrderTrackingContent() {
     
     const statusMap: Record<string, { label: string; color: string }> = {
       'pending': { label: 'Pending', color: 'bg-amber-100 text-amber-800' },
-      'processing': { label: 'Processing', color: 'bg-stone-100 text-stone-800' },
-      'shipped': { label: 'Packaged', color: 'bg-purple-100 text-purple-800' },
-      'delivered': { label: 'Delivered', color: 'bg-stone-100 text-stone-800' },
+      'processing': { label: 'Processing', color: 'bg-store-surface text-store-ink' },
+      'shipped': { label: 'Packaged', color: 'bg-store-primary/15 text-store-ink' },
+      'delivered': { label: 'Delivered', color: 'bg-store-surface text-store-ink' },
       'cancelled': { label: 'Cancelled', color: 'bg-red-100 text-red-800' }
     };
 
@@ -166,7 +166,7 @@ function OrderTrackingContent() {
                   type="text"
                   value={orderNumber}
                   onChange={(e) => setOrderNumber(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-stone-500"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-store-primary focus:border-store-primary"
                   placeholder="e.g. ORD-1770328211911-915 or SLI-ABC123"
                 />
               </div>
@@ -179,7 +179,7 @@ function OrderTrackingContent() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-stone-500"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-store-primary focus:border-store-primary"
                   placeholder="you@example.com"
                 />
               </div>
@@ -193,7 +193,7 @@ function OrderTrackingContent() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-stone-700 hover:bg-stone-800 text-white py-4 rounded-lg font-semibold transition-colors whitespace-nowrap disabled:opacity-50"
+                className="w-full bg-store-navy hover:bg-store-navy-light text-white py-4 rounded-lg font-semibold transition-colors whitespace-nowrap disabled:opacity-50"
               >
                 {loading ? (
                   <span className="flex items-center justify-center">
@@ -204,12 +204,12 @@ function OrderTrackingContent() {
               </button>
             </form>
 
-            <div className="mt-8 p-4 bg-stone-50 border border-stone-200 rounded-lg">
+            <div className="mt-8 p-4 bg-store-surface border border-gray-200 rounded-lg">
               <div className="flex items-start space-x-3">
-                <i className="ri-information-line text-xl text-stone-700 mt-0.5"></i>
+                <i className="ri-information-line text-xl text-store-ink mt-0.5"></i>
                 <div>
-                  <p className="text-sm font-semibold text-stone-900">Need Help?</p>
-                  <p className="text-sm text-stone-700 mt-1">
+                  <p className="text-sm font-semibold text-store-ink">Need Help?</p>
+                  <p className="text-sm text-store-ink mt-1">
                     You can find your order number and tracking number in the SMS or email we sent you after your order was confirmed.
                   </p>
                 </div>
@@ -269,8 +269,8 @@ function OrderTrackingContent() {
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             <div className="p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 flex items-center justify-center bg-stone-100 rounded-full">
-                  <i className="ri-map-pin-line text-xl text-stone-700"></i>
+                <div className="w-10 h-10 flex items-center justify-center bg-store-surface rounded-full">
+                  <i className="ri-map-pin-line text-xl text-store-ink"></i>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Shipping To</p>
@@ -283,8 +283,8 @@ function OrderTrackingContent() {
 
             <div className="p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 flex items-center justify-center bg-stone-100 rounded-full">
-                  <i className="ri-money-cny-circle-line text-xl text-stone-700"></i>
+                <div className="w-10 h-10 flex items-center justify-center bg-store-surface rounded-full">
+                  <i className="ri-money-cny-circle-line text-xl text-store-ink"></i>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Total</p>
@@ -295,8 +295,8 @@ function OrderTrackingContent() {
 
             <div className="p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 flex items-center justify-center bg-stone-100 rounded-full">
-                  <i className="ri-box-3-line text-xl text-stone-700"></i>
+                <div className="w-10 h-10 flex items-center justify-center bg-store-surface rounded-full">
+                  <i className="ri-box-3-line text-xl text-store-ink"></i>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Items</p>
@@ -315,16 +315,16 @@ function OrderTrackingContent() {
                 <div className="relative flex flex-col items-center mr-6">
                   <div className={`w-12 h-12 flex items-center justify-center rounded-full font-bold transition-colors ${
                     step.status === 'completed'
-                      ? 'bg-stone-700 text-white'
+                      ? 'bg-store-navy text-white'
                       : step.status === 'active'
-                      ? 'bg-stone-100 text-stone-700 ring-4 ring-stone-200'
+                      ? 'bg-store-surface text-store-ink ring-4 ring-store-primary/20'
                       : 'bg-gray-200 text-gray-500'
                   }`}>
                     <i className={`${step.icon} text-xl`}></i>
                   </div>
                   {index < trackingSteps.length - 1 && (
                     <div className={`w-0.5 h-16 mt-2 ${
-                      step.status === 'completed' ? 'bg-stone-700' : 'bg-gray-200'
+                      step.status === 'completed' ? 'bg-store-navy' : 'bg-gray-200'
                     }`}></div>
                   )}
                 </div>
@@ -340,7 +340,7 @@ function OrderTrackingContent() {
                     {step.description}
                   </p>
                   <p className={`text-sm mt-1 font-semibold ${
-                    step.status === 'pending' ? 'text-gray-400' : 'text-stone-700'
+                    step.status === 'pending' ? 'text-gray-400' : 'text-store-ink'
                   }`}>
                     {step.date}
                   </p>
@@ -376,7 +376,7 @@ function OrderTrackingContent() {
                     <p className="text-xs text-gray-500">{item.variant_name}</p>
                   )}
                 </div>
-                <p className="font-bold text-stone-700">GH₵ {Number(item.unit_price).toFixed(2)}</p>
+                <p className="font-bold text-store-ink">GH₵ {Number(item.unit_price).toFixed(2)}</p>
               </div>
             ))}
           </div>
@@ -385,11 +385,11 @@ function OrderTrackingContent() {
         <div className="mt-8 text-center">
           <p className="text-gray-600 mb-4">Need help with your order?</p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/contact" className="text-stone-700 hover:text-stone-900 font-semibold whitespace-nowrap">
+            <Link href="/contact" className="text-store-ink hover:text-store-ink font-semibold whitespace-nowrap">
               <i className="ri-customer-service-line mr-1"></i>
               Contact Support
             </Link>
-            <Link href="/returns" className="text-stone-700 hover:text-stone-900 font-semibold whitespace-nowrap">
+            <Link href="/returns" className="text-store-ink hover:text-store-ink font-semibold whitespace-nowrap">
               <i className="ri-arrow-left-right-line mr-1"></i>
               Returns Policy
             </Link>
@@ -405,7 +405,7 @@ export default function OrderTrackingPage() {
     <Suspense fallback={
       <main className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-stone-700 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <div className="w-12 h-12 border-4 border-store-navy border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       </main>
     }>

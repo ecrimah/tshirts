@@ -40,7 +40,7 @@ export default function WishlistPage() {
           <div className="flex items-center justify-between">
             <div>
               <nav className="flex items-center space-x-2 text-sm mb-2">
-                <Link href="/" className="text-gray-600 hover:text-stone-700 transition-colors">Home</Link>
+                <Link href="/" className="text-gray-600 hover:text-store-ink transition-colors">Home</Link>
                 <i className="ri-arrow-right-s-line text-gray-400"></i>
                 <span className="text-gray-900 font-medium">Wishlist</span>
               </nav>
@@ -51,7 +51,7 @@ export default function WishlistPage() {
             {wishlistItems.length > 0 && (
               <button
                 onClick={addAllToCart}
-                className="bg-gray-900 hover:bg-stone-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap"
+                className="bg-store-navy hover:bg-store-navy-light text-white px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap"
               >
                 Add All to Cart
               </button>
@@ -68,7 +68,7 @@ export default function WishlistPage() {
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Your wishlist is empty</h2>
             <p className="text-gray-600 mb-8 text-lg">Save your favourite items here to easily find them later</p>
-            <Link href="/shop" className="inline-block bg-gray-900 hover:bg-stone-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors whitespace-nowrap">
+            <Link href="/shop" className="inline-block bg-store-navy hover:bg-store-navy-light text-white px-8 py-4 rounded-lg font-semibold transition-colors whitespace-nowrap">
               Explore Products
             </Link>
           </div>
@@ -95,9 +95,9 @@ export default function WishlistPage() {
 
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="bg-gradient-to-r from-stone-700 to-stone-800 rounded-2xl p-12 text-center text-white">
+          <div className="bg-gradient-to-r from-store-navy to-store-navy-light rounded-2xl p-12 text-center text-white">
             <h2 className="text-3xl font-bold mb-4">Share Your Wishlist</h2>
-            <p className="text-stone-100 mb-8 text-lg">Let friends and family know what you love</p>
+            <p className="text-white/90 mb-8 text-lg">Let friends and family know what you love</p>
             <div className="flex justify-center space-x-4">
               <button className="w-12 h-12 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-lg transition-colors">
                 <i className="ri-facebook-fill text-xl"></i>

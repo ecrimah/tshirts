@@ -9,8 +9,8 @@ export default function ReturnConfirmationPage() {
       <main className="min-h-screen bg-gray-50 flex items-center justify-center py-12">
         <div className="max-w-2xl mx-auto px-4">
           <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-            <div className="w-20 h-20 flex items-center justify-center bg-blue-100 rounded-full mx-auto mb-6">
-              <i className="ri-check-line text-4xl text-blue-700"></i>
+            <div className="w-20 h-20 flex items-center justify-center bg-store-primary/15 rounded-full mx-auto mb-6">
+              <i className="ri-check-line text-4xl text-store-primary"></i>
             </div>
 
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Return Request Submitted!</h1>
@@ -19,9 +19,9 @@ export default function ReturnConfirmationPage() {
               Return ID: <span className="font-semibold">{returnId}</span>
             </p>
 
-            <div className="mb-8 p-6 bg-blue-50 border border-blue-200 rounded-xl text-left">
+            <div className="mb-8 p-6 bg-store-surface border border-store-primary/30 rounded-xl text-left">
               <h2 className="font-bold text-gray-900 mb-4 flex items-center">
-                <i className="ri-mail-line text-2xl text-blue-700 mr-2"></i>
+                <i className="ri-mail-line text-2xl text-store-primary mr-2"></i>
                 Check Your Email
               </h2>
               <p className="text-sm text-gray-700 mb-3">
@@ -29,19 +29,19 @@ export default function ReturnConfirmationPage() {
               </p>
               <ul className="text-sm text-gray-700 space-y-2">
                 <li className="flex items-start space-x-2">
-                  <i className="ri-checkbox-circle-fill text-blue-600 mt-0.5"></i>
+                  <i className="ri-checkbox-circle-fill text-store-primary mt-0.5"></i>
                   <span>Prepaid return shipping label</span>
                 </li>
                 <li className="flex items-start space-x-2">
-                  <i className="ri-checkbox-circle-fill text-blue-600 mt-0.5"></i>
+                  <i className="ri-checkbox-circle-fill text-store-primary mt-0.5"></i>
                   <span>Packing instructions</span>
                 </li>
                 <li className="flex items-start space-x-2">
-                  <i className="ri-checkbox-circle-fill text-blue-600 mt-0.5"></i>
+                  <i className="ri-checkbox-circle-fill text-store-primary mt-0.5"></i>
                   <span>Nearest drop-off locations</span>
                 </li>
                 <li className="flex items-start space-x-2">
-                  <i className="ri-checkbox-circle-fill text-blue-600 mt-0.5"></i>
+                  <i className="ri-checkbox-circle-fill text-store-primary mt-0.5"></i>
                   <span>Return tracking number</span>
                 </li>
               </ul>
@@ -51,8 +51,8 @@ export default function ReturnConfirmationPage() {
               <h2 className="font-bold text-gray-900 mb-4">What happens next?</h2>
               <div className="space-y-4">
                 <div className="flex items-start space-x-4">
-                  <div className="w-10 h-10 flex items-center justify-center bg-blue-100 rounded-full flex-shrink-0">
-                    <span className="font-bold text-blue-700">1</span>
+                  <div className="w-10 h-10 flex items-center justify-center bg-store-primary/15 rounded-full flex-shrink-0">
+                    <span className="font-bold text-store-primary">1</span>
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900">Print Your Label</p>
@@ -61,8 +61,8 @@ export default function ReturnConfirmationPage() {
                 </div>
 
                 <div className="flex items-start space-x-4">
-                  <div className="w-10 h-10 flex items-center justify-center bg-blue-100 rounded-full flex-shrink-0">
-                    <span className="font-bold text-blue-700">2</span>
+                  <div className="w-10 h-10 flex items-center justify-center bg-store-primary/15 rounded-full flex-shrink-0">
+                    <span className="font-bold text-store-primary">2</span>
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900">Pack Your Items</p>
@@ -71,8 +71,8 @@ export default function ReturnConfirmationPage() {
                 </div>
 
                 <div className="flex items-start space-x-4">
-                  <div className="w-10 h-10 flex items-center justify-center bg-blue-100 rounded-full flex-shrink-0">
-                    <span className="font-bold text-blue-700">3</span>
+                  <div className="w-10 h-10 flex items-center justify-center bg-store-primary/15 rounded-full flex-shrink-0">
+                    <span className="font-bold text-store-primary">3</span>
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900">Ship It Back</p>
@@ -81,8 +81,8 @@ export default function ReturnConfirmationPage() {
                 </div>
 
                 <div className="flex items-start space-x-4">
-                  <div className="w-10 h-10 flex items-center justify-center bg-blue-100 rounded-full flex-shrink-0">
-                    <span className="font-bold text-blue-700">4</span>
+                  <div className="w-10 h-10 flex items-center justify-center bg-store-primary/15 rounded-full flex-shrink-0">
+                    <span className="font-bold text-store-primary">4</span>
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900">Get Your Refund</p>
@@ -95,7 +95,7 @@ export default function ReturnConfirmationPage() {
             <div className="space-y-3">
               <Link
                 href="/account"
-                className="block w-full bg-blue-700 hover:bg-blue-800 text-white py-4 rounded-lg font-semibold transition-colors whitespace-nowrap"
+                className="block w-full bg-store-navy hover:bg-store-navy text-white py-4 rounded-lg font-semibold transition-colors whitespace-nowrap"
               >
                 Track Return Status
               </Link>
@@ -107,7 +107,7 @@ export default function ReturnConfirmationPage() {
               </Link>
               <Link
                 href="/support/ticket"
-                className="block text-blue-700 hover:text-blue-900 font-semibold whitespace-nowrap"
+                className="block text-store-primary hover:text-store-ink font-semibold whitespace-nowrap"
               >
                 Need Help? Contact Support
               </Link>

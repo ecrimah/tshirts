@@ -179,7 +179,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-700 focus:outline-none"
+            className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-store-navy focus:outline-none"
           />
         </div>
 
@@ -192,7 +192,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
               setSlugTouched(true);
               setSlug(slugifyProduct(e.target.value));
             }}
-            className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-700 focus:outline-none font-mono text-sm"
+            className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-store-navy focus:outline-none font-mono text-sm"
           />
           <p className="text-xs text-gray-500 mt-1">URL: /blog/{slug || 'your-slug'}</p>
         </div>
@@ -203,7 +203,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
             value={excerpt}
             onChange={(e) => setExcerpt(e.target.value)}
             rows={3}
-            className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-700 focus:outline-none"
+            className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-store-navy focus:outline-none"
           />
         </div>
 
@@ -213,7 +213,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             rows={16}
-            className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-700 focus:outline-none font-mono text-sm"
+            className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-store-navy focus:outline-none font-mono text-sm"
             placeholder="Write your post… Plain text or HTML."
           />
         </div>
@@ -234,7 +234,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
           ) : null}
           <div className="flex flex-col sm:flex-row gap-3">
             <label
-              className={`inline-flex items-center justify-center px-4 py-3 rounded-lg border-2 border-dashed border-gray-300 text-gray-700 hover:border-blue-700 hover:text-blue-700 cursor-pointer ${uploading ? 'opacity-50 pointer-events-none' : ''}`}
+              className={`inline-flex items-center justify-center px-4 py-3 rounded-lg border-2 border-dashed border-gray-300 text-gray-700 hover:border-store-navy hover:text-store-primary cursor-pointer ${uploading ? 'opacity-50 pointer-events-none' : ''}`}
             >
               <i className="ri-upload-2-line mr-2"></i>
               {uploading ? 'Uploading…' : 'Upload image'}
@@ -244,7 +244,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
               type="url"
               value={featuredImage}
               onChange={(e) => setFeaturedImage(e.target.value)}
-              className="flex-1 border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-700 focus:outline-none text-sm"
+              className="flex-1 border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-store-navy focus:outline-none text-sm"
               placeholder="Or paste image URL"
             />
           </div>
@@ -257,7 +257,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
               type="text"
               value={tagsInput}
               onChange={(e) => setTagsInput(e.target.value)}
-              className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-700 focus:outline-none"
+              className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-store-navy focus:outline-none"
               placeholder="Tips, News"
             />
           </div>
@@ -266,7 +266,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value as BlogStatus)}
-              className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-700 focus:outline-none bg-white"
+              className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-store-navy focus:outline-none bg-white"
             >
               <option value="draft">Draft</option>
               <option value="published">Published</option>
@@ -283,7 +283,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
               type="text"
               value={seoTitle}
               onChange={(e) => setSeoTitle(e.target.value)}
-              className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-700 focus:outline-none"
+              className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-store-navy focus:outline-none"
               maxLength={60}
             />
           </div>
@@ -293,7 +293,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
               value={seoDescription}
               onChange={(e) => setSeoDescription(e.target.value)}
               rows={3}
-              className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-700 focus:outline-none"
+              className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-store-navy focus:outline-none"
               maxLength={160}
             />
           </div>
@@ -312,7 +312,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
             type="button"
             disabled={saving}
             onClick={() => handleSubmit('published')}
-            className="px-5 py-3 rounded-lg bg-blue-700 text-white font-semibold hover:bg-blue-800 disabled:opacity-50"
+            className="px-5 py-3 rounded-lg bg-store-navy text-white font-semibold hover:bg-store-navy disabled:opacity-50"
           >
             {saving ? 'Saving…' : 'Publish'}
           </button>

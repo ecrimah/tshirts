@@ -29,14 +29,14 @@ export default function OrderSummary({ items, subtotal, shipping, tax, total }: 
                 alt={item.name}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute -top-2 -right-2 w-6 h-6 flex items-center justify-center bg-stone-700 text-white text-xs font-bold rounded-full">
+              <div className="absolute -top-2 -right-2 w-6 h-6 flex items-center justify-center bg-store-navy text-white text-xs font-bold rounded-full">
                 {item.quantity}
               </div>
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-gray-900 text-sm line-clamp-2">{item.name}</h3>
               {item.variant && <p className="text-xs text-gray-500 mt-0.5">{item.variant}</p>}
-              <p className="text-stone-700 font-bold mt-1">GH₵ {item.price.toFixed(2)}</p>
+              <p className="text-store-ink font-bold mt-1">GH₵ {item.price.toFixed(2)}</p>
             </div>
           </div>
         ))}
@@ -59,12 +59,12 @@ export default function OrderSummary({ items, subtotal, shipping, tax, total }: 
       <div className="border-t border-gray-200 mt-4 pt-4">
         <div className="flex justify-between items-center">
           <span className="text-lg font-bold text-gray-900">Total</span>
-          <span className="text-2xl font-bold text-stone-700">GH₵ {total.toFixed(2)}</span>
+          <span className="text-2xl font-bold text-store-ink">GH₵ {total.toFixed(2)}</span>
         </div>
       </div>
 
-      <div className="mt-6 p-4 bg-stone-50 border border-stone-200 rounded-lg">
-        <div className="flex items-center space-x-2 text-stone-800">
+      <div className="mt-6 p-4 bg-store-surface border border-gray-200 rounded-lg">
+        <div className="flex items-center space-x-2 text-store-ink">
           <i className="ri-shield-check-line text-xl"></i>
           <p className="text-sm font-semibold">Secure Checkout</p>
         </div>

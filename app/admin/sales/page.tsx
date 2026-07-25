@@ -90,7 +90,7 @@ export default function AdminSalesPage() {
             disabled={!isAdmin || saving}
             onClick={() => handleToggle(!salesActive)}
             className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
-              salesActive ? 'bg-stone-700' : 'bg-gray-300'
+              salesActive ? 'bg-store-navy' : 'bg-gray-300'
             } ${!isAdmin ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             <span

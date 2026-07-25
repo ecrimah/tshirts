@@ -41,7 +41,7 @@ export default function ProductSort({ onSortChange, totalProducts }: ProductSort
             <select
               value={sortBy}
               onChange={(e) => handleSortChange(e.target.value)}
-              className="px-4 py-2 pr-8 border-2 border-gray-300 rounded-lg text-sm font-medium text-gray-700 focus:border-stone-700 focus:ring-2 focus:ring-stone-200 bg-white cursor-pointer"
+              className="px-4 py-2 pr-8 border-2 border-gray-300 rounded-lg text-sm font-medium text-gray-700 focus:border-store-navy focus:ring-2 focus:ring-store-primary/20 bg-white cursor-pointer"
             >
               {sortOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -55,7 +55,7 @@ export default function ProductSort({ onSortChange, totalProducts }: ProductSort
             <button
               onClick={() => setViewMode('grid')}
               className={`w-10 h-10 flex items-center justify-center transition-colors ${
-                viewMode === 'grid' ? 'bg-stone-700 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'
+                viewMode === 'grid' ? 'bg-store-navy text-white' : 'bg-white text-gray-600 hover:bg-gray-50'
               }`}
             >
               <i className="ri-grid-line"></i>
@@ -63,7 +63,7 @@ export default function ProductSort({ onSortChange, totalProducts }: ProductSort
             <button
               onClick={() => setViewMode('list')}
               className={`w-10 h-10 flex items-center justify-center transition-colors ${
-                viewMode === 'list' ? 'bg-stone-700 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'
+                viewMode === 'list' ? 'bg-store-navy text-white' : 'bg-white text-gray-600 hover:bg-gray-50'
               }`}
             >
               <i className="ri-list-check"></i>

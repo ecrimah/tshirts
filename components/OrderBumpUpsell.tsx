@@ -36,7 +36,7 @@ export default function OrderBumpUpsell({ products, onToggle }: OrderBumpUpsellP
             key={product.id}
             className={`bg-white rounded-lg p-4 border-2 transition-all cursor-pointer ${
               product.selected
-                ? 'border-stone-700 shadow-md'
+                ? 'border-store-navy shadow-md'
                 : 'border-gray-200 hover:border-gray-300'
             }`}
             onClick={() => onToggle(product.id)}
@@ -46,7 +46,7 @@ export default function OrderBumpUpsell({ products, onToggle }: OrderBumpUpsellP
                 type="checkbox"
                 checked={product.selected}
                 onChange={() => onToggle(product.id)}
-                className="w-5 h-5 text-stone-700 rounded border-gray-300 focus:ring-stone-500"
+                className="w-5 h-5 text-store-ink rounded border-gray-300 focus:ring-store-primary"
               />
               
               <div className="w-20 h-20 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
@@ -61,7 +61,7 @@ export default function OrderBumpUpsell({ products, onToggle }: OrderBumpUpsellP
                 <h4 className="font-semibold text-gray-900 mb-1">{product.name}</h4>
                 <p className="text-sm text-gray-600 mb-2">{product.description}</p>
                 <div className="flex items-center space-x-2">
-                  <span className="text-lg font-bold text-stone-700">GH₵{product.price.toFixed(2)}</span>
+                  <span className="text-lg font-bold text-store-ink">GH₵{product.price.toFixed(2)}</span>
                   {product.originalPrice && (
                     <>
                       <span className="text-sm text-gray-400 line-through">GH₵{product.originalPrice.toFixed(2)}</span>
@@ -75,7 +75,7 @@ export default function OrderBumpUpsell({ products, onToggle }: OrderBumpUpsellP
 
               <div className={`w-8 h-8 flex items-center justify-center rounded-full border-2 transition-colors ${
                 product.selected
-                  ? 'border-stone-700 bg-stone-700'
+                  ? 'border-store-navy bg-store-navy'
                   : 'border-gray-300'
               }`}>
                 {product.selected && <i className="ri-check-line text-white"></i>}

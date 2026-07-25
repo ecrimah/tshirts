@@ -13,7 +13,7 @@ export default function FreeShippingBar({ currentAmount, threshold = 200 }: Free
   return (
     <div className={`rounded-lg p-4 mb-4 ${
       isQualified 
-        ? 'bg-gradient-to-r from-stone-500 to-teal-500 text-white' 
+        ? 'bg-gradient-to-r from-store-navy-light to-teal-500 text-white' 
         : 'bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200'
     }`}>
       <div className="flex items-center justify-between mb-2">
@@ -46,7 +46,7 @@ export default function FreeShippingBar({ currentAmount, threshold = 200 }: Free
             className={`h-full transition-all duration-500 ${
               isQualified 
                 ? 'bg-white' 
-                : 'bg-gradient-to-r from-amber-500 to-orange-500'
+                : 'bg-gradient-to-r from-store-primary to-orange-500'
             }`}
             style={{ width: `${percentage}%` }}
           />
@@ -54,7 +54,7 @@ export default function FreeShippingBar({ currentAmount, threshold = 200 }: Free
         
         {isQualified && (
           <div className="absolute right-0 top-1/2 -translate-y-1/2 -mr-1">
-            <div className="w-6 h-6 flex items-center justify-center bg-white rounded-full text-stone-600">
+            <div className="w-6 h-6 flex items-center justify-center bg-white rounded-full text-store-muted">
               <i className="ri-check-line text-lg font-bold"></i>
             </div>
           </div>

@@ -133,8 +133,8 @@ export default function InventoryManagementPage() {
                 <p className="text-sm text-gray-600 mb-1">Total Products</p>
                 <p className="text-3xl font-bold text-gray-900">{products.length}</p>
               </div>
-              <div className="w-12 h-12 flex items-center justify-center bg-stone-100 rounded-lg">
-                <i className="ri-stack-line text-2xl text-stone-600"></i>
+              <div className="w-12 h-12 flex items-center justify-center bg-store-surface rounded-lg">
+                <i className="ri-stack-line text-2xl text-store-muted"></i>
               </div>
             </div>
           </div>
@@ -167,10 +167,10 @@ export default function InventoryManagementPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Total Retail Value</p>
-                <p className="text-3xl font-bold text-stone-600">GH₵{totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                <p className="text-3xl font-bold text-store-muted">GH₵{totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
               </div>
-              <div className="w-12 h-12 flex items-center justify-center bg-stone-100 rounded-lg">
-                <i className="ri-money-dollar-circle-line text-2xl text-stone-600"></i>
+              <div className="w-12 h-12 flex items-center justify-center bg-store-surface rounded-lg">
+                <i className="ri-money-dollar-circle-line text-2xl text-store-muted"></i>
               </div>
             </div>
           </div>
@@ -186,7 +186,7 @@ export default function InventoryManagementPage() {
                   placeholder="Search by product name or SKU..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-stone-500 text-sm"
+                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-store-primary focus:border-store-primary text-sm"
                 />
               </div>
             </div>
@@ -212,7 +212,7 @@ export default function InventoryManagementPage() {
 
               <button
                 onClick={() => setShowImportModal(true)}
-                className="bg-stone-700 hover:bg-stone-800 text-white px-4 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2 whitespace-nowrap cursor-pointer"
+                className="bg-store-navy hover:bg-store-navy text-white px-4 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2 whitespace-nowrap cursor-pointer"
               >
                 <i className="ri-upload-line"></i>
                 <span>Import CSV</span>
@@ -229,14 +229,14 @@ export default function InventoryManagementPage() {
           </div>
 
           {selectedProducts.length > 0 && (
-            <div className="mt-4 flex items-center justify-between p-4 bg-stone-50 border border-stone-200 rounded-lg">
-              <p className="text-stone-800 font-medium">
+            <div className="mt-4 flex items-center justify-between p-4 bg-store-surface border border-gray-200 rounded-lg">
+              <p className="text-store-ink font-medium">
                 {selectedProducts.length} product{selectedProducts.length > 1 ? 's' : ''} selected
               </p>
               <div className="flex items-center space-x-3">
                 <button
                   onClick={handleBulkRestock}
-                  className="bg-stone-700 hover:bg-stone-800 text-white px-4 py-2 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer"
+                  className="bg-store-navy hover:bg-store-navy text-white px-4 py-2 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer"
                 >
                   Bulk Restock
                 </button>
@@ -261,7 +261,7 @@ export default function InventoryManagementPage() {
                       type="checkbox"
                       checked={selectedProducts.length === filteredProducts.length && filteredProducts.length > 0}
                       onChange={toggleAllProducts}
-                      className="w-5 h-5 text-stone-700 rounded cursor-pointer"
+                      className="w-5 h-5 text-store-ink rounded cursor-pointer"
                     />
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Product</th>
@@ -286,7 +286,7 @@ export default function InventoryManagementPage() {
                           type="checkbox"
                           checked={selectedProducts.includes(product.id)}
                           onChange={() => toggleProductSelection(product.id)}
-                          className="w-5 h-5 text-stone-700 rounded cursor-pointer"
+                          className="w-5 h-5 text-store-ink rounded cursor-pointer"
                         />
                       </td>
                       <td className="px-6 py-4">
@@ -307,7 +307,7 @@ export default function InventoryManagementPage() {
                       </td>
                       <td className="px-6 py-4">
                         {product.status === 'good' && (
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-stone-100 text-stone-700 whitespace-nowrap">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-store-surface text-store-ink whitespace-nowrap">
                             <i className="ri-checkbox-circle-fill mr-1"></i>
                             In Stock
                           </span>
@@ -328,13 +328,13 @@ export default function InventoryManagementPage() {
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-2">
                           <button
-                            className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-stone-700 transition-colors cursor-pointer"
+                            className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-store-ink transition-colors cursor-pointer"
                             title="Edit"
                           >
                             <i className="ri-edit-line text-lg"></i>
                           </button>
                           <button
-                            className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-stone-700 transition-colors cursor-pointer"
+                            className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-store-ink transition-colors cursor-pointer"
                             title="View Details"
                           >
                             <i className="ri-eye-line text-lg"></i>

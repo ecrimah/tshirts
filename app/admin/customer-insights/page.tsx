@@ -116,8 +116,8 @@ export default function CustomerInsightsPage() {
 
   const getSegmentBadge = (segment: string) => {
     const badges: any = {
-      vip: 'bg-stone-100 text-stone-700',
-      returning: 'bg-stone-100 text-stone-700',
+      vip: 'bg-store-surface text-store-ink',
+      returning: 'bg-store-surface text-store-ink',
       new: 'bg-amber-100 text-amber-700',
       'at-risk': 'bg-red-100 text-red-700'
     };
@@ -136,7 +136,7 @@ export default function CustomerInsightsPage() {
 
   const getRiskBadge = (risk: string) => {
     const badges: any = {
-      low: 'bg-stone-100 text-stone-700',
+      low: 'bg-store-surface text-store-ink',
       medium: 'bg-amber-100 text-amber-700',
       high: 'bg-red-100 text-red-700'
     };
@@ -170,24 +170,24 @@ export default function CustomerInsightsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 flex items-center justify-center bg-stone-100 rounded-lg">
-                <i className="ri-vip-crown-line text-2xl text-stone-700"></i>
+              <div className="w-12 h-12 flex items-center justify-center bg-store-surface rounded-lg">
+                <i className="ri-vip-crown-line text-2xl text-store-ink"></i>
               </div>
             </div>
             <p className="text-sm text-gray-600 mb-1">VIP Customers</p>
             <p className="text-3xl font-bold text-gray-900">{stats.vip}</p>
-            <p className="text-sm text-stone-700 font-semibold mt-2">Spent &gt; GH₵1,000</p>
+            <p className="text-sm text-store-ink font-semibold mt-2">Spent &gt; GH₵1,000</p>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 flex items-center justify-center bg-stone-100 rounded-lg">
-                <i className="ri-refresh-line text-2xl text-stone-700"></i>
+              <div className="w-12 h-12 flex items-center justify-center bg-store-surface rounded-lg">
+                <i className="ri-refresh-line text-2xl text-store-ink"></i>
               </div>
             </div>
             <p className="text-sm text-gray-600 mb-1">Returning Customers</p>
             <p className="text-3xl font-bold text-gray-900">{stats.returning}</p>
-            <p className="text-sm text-stone-700 font-semibold mt-2">More than 1 order</p>
+            <p className="text-sm text-store-ink font-semibold mt-2">More than 1 order</p>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm p-6">
@@ -203,8 +203,8 @@ export default function CustomerInsightsPage() {
 
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 flex items-center justify-center bg-purple-100 rounded-lg">
-                <i className="ri-line-chart-line text-2xl text-purple-700"></i>
+              <div className="w-12 h-12 flex items-center justify-center bg-store-primary/15 rounded-lg">
+                <i className="ri-line-chart-line text-2xl text-store-primary"></i>
               </div>
             </div>
             <p className="text-sm text-gray-600 mb-1">Avg. Lifetime Value</p>
@@ -223,7 +223,7 @@ export default function CustomerInsightsPage() {
                   placeholder="Search customers by name or email..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-stone-500 text-sm"
+                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-store-primary focus:border-store-primary text-sm"
                 />
               </div>
             </div>
@@ -261,7 +261,7 @@ export default function CustomerInsightsPage() {
               <div key={customer.id} className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-start space-x-4">
-                    <div className="w-16 h-16 flex items-center justify-center bg-gradient-to-br from-stone-500 to-stone-700 rounded-full text-white text-2xl font-bold">
+                    <div className="w-16 h-16 flex items-center justify-center bg-gradient-to-br from-store-muted to-store-navy rounded-full text-white text-2xl font-bold">
                       {customer.name?.charAt(0).toUpperCase() || 'U'}
                     </div>
                     <div>
@@ -308,15 +308,15 @@ export default function CustomerInsightsPage() {
                   </div>
                   <div className="bg-gray-50 rounded-lg p-4">
                     <p className="text-sm text-gray-600 mb-1">Lifetime Value</p>
-                    <p className="text-2xl font-bold text-stone-700">{formatCurrency(customer.lifetimeValue)}</p>
+                    <p className="text-2xl font-bold text-store-ink">{formatCurrency(customer.lifetimeValue)}</p>
                   </div>
                   <div className="bg-gray-50 rounded-lg p-4">
                     <p className="text-sm text-gray-600 mb-1">Engagement</p>
                     <div className="flex items-center space-x-2">
                       <div className="flex-1 bg-gray-200 rounded-full h-2">
                         <div
-                          className={`h-2 rounded-full ${customer.engagementScore >= 80 ? 'bg-stone-600' :
-                            customer.engagementScore >= 60 ? 'bg-stone-600' :
+                          className={`h-2 rounded-full ${customer.engagementScore >= 80 ? 'bg-store-navy-light' :
+                            customer.engagementScore >= 60 ? 'bg-store-navy-light' :
                               customer.engagementScore >= 40 ? 'bg-amber-600' : 'bg-red-600'
                             }`}
                           style={{ width: `${customer.engagementScore}%` }}

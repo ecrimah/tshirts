@@ -237,7 +237,7 @@ export default function AdminLayout({
       >
         <div className="h-full px-4 py-6 overflow-y-auto">
           <Link href="/admin" className="flex items-center mb-8 px-2 cursor-pointer">
-            <span className="text-xl font-['Pacifico'] text-stone-700">{process.env.NEXT_PUBLIC_SITE_NAME || 'Mamator'}</span>
+            <span className="text-xl font-['Pacifico'] text-store-ink">{process.env.NEXT_PUBLIC_SITE_NAME || 'Mamator'}</span>
             <span className="ml-3 text-sm font-semibold text-gray-500">ADMIN</span>
           </Link>
 
@@ -250,7 +250,7 @@ export default function AdminLayout({
                   href={item.path}
                   onClick={() => window.innerWidth < 1024 && setIsSidebarOpen(false)} // Close on mobile click
                   className={`flex items-center justify-between px-4 py-3 rounded-lg transition-colors cursor-pointer ${isActive
-                    ? 'bg-stone-50 text-stone-700 font-semibold'
+                    ? 'bg-store-surface text-store-ink font-semibold'
                     : 'text-gray-700 hover:bg-gray-50'
                     }`}
                 >
@@ -298,8 +298,8 @@ export default function AdminLayout({
                 href="/admin/sales"
                 className={`inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg text-sm font-semibold border transition-colors shrink-0 ${
                   pathname === '/admin/sales'
-                    ? 'bg-stone-700 text-white border-stone-700'
-                    : 'bg-white text-stone-800 border-stone-200 hover:bg-stone-50'
+                    ? 'bg-store-navy text-white border-store-navy'
+                    : 'bg-white text-store-ink border-gray-200 hover:bg-store-surface'
                 }`}
                 title="Turn store-wide sale pricing on or off"
               >
@@ -320,7 +320,7 @@ export default function AdminLayout({
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="flex items-center space-x-2 lg:space-x-3 px-2 lg:px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
                 >
-                  <div className="w-8 h-8 lg:w-9 lg:h-9 flex items-center justify-center bg-stone-100 text-stone-700 rounded-full font-semibold">
+                  <div className="w-8 h-8 lg:w-9 lg:h-9 flex items-center justify-center bg-store-surface text-store-ink rounded-full font-semibold">
                     {user?.email?.charAt(0).toUpperCase() || 'A'}
                   </div>
                   <div className="text-left hidden md:block">

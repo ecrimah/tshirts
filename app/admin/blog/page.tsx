@@ -52,7 +52,7 @@ export default function AdminBlogPage() {
         </div>
         <Link
           href="/admin/blog/new"
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-700 text-white rounded-lg font-semibold hover:bg-blue-800"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-store-navy text-white rounded-lg font-semibold hover:bg-store-navy"
         >
           <i className="ri-add-line"></i> New Post
         </Link>
@@ -64,7 +64,7 @@ export default function AdminBlogPage() {
         ) : posts.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
             No posts yet.{' '}
-            <Link href="/admin/blog/new" className="text-blue-700 font-medium">
+            <Link href="/admin/blog/new" className="text-store-primary font-medium">
               Create one
             </Link>
           </div>
@@ -92,7 +92,7 @@ export default function AdminBlogPage() {
                   <td className="px-4 py-3 text-right space-x-2">
                     <Link
                       href={`/admin/blog/${post.id}/edit`}
-                      className="text-blue-700 font-medium text-sm hover:underline"
+                      className="text-store-primary font-medium text-sm hover:underline"
                     >
                       Edit
                     </Link>

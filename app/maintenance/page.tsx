@@ -1,10 +1,10 @@
 export default function MaintenancePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-store-surface via-white to-amber-50 flex items-center justify-center px-4">
       <div className="max-w-2xl mx-auto text-center">
         <div className="mb-8">
-          <div className="w-32 h-32 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <i className="ri-tools-line text-6xl text-stone-700"></i>
+          <div className="w-32 h-32 bg-store-surface rounded-full flex items-center justify-center mx-auto mb-6">
+            <i className="ri-tools-line text-6xl text-store-ink"></i>
           </div>
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
             We'll Be Right Back
@@ -16,7 +16,7 @@ export default function MaintenancePage() {
 
         <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Expected Downtime</h2>
-          <div className="flex items-center justify-center gap-3 text-stone-700">
+          <div className="flex items-center justify-center gap-3 text-store-ink">
             <i className="ri-time-line text-3xl"></i>
             <div className="text-left">
               <p className="text-sm text-gray-600">Estimated completion</p>
@@ -27,16 +27,16 @@ export default function MaintenancePage() {
 
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white border border-gray-200 rounded-xl p-6">
-            <div className="w-12 h-12 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i className="ri-rocket-line text-2xl text-stone-700"></i>
+            <div className="w-12 h-12 bg-store-surface rounded-full flex items-center justify-center mx-auto mb-4">
+              <i className="ri-rocket-line text-2xl text-store-ink"></i>
             </div>
             <h3 className="font-bold text-gray-900 mb-2">Performance</h3>
             <p className="text-gray-600 text-sm">Faster loading times and smoother navigation</p>
           </div>
 
           <div className="bg-white border border-gray-200 rounded-xl p-6">
-            <div className="w-12 h-12 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i className="ri-shield-check-line text-2xl text-stone-700"></i>
+            <div className="w-12 h-12 bg-store-surface rounded-full flex items-center justify-center mx-auto mb-4">
+              <i className="ri-shield-check-line text-2xl text-store-ink"></i>
             </div>
             <h3 className="font-bold text-gray-900 mb-2">Security</h3>
             <p className="text-gray-600 text-sm">Enhanced protection for your data and transactions</p>
@@ -51,7 +51,7 @@ export default function MaintenancePage() {
           </div>
         </div>
 
-        <div className="bg-stone-50 border border-stone-200 rounded-2xl p-8 mb-8">
+        <div className="bg-store-surface border border-gray-200 rounded-2xl p-8 mb-8">
           <h3 className="text-xl font-bold text-gray-900 mb-4">Need Immediate Assistance?</h3>
           <p className="text-gray-600 mb-6">
             Our customer service team is still available to help you. Please reach out once the site is back online using the contact page.

@@ -113,7 +113,7 @@ export default function ProductCard({
 
         {!inStock && (
           <div className="absolute inset-0 flex items-center justify-center bg-white/65 backdrop-blur-[1px]">
-            <span className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white">Out of Stock</span>
+            <span className="rounded-lg bg-store-navy px-4 py-2 text-sm font-medium text-white">Out of Stock</span>
           </div>
         )}
 

@@ -31,11 +31,11 @@ export default function StockNotification({ stockCount, threshold = 10, viewCoun
       )}
 
       {viewCount && viewCount > 50 && (
-        <div className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-purple-50 border border-purple-200">
-          <div className="w-6 h-6 flex items-center justify-center bg-purple-500 rounded-full">
+        <div className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-store-surface border border-store-primary/30">
+          <div className="w-6 h-6 flex items-center justify-center bg-store-primary rounded-full">
             <i className="ri-eye-fill text-white text-xs"></i>
           </div>
-          <span className="text-sm font-semibold text-purple-700">
+          <span className="text-sm font-semibold text-store-primary">
             🔥 {viewCount.toLocaleString()} people viewed this today
           </span>
         </div>

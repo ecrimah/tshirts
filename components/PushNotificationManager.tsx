@@ -39,9 +39,9 @@ export default function PushNotificationManager() {
 
         new Notification('Notifications Enabled! 🎉', {
           body: 'You will now receive updates about orders, deals, and more.',
-          icon: '/icon-192x192.png',
-          badge: '/icon-192x192.png',
-          tag: 'welcome-notification'
+          icon: '/icon-192.png',
+          badge: '/icon-192.png',
+          tag: 'welcome-notification',
         });
       }
     } catch (error) {
@@ -67,13 +67,12 @@ export default function PushNotificationManager() {
 
       const newSubscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey) as any
+        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey) as any,
       });
 
       setSubscription(newSubscription);
 
       console.log('Push subscription:', JSON.stringify(newSubscription));
-
     } catch (error) {
       console.error('Error subscribing to push notifications:', error);
     }
@@ -89,38 +88,38 @@ export default function PushNotificationManager() {
   return (
     <div className="fixed bottom-4 right-4 w-96 bg-white rounded-xl shadow-2xl p-6 z-50 border border-gray-200 animate-slide-up">
       <div className="flex items-start gap-4">
-        <div className="w-12 h-12 bg-stone-100 rounded-xl flex items-center justify-center flex-shrink-0">
-          <i className="ri-notification-line text-2xl text-stone-700"></i>
+        <div className="w-12 h-12 bg-store-surface rounded-xl flex items-center justify-center flex-shrink-0 border border-gray-100">
+          <i className="ri-notification-line text-2xl text-store-navy"></i>
         </div>
         <div className="flex-1">
-          <h3 className="font-bold text-gray-900 mb-2">Stay Updated! 🔔</h3>
-          <p className="text-sm text-gray-600 mb-4">
+          <h3 className="font-bold text-store-ink mb-2">Stay Updated!</h3>
+          <p className="text-sm text-store-muted mb-4">
             Get instant notifications about your orders, exclusive deals, and price drops on your wishlist items!
           </p>
           <div className="space-y-2 mb-4">
-            <div className="flex items-center gap-2 text-sm text-gray-700">
-              <i className="ri-check-line text-green-600"></i>
+            <div className="flex items-center gap-2 text-sm text-store-ink">
+              <i className="ri-check-line text-store-primary"></i>
               <span>Order updates & tracking</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-700">
-              <i className="ri-check-line text-green-600"></i>
+            <div className="flex items-center gap-2 text-sm text-store-ink">
+              <i className="ri-check-line text-store-primary"></i>
               <span>Flash sales & exclusive offers</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-700">
-              <i className="ri-check-line text-green-600"></i>
+            <div className="flex items-center gap-2 text-sm text-store-ink">
+              <i className="ri-check-line text-store-primary"></i>
               <span>Price drops on wishlist</span>
             </div>
           </div>
           <div className="flex gap-3">
             <button
               onClick={requestPermission}
-              className="flex-1 bg-stone-700 hover:bg-stone-800 text-white py-2 px-4 rounded-lg font-medium transition-colors whitespace-nowrap"
+              className="flex-1 bg-store-navy hover:bg-store-navy-light text-white py-2 px-4 rounded-lg font-medium transition-colors whitespace-nowrap"
             >
               Enable Notifications
             </button>
             <button
               onClick={handleDismiss}
-              className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors whitespace-nowrap"
+              className="px-4 py-2 text-store-muted hover:text-store-ink transition-colors whitespace-nowrap"
             >
               Not Now
             </button>
@@ -128,7 +127,7 @@ export default function PushNotificationManager() {
         </div>
         <button
           onClick={handleDismiss}
-          className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+          className="w-8 h-8 flex items-center justify-center text-store-muted hover:text-store-ink transition-colors flex-shrink-0"
         >
           <i className="ri-close-line"></i>
         </button>
@@ -139,9 +138,7 @@ export default function PushNotificationManager() {
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
-  const base64 = (base64String + padding)
-    .replace(/\-/g, '+')
-    .replace(/_/g, '/');
+  const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
 
   const rawData = window.atob(base64);
   const outputArray = new Uint8Array(new ArrayBuffer(rawData.length));

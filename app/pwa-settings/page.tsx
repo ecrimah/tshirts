@@ -71,7 +71,7 @@ export default function PWASettingsPage() {
       <div className="max-w-4xl mx-auto">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-stone-700 hover:text-stone-800 mb-6 whitespace-nowrap"
+          className="inline-flex items-center gap-2 text-store-ink hover:text-store-ink mb-6 whitespace-nowrap"
         >
           <i className="ri-arrow-left-line"></i>
           Back to Home
@@ -85,8 +85,8 @@ export default function PWASettingsPage() {
         <div className="space-y-6">
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-              <div className="w-10 h-10 bg-stone-100 rounded-full flex items-center justify-center">
-                <i className="ri-smartphone-line text-stone-700"></i>
+              <div className="w-10 h-10 bg-store-surface rounded-full flex items-center justify-center">
+                <i className="ri-smartphone-line text-store-ink"></i>
               </div>
               Installation Status
             </h2>
@@ -98,7 +98,7 @@ export default function PWASettingsPage() {
                 </p>
               </div>
               <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                isInstalled ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-500'
+                isInstalled ? 'bg-store-primary/15 text-store-primary' : 'bg-gray-200 text-gray-500'
               }`}>
                 <i className={isInstalled ? 'ri-check-line text-2xl' : 'ri-close-line text-2xl'}></i>
               </div>
@@ -107,8 +107,8 @@ export default function PWASettingsPage() {
 
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                <i className="ri-notification-line text-purple-700"></i>
+              <div className="w-10 h-10 bg-store-primary/15 rounded-full flex items-center justify-center">
+                <i className="ri-notification-line text-store-primary"></i>
               </div>
               Notifications
             </h2>
@@ -123,14 +123,14 @@ export default function PWASettingsPage() {
                 {notificationPermission === 'default' && (
                   <button
                     onClick={requestNotificationPermission}
-                    className="px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-colors whitespace-nowrap"
+                    className="px-4 py-2 bg-store-navy text-white rounded-lg hover:bg-store-navy transition-colors whitespace-nowrap"
                   >
                     Enable
                   </button>
                 )}
                 {notificationPermission === 'granted' && (
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <i className="ri-check-line text-green-700 text-2xl"></i>
+                  <div className="w-12 h-12 bg-store-primary/15 rounded-full flex items-center justify-center">
+                    <i className="ri-check-line text-store-primary text-2xl"></i>
                   </div>
                 )}
                 {notificationPermission === 'denied' && (
@@ -141,9 +141,9 @@ export default function PWASettingsPage() {
               </div>
 
               {notificationPermission === 'granted' && (
-                <div className="bg-stone-50 border border-stone-200 rounded-xl p-4">
-                  <p className="text-sm text-stone-800 font-medium mb-2">You will receive notifications for:</p>
-                  <ul className="space-y-1 text-sm text-stone-700">
+                <div className="bg-store-surface border border-gray-200 rounded-xl p-4">
+                  <p className="text-sm text-store-ink font-medium mb-2">You will receive notifications for:</p>
+                  <ul className="space-y-1 text-sm text-store-ink">
                     <li className="flex items-center gap-2">
                       <i className="ri-check-line"></i>
                       <span>Order confirmations and updates</span>
@@ -216,32 +216,32 @@ export default function PWASettingsPage() {
 
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                <i className="ri-flashlight-line text-green-700"></i>
+              <div className="w-10 h-10 bg-store-primary/15 rounded-full flex items-center justify-center">
+                <i className="ri-flashlight-line text-store-primary"></i>
               </div>
               PWA Features
             </h2>
             <div className="grid md:grid-cols-2 gap-4">
-              <div className="p-4 bg-green-50 rounded-xl">
+              <div className="p-4 bg-store-surface rounded-xl">
                 <div className="flex items-center gap-3 mb-2">
-                  <i className="ri-wifi-off-line text-green-700 text-xl"></i>
-                  <span className="font-semibold text-green-900">Offline Mode</span>
+                  <i className="ri-wifi-off-line text-store-primary text-xl"></i>
+                  <span className="font-semibold text-store-ink">Offline Mode</span>
                 </div>
-                <p className="text-sm text-green-800">Browse cached pages without internet</p>
+                <p className="text-sm text-store-ink">Browse cached pages without internet</p>
               </div>
-              <div className="p-4 bg-stone-50 rounded-xl">
+              <div className="p-4 bg-store-surface rounded-xl">
                 <div className="flex items-center gap-3 mb-2">
-                  <i className="ri-rocket-line text-stone-700 text-xl"></i>
-                  <span className="font-semibold text-stone-900">Fast Loading</span>
+                  <i className="ri-rocket-line text-store-ink text-xl"></i>
+                  <span className="font-semibold text-store-ink">Fast Loading</span>
                 </div>
-                <p className="text-sm text-stone-800">Instant page loads with smart caching</p>
+                <p className="text-sm text-store-ink">Instant page loads with smart caching</p>
               </div>
-              <div className="p-4 bg-purple-50 rounded-xl">
+              <div className="p-4 bg-store-surface rounded-xl">
                 <div className="flex items-center gap-3 mb-2">
-                  <i className="ri-home-line text-purple-700 text-xl"></i>
-                  <span className="font-semibold text-purple-900">Home Screen</span>
+                  <i className="ri-home-line text-store-primary text-xl"></i>
+                  <span className="font-semibold text-store-ink">Home Screen</span>
                 </div>
-                <p className="text-sm text-purple-800">Add to home screen like a native app</p>
+                <p className="text-sm text-store-ink">Add to home screen like a native app</p>
               </div>
               <div className="p-4 bg-orange-50 rounded-xl">
                 <div className="flex items-center gap-3 mb-2">

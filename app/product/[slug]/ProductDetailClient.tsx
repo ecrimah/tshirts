@@ -221,7 +221,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
     return (
       <div className="min-h-screen bg-white py-12 flex justify-center items-center">
         <div className="text-center">
-          <i className="ri-loader-4-line text-4xl text-blue-700 animate-spin mb-4 block"></i>
+          <i className="ri-loader-4-line text-4xl text-store-primary animate-spin mb-4 block"></i>
           <p className="text-gray-500">Loading product...</p>
         </div>
       </div>
@@ -233,7 +233,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
       <div className="min-h-screen bg-white py-20 flex justify-center items-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Product Not Found</h2>
-          <Link href="/shop" className="text-blue-700 hover:underline">Return to Shop</Link>
+          <Link href="/shop" className="text-store-primary hover:underline">Return to Shop</Link>
         </div>
       </div>
     );
@@ -272,11 +272,11 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
         <section className="py-8 bg-gray-50 border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <nav className="flex items-center space-x-2 text-sm flex-wrap gap-y-2">
-              <Link href="/" className="text-gray-600 hover:text-blue-700 transition-colors">Home</Link>
+              <Link href="/" className="text-gray-600 hover:text-store-primary transition-colors">Home</Link>
               <i className="ri-arrow-right-s-line text-gray-400"></i>
-              <Link href="/shop" className="text-gray-600 hover:text-blue-700 transition-colors">Shop</Link>
+              <Link href="/shop" className="text-gray-600 hover:text-store-primary transition-colors">Shop</Link>
               <i className="ri-arrow-right-s-line text-gray-400"></i>
-              <Link href="#" className="text-gray-600 hover:text-blue-700 transition-colors">{product.category}</Link>
+              <Link href="#" className="text-gray-600 hover:text-store-primary transition-colors">{product.category}</Link>
               <i className="ri-arrow-right-s-line text-gray-400"></i>
               <span className="text-gray-900 font-medium truncate max-w-[200px]">{product.name}</span>
             </nav>
@@ -310,7 +310,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                       <button
                         key={index}
                         onClick={() => setSelectedImage(index)}
-                        className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${selectedImage === index ? 'border-blue-700 shadow-md' : 'border-gray-200 hover:border-gray-300'
+                        className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${selectedImage === index ? 'border-store-navy shadow-md' : 'border-gray-200 hover:border-gray-300'
                           }`}
                       >
                         <Image
@@ -330,12 +330,12 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
               <div>
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <p className="text-sm text-blue-700 font-semibold mb-2">{product.category}</p>
+                    <p className="text-sm text-store-primary font-semibold mb-2">{product.category}</p>
                     <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3">{product.name}</h1>
                   </div>
                   <button
                     onClick={() => setIsWishlisted(!isWishlisted)}
-                    className="w-12 h-12 flex items-center justify-center border-2 border-gray-200 hover:border-blue-700 rounded-full transition-colors cursor-pointer"
+                    className="w-12 h-12 flex items-center justify-center border-2 border-gray-200 hover:border-store-navy rounded-full transition-colors cursor-pointer"
                   >
                     <i className={`${isWishlisted ? 'ri-heart-fill text-red-600' : 'ri-heart-line text-gray-700'} text-xl`}></i>
                   </button>
@@ -373,7 +373,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                   <div className="mb-6">
                     <label className="block font-semibold text-gray-900 mb-3">
                       Color: {selectedColor ? (
-                        <span className="text-blue-700 font-normal">{selectedColor}</span>
+                        <span className="text-store-primary font-normal">{selectedColor}</span>
                       ) : (
                         <span className="text-red-500 font-normal text-sm">Please select a color</span>
                       )}
@@ -402,7 +402,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                             }}
                             disabled={isOutOfStock}
                             className={`px-5 py-2.5 rounded-full border-2 font-medium transition-all whitespace-nowrap cursor-pointer flex items-center gap-2 ${isSelected
-                              ? 'border-blue-700 bg-blue-50 text-blue-700 shadow-sm'
+                              ? 'border-store-navy bg-store-surface text-store-primary shadow-sm'
                               : isOutOfStock
                                 ? 'border-gray-200 text-gray-300 cursor-not-allowed bg-gray-50'
                                 : 'border-gray-300 text-gray-700 hover:border-gray-400'
@@ -437,7 +437,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                       <div className="mb-8">
                         <label className="block font-semibold text-gray-900 mb-3">
                           Variant: {selectedVariant ? (
-                            <span className="text-blue-700 font-normal">{selectedVariant.name} — GH₵{selectedVariant.price?.toFixed(2)}</span>
+                            <span className="text-store-primary font-normal">{selectedVariant.name} — GH₵{selectedVariant.price?.toFixed(2)}</span>
                           ) : (
                             <span className="text-red-500 font-normal text-sm">Please select a variant</span>
                           )}
@@ -456,14 +456,14 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                                 }}
                                 disabled={isOutOfStock}
                                 className={`px-6 py-3 rounded-lg border-2 font-medium transition-all whitespace-nowrap cursor-pointer flex flex-col items-center ${isSelected
-                                  ? 'border-blue-700 bg-blue-50 text-blue-700 shadow-sm'
+                                  ? 'border-store-navy bg-store-surface text-store-primary shadow-sm'
                                   : isOutOfStock
                                     ? 'border-gray-200 text-gray-300 cursor-not-allowed bg-gray-50'
                                     : 'border-gray-300 text-gray-700 hover:border-gray-400'
                                   }`}
                               >
                                 <span>{variant.name}</span>
-                                <span className={`text-xs mt-0.5 ${isSelected ? 'text-blue-600' : 'text-gray-500'}`}>
+                                <span className={`text-xs mt-0.5 ${isSelected ? 'text-store-primary' : 'text-gray-500'}`}>
                                   GH₵{(variant.price || product.price).toFixed(2)}
                                 </span>
                               </button>
@@ -479,7 +479,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                       <div className="mb-8">
                         <label className="block font-semibold text-gray-900 mb-3">
                           Size / Type: {selectedVariant ? (
-                            <span className="text-blue-700 font-normal">{selectedVariant.name} — GH₵{selectedVariant.price?.toFixed(2)}</span>
+                            <span className="text-store-primary font-normal">{selectedVariant.name} — GH₵{selectedVariant.price?.toFixed(2)}</span>
                           ) : (
                             <span className="text-red-500 font-normal text-sm">Please select</span>
                           )}
@@ -498,14 +498,14 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                                 }}
                                 disabled={isOutOfStock}
                                 className={`px-6 py-3 rounded-lg border-2 font-medium transition-all whitespace-nowrap cursor-pointer flex flex-col items-center ${isSelected
-                                  ? 'border-blue-700 bg-blue-50 text-blue-700 shadow-sm'
+                                  ? 'border-store-navy bg-store-surface text-store-primary shadow-sm'
                                   : isOutOfStock
                                     ? 'border-gray-200 text-gray-300 cursor-not-allowed bg-gray-50'
                                     : 'border-gray-300 text-gray-700 hover:border-gray-400'
                                   }`}
                               >
                                 <span>{variant.name}</span>
-                                <span className={`text-xs mt-0.5 ${isSelected ? 'text-blue-600' : 'text-gray-500'}`}>
+                                <span className={`text-xs mt-0.5 ${isSelected ? 'text-store-primary' : 'text-gray-500'}`}>
                                   GH₵{(variant.price || product.price).toFixed(2)}
                                 </span>
                               </button>
@@ -549,14 +549,14 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                     </div>
                     <div className="flex flex-col">
                       {product.moq > 1 && (
-                        <span className="text-blue-700 font-medium text-sm">
+                        <span className="text-store-primary font-medium text-sm">
                           <i className="ri-information-line mr-1"></i>
                           Min. order: {product.moq} units
                         </span>
                       )}
                       {activeStock > 10 && (
                         <span className="text-gray-600 font-medium text-sm">
-                          <i className="ri-checkbox-circle-line mr-1 text-blue-600"></i>
+                          <i className="ri-checkbox-circle-line mr-1 text-store-primary"></i>
                           {activeStock} in stock
                         </span>
                       )}
@@ -579,7 +579,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                 <div className="flex flex-col sm:flex-row gap-4 mb-8">
                   <button
                     disabled={activeStock === 0 || needsVariantSelection || needsColorSelection}
-                    className={`flex-1 bg-gray-900 hover:bg-blue-700 text-white py-4 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2 text-lg whitespace-nowrap cursor-pointer ${(activeStock === 0 || needsVariantSelection || needsColorSelection) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`flex-1 bg-store-navy hover:bg-store-navy-light text-white py-4 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2 text-lg whitespace-nowrap cursor-pointer ${(activeStock === 0 || needsVariantSelection || needsColorSelection) ? 'opacity-50 cursor-not-allowed' : ''}`}
                     onClick={handleAddToCart}
                   >
                     <i className="ri-shopping-cart-line text-xl"></i>
@@ -588,7 +588,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                   {activeStock > 0 && !needsVariantSelection && !needsColorSelection && (
                     <button
                       onClick={handleBuyNow}
-                      className="sm:w-auto bg-blue-700 hover:bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer"
+                      className="sm:w-auto bg-store-navy hover:bg-store-navy text-white px-8 py-4 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer"
                     >
                       Buy Now
                     </button>
@@ -597,20 +597,20 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
 
                 <div className="border-t border-gray-200 pt-6 space-y-4">
                   <div className="flex items-center text-gray-700">
-                    <i className="ri-store-2-line text-xl text-blue-700 mr-3"></i>
+                    <i className="ri-store-2-line text-xl text-store-primary mr-3"></i>
                     <span>Free store pickup available</span>
                   </div>
                   <div className="flex items-center text-gray-700">
-                    <i className="ri-arrow-left-right-line text-xl text-blue-700 mr-3"></i>
+                    <i className="ri-arrow-left-right-line text-xl text-store-primary mr-3"></i>
                     <span>30-day easy returns and exchanges</span>
                   </div>
                   <div className="flex items-center text-gray-700">
-                    <i className="ri-shield-check-line text-xl text-blue-700 mr-3"></i>
+                    <i className="ri-shield-check-line text-xl text-store-primary mr-3"></i>
                     <span>Secure payment & buyer protection</span>
                   </div>
                   {product.sku && (
                     <div className="flex items-center text-gray-700">
-                      <i className="ri-barcode-line text-xl text-blue-700 mr-3"></i>
+                      <i className="ri-barcode-line text-xl text-store-primary mr-3"></i>
                       <span>SKU: {product.sku}</span>
                     </div>
                   )}
@@ -629,7 +629,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                     key={tab}
                     onClick={() => setActiveTab(tab)}
                     className={`pb-4 font-semibold transition-colors relative whitespace-nowrap cursor-pointer ${activeTab === tab
-                      ? 'text-blue-700 border-b-2 border-blue-700'
+                      ? 'text-store-primary border-b-2 border-store-navy'
                       : 'text-gray-600 hover:text-gray-900'
                       }`}
                   >
@@ -651,7 +651,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                 <ul className="grid md:grid-cols-2 gap-4">
                   {product.features.map((feature: string, index: number) => (
                     <li key={index} className="flex items-start">
-                      <i className="ri-checkbox-circle-fill text-blue-700 text-xl mr-3 mt-1"></i>
+                      <i className="ri-checkbox-circle-fill text-store-primary text-xl mr-3 mt-1"></i>
                       <span className="text-gray-700 text-lg">{feature}</span>
                     </li>
                   ))}

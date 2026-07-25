@@ -70,7 +70,7 @@ export default function PasswordStrengthMeter({ password }: PasswordStrengthMete
     if (strength < 40) return 'bg-red-500';
     if (strength < 70) return 'bg-orange-500';
     if (strength < 90) return 'bg-yellow-500';
-    return 'bg-green-500';
+    return 'bg-store-primary';
   };
 
   if (!password) return null;
@@ -88,7 +88,7 @@ export default function PasswordStrengthMeter({ password }: PasswordStrengthMete
           strength < 40 ? 'text-red-600' :
           strength < 70 ? 'text-orange-600' :
           strength < 90 ? 'text-yellow-600' :
-          'text-green-600'
+          'text-store-primary'
         }`}>
           {getStrengthText()}
         </span>
@@ -106,7 +106,7 @@ export default function PasswordStrengthMeter({ password }: PasswordStrengthMete
       )}
 
       {strength >= 90 && (
-        <div className="flex items-center gap-1.5 text-xs text-green-600">
+        <div className="flex items-center gap-1.5 text-xs text-store-primary">
           <i className="ri-checkbox-circle-fill w-3 h-3 flex items-center justify-center"></i>
           <span>Your password is strong and secure!</span>
         </div>

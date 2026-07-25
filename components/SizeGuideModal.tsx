@@ -79,14 +79,14 @@ export default function SizeGuideModal({ isOpen, onClose, category = 'General' }
           </div>
 
           <div className="p-6">
-            <div className="bg-stone-50 border border-stone-200 rounded-lg p-4 mb-6">
+            <div className="bg-store-surface border border-gray-200 rounded-lg p-4 mb-6">
               <div className="flex items-start">
                 <div className="w-6 h-6 flex items-center justify-center mr-3">
-                  <i className="ri-information-line text-xl text-stone-600"></i>
+                  <i className="ri-information-line text-xl text-store-muted"></i>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-stone-900 mb-2">How to Measure</h3>
-                  <ul className="text-sm text-stone-800 space-y-1">
+                  <h3 className="font-semibold text-store-ink mb-2">How to Measure</h3>
+                  <ul className="text-sm text-store-ink space-y-1">
                     <li>• Use a soft measuring tape for accurate measurements</li>
                     <li>• Measure over light clothing or undergarments</li>
                     <li>• Keep the tape parallel to the floor</li>
@@ -130,7 +130,7 @@ export default function SizeGuideModal({ isOpen, onClose, category = 'General' }
               <div className="bg-gray-50 rounded-lg p-4">
                 <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
                   <div className="w-6 h-6 flex items-center justify-center mr-2">
-                    <i className="ri-ruler-line text-stone-700"></i>
+                    <i className="ri-ruler-line text-store-ink"></i>
                   </div>
                   Measurement Tips
                 </h4>
@@ -145,7 +145,7 @@ export default function SizeGuideModal({ isOpen, onClose, category = 'General' }
               <div className="bg-gray-50 rounded-lg p-4">
                 <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
                   <div className="w-6 h-6 flex items-center justify-center mr-2">
-                    <i className="ri-question-line text-stone-700"></i>
+                    <i className="ri-question-line text-store-ink"></i>
                   </div>
                   Fit Guide
                 </h4>
@@ -162,7 +162,7 @@ export default function SizeGuideModal({ isOpen, onClose, category = 'General' }
               <p className="text-sm text-gray-600 mb-4">
                 Still not sure about sizing? Our customer service team is here to help!
               </p>
-              <button className="px-6 py-3 bg-stone-700 text-white rounded-lg font-semibold hover:bg-stone-800 transition-colors whitespace-nowrap">
+              <button className="px-6 py-3 bg-store-navy text-white rounded-lg font-semibold hover:bg-store-navy-light transition-colors whitespace-nowrap">
                 Contact Support
               </button>
             </div>

@@ -70,7 +70,7 @@ export default function VerifyEmailPage() {
       <div className="max-w-md w-full">
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-store-navy rounded-full flex items-center justify-center mx-auto mb-4">
               <i className="ri-mail-check-line text-3xl text-white"></i>
             </div>
             <h1 className="text-2xl font-bold mb-2">Verify Your Email</h1>
@@ -105,7 +105,7 @@ export default function VerifyEmailPage() {
             <button
               onClick={handleVerify}
               disabled={code.join('').length !== 6 || isVerifying}
-              className="w-full py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed font-medium whitespace-nowrap"
+              className="w-full py-3 bg-store-navy text-white rounded-lg hover:bg-store-navy-light transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed font-medium whitespace-nowrap"
             >
               {isVerifying ? (
                 <>
@@ -136,9 +136,9 @@ export default function VerifyEmailPage() {
           </div>
 
           <div className="mt-8 pt-6 border-t">
-            <div className="bg-blue-50 rounded-lg p-4">
+            <div className="bg-store-surface rounded-lg p-4">
               <h3 className="font-semibold text-sm mb-2 flex items-center gap-2">
-                <i className="ri-information-line text-blue-600"></i>
+                <i className="ri-information-line text-store-primary"></i>
                 Didn't receive the code?
               </h3>
               <ul className="text-xs text-gray-600 space-y-1">

@@ -36,7 +36,7 @@ export default function PWASplash() {
       </div>
       <div className="z-10 flex flex-col items-center animate-fade-in-up delay-300">
         <h1 className="text-white text-xl font-bold font-serif mb-2">Mamator</h1>
-        <p className="text-stone-200 text-sm font-medium mb-8">Premium t-shirts &amp; polos</p>
+        <p className="text-white/80 text-sm font-medium mb-8">Premium t-shirts &amp; polos</p>
         <div className="flex gap-2">
           <span className="w-2 h-2 bg-white rounded-full" />
           <span className="w-2 h-2 bg-white rounded-full" />

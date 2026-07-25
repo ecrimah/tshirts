@@ -45,14 +45,14 @@ export default function BlogPostPage() {
   }, [slug]);
 
   if (loading) {
-    return <div className="max-w-3xl mx-auto px-4 py-16 text-stone-500">Loading…</div>;
+    return <div className="max-w-3xl mx-auto px-4 py-16 text-store-muted">Loading…</div>;
   }
 
   if (error || !post) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-16 text-center">
-        <h1 className="text-2xl font-semibold text-stone-900 mb-3">Post not found</h1>
-        <Link href="/blog" className="text-blue-700 font-medium hover:underline">
+        <h1 className="text-2xl font-semibold text-store-ink mb-3">Post not found</h1>
+        <Link href="/blog" className="text-store-primary font-medium hover:underline">
           Back to blog
         </Link>
       </div>
@@ -61,12 +61,12 @@ export default function BlogPostPage() {
 
   return (
     <article className="max-w-3xl mx-auto px-4 py-12">
-      <Link href="/blog" className="text-sm text-stone-500 hover:text-stone-800 inline-flex items-center gap-1 mb-6">
+      <Link href="/blog" className="text-sm text-store-muted hover:text-store-ink inline-flex items-center gap-1 mb-6">
         <i className="ri-arrow-left-line"></i> Blog
       </Link>
-      <h1 className="text-4xl font-serif text-stone-900 mb-4">{post.title}</h1>
+      <h1 className="text-4xl font-serif text-store-ink mb-4">{post.title}</h1>
       {post.published_at ? (
-        <p className="text-sm text-stone-500 mb-8">
+        <p className="text-sm text-store-muted mb-8">
           {new Date(post.published_at).toLocaleDateString()}
         </p>
       ) : null}
@@ -75,7 +75,7 @@ export default function BlogPostPage() {
         <img
           src={post.featured_image}
           alt=""
-          className="w-full rounded-2xl mb-8 aspect-[16/9] object-cover bg-stone-100"
+          className="w-full rounded-2xl mb-8 aspect-[16/9] object-cover bg-store-surface"
         />
       ) : null}
       <div

@@ -146,14 +146,14 @@ export default function AnalyticsPage() {
             <select
               value={timeRange}
               onChange={(e) => setTimeRange(e.target.value)}
-              className="px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-stone-500 font-medium pr-8 cursor-pointer bg-white"
+              className="px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-store-primary focus:border-store-primary font-medium pr-8 cursor-pointer bg-white"
             >
               <option value="7days">Last 7 Days</option>
               <option value="30days">Last 30 Days</option>
               <option value="90days">Last 90 Days</option>
               <option value="year">This Year</option>
             </select>
-            <button className="bg-stone-700 hover:bg-stone-800 text-white px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer flex items-center justify-center">
+            <button className="bg-store-navy hover:bg-store-navy text-white px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer flex items-center justify-center">
               <i className="ri-download-line mr-2"></i>
               Export
             </button>
@@ -170,10 +170,10 @@ export default function AnalyticsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 flex items-center justify-center bg-stone-100 rounded-lg">
-                <i className="ri-money-dollar-circle-line text-2xl text-stone-700"></i>
+              <div className="w-12 h-12 flex items-center justify-center bg-store-surface rounded-lg">
+                <i className="ri-money-dollar-circle-line text-2xl text-store-ink"></i>
               </div>
-              <span className="text-stone-700 font-semibold text-sm">Live</span>
+              <span className="text-store-ink font-semibold text-sm">Live</span>
             </div>
             <p className="text-sm text-gray-600 mb-1">Total Revenue</p>
             <p className="text-3xl font-bold text-gray-900">GH₵{metrics.revenue.toLocaleString()}</p>
@@ -181,8 +181,8 @@ export default function AnalyticsPage() {
 
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 flex items-center justify-center bg-stone-100 rounded-lg">
-                <i className="ri-shopping-cart-line text-2xl text-stone-700"></i>
+              <div className="w-12 h-12 flex items-center justify-center bg-store-surface rounded-lg">
+                <i className="ri-shopping-cart-line text-2xl text-store-ink"></i>
               </div>
             </div>
             <p className="text-sm text-gray-600 mb-1">Total Orders</p>
@@ -191,8 +191,8 @@ export default function AnalyticsPage() {
 
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 flex items-center justify-center bg-purple-100 rounded-lg">
-                <i className="ri-bar-chart-box-line text-2xl text-purple-700"></i>
+              <div className="w-12 h-12 flex items-center justify-center bg-store-primary/15 rounded-lg">
+                <i className="ri-bar-chart-box-line text-2xl text-store-primary"></i>
               </div>
             </div>
             <p className="text-sm text-gray-600 mb-1">Avg. Order Value</p>
@@ -283,7 +283,7 @@ export default function AnalyticsPage() {
                     <tr key={index}>
                       <td className="py-3 text-sm font-medium text-gray-900">{product.name}</td>
                       <td className="py-3 text-right text-sm text-gray-600">{product.units}</td>
-                      <td className="py-3 text-right text-sm font-semibold text-stone-600">GH₵{product.revenue.toLocaleString()}</td>
+                      <td className="py-3 text-right text-sm font-semibold text-store-muted">GH₵{product.revenue.toLocaleString()}</td>
                     </tr>
                   ))}
                   {topProducts.length === 0 && <tr><td colSpan={3} className="text-center py-4 text-gray-500">No sales data yet.</td></tr>}

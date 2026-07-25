@@ -47,10 +47,10 @@ export default function CartSuggestions() {
   ];
 
   return (
-    <div className="bg-stone-50 border-2 border-stone-100 rounded-lg p-6 mb-6">
+    <div className="bg-store-surface border-2 border-gray-100 rounded-lg p-6 mb-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-bold text-gray-900">You Might Also Like</h3>
-        <span className="text-sm text-stone-700 font-medium whitespace-nowrap">Boost Your Order</span>
+        <span className="text-sm text-store-ink font-medium whitespace-nowrap">Boost Your Order</span>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -67,12 +67,12 @@ export default function CartSuggestions() {
               <div className="p-3">
                 <h4 className="font-semibold text-gray-900 text-sm mb-2 line-clamp-2">{product.name}</h4>
                 <div className="flex items-center space-x-2 mb-2">
-                  <span className="text-lg font-bold text-stone-700">GH₵{product.price.toFixed(2)}</span>
+                  <span className="text-lg font-bold text-store-ink">GH₵{product.price.toFixed(2)}</span>
                   {product.originalPrice && (
                     <span className="text-xs text-gray-400 line-through">GH₵{product.originalPrice.toFixed(2)}</span>
                   )}
                 </div>
-                <button className="w-full py-2 bg-stone-700 text-white text-sm rounded-lg font-semibold hover:bg-stone-800 transition-colors whitespace-nowrap">
+                <button className="w-full py-2 bg-store-navy text-white text-sm rounded-lg font-semibold hover:bg-store-navy-light transition-colors whitespace-nowrap">
                   <i className="ri-add-line mr-1"></i>
                   Quick Add
                 </button>

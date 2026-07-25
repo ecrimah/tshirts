@@ -80,12 +80,12 @@ export default function PrivacySettingsPage() {
       </div>
 
       <div className="max-w-4xl mx-auto p-4 space-y-6">
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+        <div className="bg-store-surface border border-store-primary/30 rounded-xl p-4">
           <div className="flex gap-3">
-            <i className="ri-shield-check-line text-xl text-blue-600 flex-shrink-0 mt-0.5"></i>
+            <i className="ri-shield-check-line text-xl text-store-primary flex-shrink-0 mt-0.5"></i>
             <div>
-              <h3 className="font-semibold text-blue-900 mb-1">Your Privacy Matters</h3>
-              <p className="text-sm text-blue-800">
+              <h3 className="font-semibold text-store-ink mb-1">Your Privacy Matters</h3>
+              <p className="text-sm text-store-ink">
                 We are committed to protecting your personal information in compliance with GDPR, CCPA, and other privacy regulations.
               </p>
             </div>
@@ -106,7 +106,7 @@ export default function PrivacySettingsPage() {
               <button
                 onClick={handleExportData}
                 disabled={exporting}
-                className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed font-medium whitespace-nowrap"
+                className="px-4 py-2 bg-store-navy text-white rounded-lg hover:bg-store-navy-light transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed font-medium whitespace-nowrap"
               >
                 {exporting ? (
                   <>
@@ -126,23 +126,23 @@ export default function PrivacySettingsPage() {
               <h3 className="font-semibold mb-2">What's Included?</h3>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-start gap-2">
-                  <i className="ri-check-line text-green-600 mt-0.5 flex-shrink-0"></i>
+                  <i className="ri-check-line text-store-primary mt-0.5 flex-shrink-0"></i>
                   <span>Personal information (name, email, phone)</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <i className="ri-check-line text-green-600 mt-0.5 flex-shrink-0"></i>
+                  <i className="ri-check-line text-store-primary mt-0.5 flex-shrink-0"></i>
                   <span>Order history and transaction details</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <i className="ri-check-line text-green-600 mt-0.5 flex-shrink-0"></i>
+                  <i className="ri-check-line text-store-primary mt-0.5 flex-shrink-0"></i>
                   <span>Saved addresses and payment methods</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <i className="ri-check-line text-green-600 mt-0.5 flex-shrink-0"></i>
+                  <i className="ri-check-line text-store-primary mt-0.5 flex-shrink-0"></i>
                   <span>Marketing preferences and subscriptions</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <i className="ri-check-line text-green-600 mt-0.5 flex-shrink-0"></i>
+                  <i className="ri-check-line text-store-primary mt-0.5 flex-shrink-0"></i>
                   <span>Wishlist and browsing history</span>
                 </li>
               </ul>
@@ -199,7 +199,7 @@ export default function PrivacySettingsPage() {
                         value={deleteConfirmText}
                         onChange={(e) => setDeleteConfirmText(e.target.value)}
                         placeholder="DELETE"
-                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-store-primary"
                       />
                     </div>
 

@@ -15,8 +15,8 @@ interface Module {
 
 const colorMap: Record<string, string> = {
   red: 'bg-red-100 text-red-600',
-  blue: 'bg-stone-100 text-stone-600',
-  purple: 'bg-purple-100 text-purple-600',
+  blue: 'bg-store-surface text-store-muted',
+  purple: 'bg-store-primary/15 text-store-primary',
   teal: 'bg-teal-100 text-teal-600',
   orange: 'bg-orange-100 text-orange-600',
   amber: 'bg-amber-100 text-amber-600',
@@ -169,8 +169,8 @@ export default function ModulesPage() {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 text-center border border-gray-100">
-          <div className="w-20 h-20 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <i className="ri-lock-2-line text-4xl text-stone-600"></i>
+          <div className="w-20 h-20 bg-store-surface rounded-full flex items-center justify-center mx-auto mb-6">
+            <i className="ri-lock-2-line text-4xl text-store-muted"></i>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Restricted Access</h2>
           <p className="text-gray-500 mb-8">Please enter the security PIN to access Modules.</p>
@@ -184,7 +184,7 @@ export default function ModulesPage() {
                   setPin(e.target.value);
                   setPinError('');
                 }}
-                className="w-full text-center text-3xl font-bold tracking-widest px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-stone-500 focus:ring-4 focus:ring-stone-500/10 outline-none transition-all"
+                className="w-full text-center text-3xl font-bold tracking-widest px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-store-primary focus:ring-4 focus:ring-store-primary/10 outline-none transition-all"
                 placeholder="• • • •"
                 maxLength={4}
                 autoFocus
@@ -195,7 +195,7 @@ export default function ModulesPage() {
             )}
             <button
               type="submit"
-              className="w-full bg-gray-900 hover:bg-stone-700 text-white font-bold py-4 rounded-xl transition-colors text-lg"
+              className="w-full bg-gray-900 hover:bg-store-navy text-white font-bold py-4 rounded-xl transition-colors text-lg"
             >
               Unlock Dashboard
             </button>
@@ -236,7 +236,7 @@ export default function ModulesPage() {
                 placeholder="Search modules..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-stone-500 outline-none"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-store-primary outline-none"
               />
             </div>
             <select
@@ -255,17 +255,17 @@ export default function ModulesPage() {
           <div className="space-y-10">
             {Object.entries(groupedModules).map(([category, items]) => (
               <div key={category}>
-                <h2 className="text-xl font-bold text-gray-800 mb-4 border-l-4 border-stone-500 pl-3">{category}</h2>
+                <h2 className="text-xl font-bold text-gray-800 mb-4 border-l-4 border-store-muted pl-3">{category}</h2>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {items.map(module => (
-                    <div key={module.id} className={`bg-white rounded-xl border-2 p-6 transition-all ${module.enabled ? 'border-stone-500 shadow-md' : 'border-gray-200 opacity-75'}`}>
+                    <div key={module.id} className={`bg-white rounded-xl border-2 p-6 transition-all ${module.enabled ? 'border-store-muted shadow-md' : 'border-gray-200 opacity-75'}`}>
                       <div className="flex justify-between items-start mb-4">
                         <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${colorMap[module.color] || 'bg-gray-100 text-gray-600'}`}>
                           <i className={`${module.icon} text-2xl`}></i>
                         </div>
                         <button
                           onClick={() => toggleModule(module.id, module.enabled)}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${module.enabled ? 'bg-stone-600' : 'bg-gray-300'}`}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${module.enabled ? 'bg-store-navy-light' : 'bg-gray-300'}`}
                         >
                           <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${module.enabled ? 'translate-x-6' : 'translate-x-1'}`} />
                         </button>
@@ -273,7 +273,7 @@ export default function ModulesPage() {
                       <h3 className="text-lg font-bold text-gray-900">{module.name}</h3>
                       <p className="text-sm text-gray-500 mt-1 h-10">{module.description}</p>
                       <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
-                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${module.enabled ? 'bg-stone-100 text-stone-700' : 'bg-gray-100 text-gray-600'}`}>
+                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${module.enabled ? 'bg-store-surface text-store-ink' : 'bg-gray-100 text-gray-600'}`}>
                           {module.enabled ? 'Enabled' : 'Disabled'}
                         </span>
                       </div>

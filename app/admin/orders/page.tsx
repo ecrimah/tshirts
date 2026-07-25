@@ -109,9 +109,9 @@ export default function AdminOrdersPage() {
 
   const statusColors: Record<string, string> = {
     'pending': 'bg-amber-100 text-amber-700 border-amber-200',
-    'processing': 'bg-stone-100 text-stone-700 border-stone-200',
-    'shipped': 'bg-purple-100 text-purple-700 border-purple-200',
-    'delivered': 'bg-stone-100 text-stone-700 border-stone-200',
+    'processing': 'bg-store-surface text-store-ink border-gray-200',
+    'shipped': 'bg-store-primary/15 text-store-primary border-store-primary/30',
+    'delivered': 'bg-store-surface text-store-ink border-gray-200',
     'cancelled': 'bg-red-100 text-red-700 border-red-200',
     'awaiting_payment': 'bg-gray-100 text-gray-700 border-gray-200'
   };
@@ -310,7 +310,7 @@ export default function AdminOrdersPage() {
           </button>
           <button
             onClick={handleExportAll}
-            className="flex-1 md:flex-none bg-stone-700 hover:bg-stone-800 text-white px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer shadow-sm flex items-center justify-center"
+            className="flex-1 md:flex-none bg-store-navy hover:bg-store-navy text-white px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer shadow-sm flex items-center justify-center"
           >
             <i className="ri-download-line mr-2"></i>
             Export
@@ -324,7 +324,7 @@ export default function AdminOrdersPage() {
           onClick={() => { setOrderViewTab('confirmed'); setStatusFilter('all'); }}
           className={`px-6 py-3 font-semibold text-sm border-b-2 transition-colors cursor-pointer ${
             orderViewTab === 'confirmed'
-              ? 'border-stone-700 text-stone-700'
+              ? 'border-store-navy text-store-ink'
               : 'border-transparent text-gray-500 hover:text-gray-700'
           }`}
         >
@@ -351,7 +351,7 @@ export default function AdminOrdersPage() {
             key={stat.status}
             onClick={() => setStatusFilter(stat.status)}
             className={`p-4 rounded-xl border-2 transition-all text-left cursor-pointer ${statusFilter === stat.status
-              ? 'border-stone-700 bg-stone-50'
+              ? 'border-store-navy bg-store-surface'
               : 'border-gray-200 bg-white hover:border-gray-300'
               }`}
           >
@@ -388,7 +388,7 @@ export default function AdminOrdersPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search by order ID, customer name, or email..."
-                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-stone-500 text-sm"
+                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-store-primary focus:border-store-primary text-sm"
                 />
               </div>
             </div>
@@ -404,7 +404,7 @@ export default function AdminOrdersPage() {
               <select
                 value={productFilter}
                 onChange={(e) => setProductFilter(e.target.value)}
-                className="px-4 py-3 pr-8 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-stone-500 font-medium cursor-pointer"
+                className="px-4 py-3 pr-8 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-store-primary focus:border-store-primary font-medium cursor-pointer"
               >
                 <option value="all">All Products</option>
                 {availableProducts.map((name) => (
@@ -414,7 +414,7 @@ export default function AdminOrdersPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-3 pr-8 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-stone-500 font-medium cursor-pointer"
+                className="px-4 py-3 pr-8 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-store-primary focus:border-store-primary font-medium cursor-pointer"
               >
                 <option value="date">Sort by Date</option>
                 <option value="total">Sort by Total</option>
@@ -453,20 +453,20 @@ export default function AdminOrdersPage() {
         </div>
 
         {selectedOrders.length > 0 && (
-          <div className="p-4 bg-stone-50 border-b border-stone-200 flex items-center justify-between">
-            <p className="text-stone-800 font-semibold">
+          <div className="p-4 bg-store-surface border-b border-gray-200 flex items-center justify-between">
+            <p className="text-store-ink font-semibold">
               {selectedOrders.length} order{selectedOrders.length > 1 ? 's' : ''} selected
             </p>
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => handleBulkAction('Mark as Processing', 'processing')}
-                className="px-4 py-2 bg-stone-600 hover:bg-stone-700 text-white rounded-lg text-sm font-medium transition-colors whitespace-nowrap cursor-pointer"
+                className="px-4 py-2 bg-store-navy-light hover:bg-store-navy text-white rounded-lg text-sm font-medium transition-colors whitespace-nowrap cursor-pointer"
               >
                 Mark Processing
               </button>
               <button
                 onClick={() => handleBulkAction('Mark as Packaged', 'shipped')}
-                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors whitespace-nowrap cursor-pointer"
+                className="px-4 py-2 bg-store-primary hover:bg-store-navy text-white rounded-lg text-sm font-medium transition-colors whitespace-nowrap cursor-pointer"
               >
                 Mark Packaged
               </button>
@@ -490,7 +490,7 @@ export default function AdminOrdersPage() {
                     type="checkbox"
                     checked={selectedOrders.length === filteredOrders.length && filteredOrders.length > 0}
                     onChange={handleSelectAll}
-                    className="w-4 h-4 text-stone-700 border-gray-300 rounded focus:ring-stone-500 cursor-pointer"
+                    className="w-4 h-4 text-store-ink border-gray-300 rounded focus:ring-store-primary cursor-pointer"
                   />
                 </th>
                 <th className="text-left py-4 px-4 text-sm font-semibold text-gray-700">Order ID</th>
@@ -507,7 +507,7 @@ export default function AdminOrdersPage() {
               {loading ? (
                 <tr>
                   <td colSpan={9} className="py-12 text-center text-gray-500">
-                    <i className="ri-loader-4-line animate-spin text-3xl text-stone-700"></i>
+                    <i className="ri-loader-4-line animate-spin text-3xl text-store-ink"></i>
                     <p className="mt-2">Loading orders...</p>
                   </td>
                 </tr>
@@ -527,11 +527,11 @@ export default function AdminOrdersPage() {
                         type="checkbox"
                         checked={selectedOrders.includes(order.id)}
                         onChange={() => handleSelectOrder(order.id)}
-                        className="w-4 h-4 text-stone-700 border-gray-300 rounded focus:ring-stone-500 cursor-pointer"
+                        className="w-4 h-4 text-store-ink border-gray-300 rounded focus:ring-store-primary cursor-pointer"
                       />
                     </td>
                     <td className="py-4 px-4">
-                      <Link href={`/admin/orders/${order.id}`} className="text-stone-700 hover:text-stone-800 font-semibold whitespace-nowrap cursor-pointer">
+                      <Link href={`/admin/orders/${order.id}`} className="text-store-ink hover:text-store-ink font-semibold whitespace-nowrap cursor-pointer">
                         {order.order_number || order.id.substring(0, 8)}
                       </Link>
                     </td>
@@ -568,7 +568,7 @@ export default function AdminOrdersPage() {
                       <div className="flex items-center space-x-2">
                         <Link
                           href={`/admin/orders/${order.id}`}
-                          className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-stone-700 hover:bg-stone-50 rounded-lg transition-colors cursor-pointer"
+                          className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-store-ink hover:bg-store-surface rounded-lg transition-colors cursor-pointer"
                           title="View Order"
                         >
                           <i className="ri-eye-line text-lg w-4 h-4 flex items-center justify-center"></i>
@@ -589,7 +589,7 @@ export default function AdminOrdersPage() {
                         )}
                         <button
                           onClick={() => handlePrintInvoice(order.id)}
-                          className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-stone-700 hover:bg-stone-50 rounded-lg transition-colors cursor-pointer"
+                          className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-store-ink hover:bg-store-surface rounded-lg transition-colors cursor-pointer"
                           title="Print Invoice"
                         >
                           <i className="ri-printer-line text-lg w-4 h-4 flex items-center justify-center"></i>

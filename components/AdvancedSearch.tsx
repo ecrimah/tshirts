@@ -123,7 +123,7 @@ export default function AdvancedSearch() {
           }}
           placeholder="Search products — suggestions appear as you type"
           autoComplete="off"
-          className="w-full pl-12 pr-24 py-3 border-2 border-gray-300 rounded-full focus:border-stone-700 focus:ring-2 focus:ring-stone-200 text-sm"
+          className="w-full pl-12 pr-24 py-3 border-2 border-gray-300 rounded-full focus:border-store-navy focus:ring-2 focus:ring-store-primary/20 text-sm"
         />
         <i className="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-xl text-gray-400"></i>
 
@@ -213,7 +213,7 @@ export default function AdvancedSearch() {
                 <button
                   type="button"
                   onClick={clearRecentSearches}
-                  className="text-xs text-stone-700 hover:text-stone-900 font-medium whitespace-nowrap"
+                  className="text-xs text-store-ink hover:text-store-ink font-medium whitespace-nowrap"
                 >
                   Clear All
                 </button>
