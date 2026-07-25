@@ -45,7 +45,7 @@ export default function HomePromoGrid({ categories = [] }: { categories?: HomeCa
             <div className="absolute inset-0 p-8 md:p-10 flex flex-col justify-end text-white">
               <p className="text-sm font-medium opacity-90">Collection</p>
               <h3 className="text-3xl md:text-4xl font-bold mt-1">{hero.name}</h3>
-              <p className="text-lg mt-2 opacity-90 line-clamp-2">
+              <p className="text-base mt-2 opacity-90 line-clamp-1 max-w-sm">
                 {hero.description?.trim() || 'Shop this category'}
               </p>
               <span className="mt-6 inline-flex w-fit bg-white text-store-ink px-6 py-2.5 text-xs font-bold uppercase tracking-wider">
@@ -86,14 +86,16 @@ export default function HomePromoGrid({ categories = [] }: { categories?: HomeCa
                   className="opacity-90 group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-black/40" />
-                <div className="absolute inset-0 p-6 md:p-8 flex flex-col sm:flex-row sm:items-end sm:justify-between text-white">
-                  <div>
-                    <p className="text-sm opacity-90">{wide.name}</p>
-                    <h4 className="text-xl md:text-2xl font-bold mt-1 line-clamp-2">
-                      {wide.description?.trim() || 'Explore the collection'}
+                <div className="absolute inset-0 p-6 md:p-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 text-white">
+                  <div className="min-w-0">
+                    <h4 className="text-xl md:text-2xl font-bold uppercase tracking-wide">
+                      {wide.name}
                     </h4>
+                    <p className="mt-1 text-sm opacity-90 line-clamp-1 max-w-md">
+                      {wide.description?.trim() || 'Explore the collection'}
+                    </p>
                   </div>
-                  <span className="mt-4 sm:mt-0 text-sm font-semibold uppercase tracking-wide group-hover:underline">
+                  <span className="mt-2 sm:mt-0 shrink-0 text-sm font-semibold uppercase tracking-wide group-hover:underline">
                     Shop Now →
                   </span>
                 </div>

@@ -36,8 +36,8 @@ export default function HomeDualPromoBanners({ categories = [] }: { categories?:
             <div className="absolute inset-0 p-8 flex flex-col justify-center text-white">
               <p className="font-handwriting text-xl text-store-primary">Shop</p>
               <h3 className="text-2xl md:text-3xl font-bold uppercase mt-1">{cat.name}</h3>
-              <p className="mt-2 opacity-90 line-clamp-2">
-                {cat.description?.trim() || 'Browse products in this category'}
+              <p className="mt-2 text-sm opacity-90 line-clamp-1 max-w-sm">
+                {cat.description?.trim() || 'Browse this collection'}
               </p>
               <span className="mt-4 text-sm font-semibold uppercase tracking-wide">Shop Now →</span>
             </div>
