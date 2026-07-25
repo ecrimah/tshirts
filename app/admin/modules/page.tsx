@@ -207,8 +207,8 @@ export default function ModulesPage() {
   }
 
   const filteredModules = modules.filter(module => {
-    const matchesSearch = module.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      module.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (module.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (module.description || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = filterCategory === 'all' || module.category === filterCategory;
     return matchesSearch && matchesCategory;
   });

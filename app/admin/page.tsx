@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
+import { asNumber, money } from '@/lib/format-money';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function AdminDashboard() {
@@ -58,7 +59,7 @@ export default function AdminDashboard() {
         const allOrdersData = await api<any[]>('/api/orders');
 
         const paidOrders = allOrdersData?.filter((o) => o.payment_status === 'paid') || [];
-        const totalRevenue = paidOrders.reduce((sum, order) => sum + (order.total || 0), 0);
+        const totalRevenue = paidOrders.reduce((sum, order) => sum + asNumber(order.total), 0);
         const totalOrders = allOrdersData?.length || 0;
         const paidOrderCount = paidOrders.length;
         const avgOrderValue = paidOrderCount > 0 ? totalRevenue / paidOrderCount : 0;
@@ -80,7 +81,7 @@ export default function AdminDashboard() {
         paidOrders.forEach(order => {
           const date = new Date(order.created_at).toISOString().split('T')[0];
           if (chartMap[date] !== undefined) {
-            chartMap[date] += (order.total || 0);
+            chartMap[date] += asNumber(order.total);
           }
         });
 
@@ -93,7 +94,7 @@ export default function AdminDashboard() {
         setStats([
           {
             title: 'Total Revenue',
-            value: `GH₵ ${totalRevenue.toFixed(2)}`,
+            value: `GH₵ ${money(totalRevenue)}`,
             change: '+0%', // Dynamic change requires date filtering logic which is complex
             trend: 'up',
             icon: 'ri-money-dollar-circle-line',
@@ -117,7 +118,7 @@ export default function AdminDashboard() {
           },
           {
             title: 'Avg Order Value',
-            value: `GH₵ ${avgOrderValue.toFixed(2)}`,
+            value: `GH₵ ${money(avgOrderValue)}`,
             change: '+0%',
             trend: 'up',
             icon: 'ri-line-chart-line',
@@ -142,7 +143,7 @@ export default function AdminDashboard() {
               customer: customerName,
               email: o.email,
               date: new Date(o.created_at).toLocaleDateString(),
-              total: o.total,
+              total: asNumber(o.total),
               status: o.status,
               items: 1
             };
@@ -275,7 +276,7 @@ export default function AdminDashboard() {
                     <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} tickFormatter={(value) => `GH₵${value}`} />
                     <Tooltip
                       contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                      formatter={(value) => [`GH₵${(value as number)?.toFixed(2) ?? '0.00'}`, 'Revenue']}
+                      formatter={(value) => [`GH₵${money(value)}`, 'Revenue']}
                     />
                     <Area type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
                   </AreaChart>
@@ -354,7 +355,7 @@ export default function AdminDashboard() {
                           <p className="text-sm text-gray-500">{order.email}</p>
                         </td>
                         <td className="py-4 px-4 text-gray-700 whitespace-nowrap">{order.date}</td>
-                        <td className="py-4 px-4 font-semibold text-gray-900 whitespace-nowrap">GH₵ {order.total.toFixed(2)}</td>
+                        <td className="py-4 px-4 font-semibold text-gray-900 whitespace-nowrap">GH₵ {money(order.total)}</td>
                         <td className="py-4 px-4">
                           <span className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${statusColors[order.status] || 'bg-gray-100'}`}>
                             {order.status === 'shipped' ? 'Packaged' : order.status.charAt(0).toUpperCase() + order.status.slice(1)}

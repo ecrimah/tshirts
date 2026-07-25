@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
+import { asNumber, money } from '@/lib/format-money';
 
 const LIST_STATE_KEY = 'admin-products-list-state-v1';
 const LIST_STATE_TTL_MS = 30 * 60 * 1000;
@@ -43,8 +44,12 @@ export default function ProductsPage() {
   };
 
   const fetchCategories = useCallback(async () => {
-    const data = await api<{ name: string }[]>('/api/catalog/categories');
-    if (data) setCategories(data);
+    try {
+      const data = await api<{ name: string }[]>('/api/catalog/categories');
+      if (Array.isArray(data)) setCategories(data);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
   }, []);
 
   const fetchProducts = useCallback(async () => {
@@ -61,15 +66,22 @@ export default function ProductsPage() {
         `/api/catalog/products?status=${statusFilter === 'all' ? 'all' : statusFilter}&sort=${sortMap[sortBy] || 'newest'}`
       );
 
+      if (!Array.isArray(data)) {
+        setProducts([]);
+        setStats({ total: 0, lowStock: 0, outOfStock: 0, active: 0 });
+        return;
+      }
+
       const transformedProducts = data.map((p: any) => ({
         ...p,
+        price: asNumber(p.price),
         category: p.categories?.name || 'Uncategorized',
         image:
           p.product_images?.find((img: any) => img.position === 0)?.url ||
           p.product_images?.[0]?.url ||
-          'https://via.placeholder.com/300?text=No+Image',
+          '/logo.png',
         variantsCount: p.variants_count || p.product_variants?.length || 0,
-        stock: p.quantity,
+        stock: asNumber(p.quantity),
         sales: 0,
         rating: p.rating_avg || 0,
       }));
@@ -193,7 +205,7 @@ export default function ProductsPage() {
 
   const filteredProducts = products.filter(product => {
     const term = searchQuery.toLowerCase();
-    return product.name.toLowerCase().includes(term) ||
+    return (product.name || '').toLowerCase().includes(term) ||
       (product.sku && product.sku.toLowerCase().includes(term)) ||
       (product.category && product.category.toLowerCase().includes(term));
   });
@@ -382,7 +394,7 @@ export default function ProductsPage() {
                     </td>
                     <td className="py-4 px-4 text-gray-700 text-sm font-mono">{product.sku || '-'}</td>
                     <td className="py-4 px-4 text-gray-700 text-sm">{product.category}</td>
-                    <td className="py-4 px-4 font-semibold text-gray-900 whitespace-nowrap">GH₵ {product.price.toFixed(2)}</td>
+                    <td className="py-4 px-4 font-semibold text-gray-900 whitespace-nowrap">GH₵ {money(product.price)}</td>
                     <td className="py-4 px-4 text-gray-700">
                       {product.stock}
                       {product.stock <= (product.metadata?.low_stock_threshold || 5) && product.stock > 0 && (
@@ -440,7 +452,7 @@ export default function ProductsPage() {
                 <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">{product.name}</h3>
                 <p className="text-sm text-gray-600 mb-2">{product.category}</p>
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-lg font-bold text-gray-900">GH₵ {product.price}</p>
+                  <p className="text-lg font-bold text-gray-900">GH₵ {money(product.price)}</p>
                 </div>
                 <div className="flex items-center justify-between text-sm text-gray-600 mb-3 pb-3 border-b border-gray-200">
                   <span>Stock: {product.stock}</span>

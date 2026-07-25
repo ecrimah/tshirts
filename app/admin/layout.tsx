@@ -19,8 +19,8 @@ export default function AdminLayout({
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
 
-  // Module Filtering State
-  const [enabledModules, setEnabledModules] = useState<string[]>([]);
+  // Module Filtering State — null means “not loaded yet” (show all optional modules)
+  const [enabledModules, setEnabledModules] = useState<string[] | null>(null);
 
   useEffect(() => {
     async function checkAuth() {
@@ -78,11 +78,14 @@ export default function AdminLayout({
         const data = await api<{ modules?: { id: string; enabled: boolean }[] }>(
           '/api/settings?include=modules'
         );
-        if (data.modules) {
+        if (Array.isArray(data.modules)) {
           setEnabledModules(data.modules.filter((m) => m.enabled).map((m) => m.id));
+        } else {
+          setEnabledModules(null);
         }
       } catch (err) {
         console.warn('Fetch modules failed:', err);
+        setEnabledModules(null);
       }
     }
     fetchModules();
@@ -110,8 +113,17 @@ export default function AdminLayout({
     router.push('/admin/login');
   };
 
+  // Special layout for Login Page (before auth gate)
+  if (pathname === '/admin/login') {
+    return <>{children}</>;
+  }
+
   if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-500">Loading Admin...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-500">Redirecting…</div>;
   }
 
   const menuItems = [
@@ -203,17 +215,12 @@ export default function AdminLayout({
     },
   ];
 
-  const visibleMenuItems = menuItems.filter(item => {
-    // @ts-ignore
-    if (!item.moduleId) return true;
-    // @ts-ignore
-    return enabledModules.includes(item.moduleId);
+  const visibleMenuItems = menuItems.filter((item) => {
+    const moduleId = (item as { moduleId?: string }).moduleId;
+    if (!moduleId) return true;
+    if (enabledModules === null) return true;
+    return enabledModules.includes(moduleId);
   });
-
-  // Special layout for Login Page
-  if (pathname === '/admin/login') {
-    return <>{children}</>;
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">

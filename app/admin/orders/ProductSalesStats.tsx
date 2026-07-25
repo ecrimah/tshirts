@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, Fragment } from 'react';
 import { api } from '@/lib/api';
+import { asNumber } from '@/lib/format-money';
 
 interface SalesStat {
     productId: string;
@@ -68,13 +69,13 @@ export default function ProductSalesStats({ isOpen, onClose }: { isOpen: boolean
                     }
 
                     const entry = map.get(pid)!;
-                    entry.itemsSold += item.quantity || 0;
-                    entry.totalRevenue += item.total_price || 0;
+                    entry.itemsSold += asNumber(item.quantity);
+                    entry.totalRevenue += asNumber(item.total_price);
 
                     const variantName = item.variant_name || 'Default';
                     const existing = entry.variants.get(variantName) || { quantity: 0, revenue: 0 };
-                    existing.quantity += item.quantity || 0;
-                    existing.revenue += item.total_price || 0;
+                    existing.quantity += asNumber(item.quantity);
+                    existing.revenue += asNumber(item.total_price);
                     entry.variants.set(variantName, existing);
 
                     const orderId = order.id;

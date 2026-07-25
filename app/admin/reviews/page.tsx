@@ -13,7 +13,8 @@ export default function AdminReviewsPage() {
     try {
       setLoading(true);
       const data = await api<any[]>(`/api/admin/reviews?status=${statusFilter === 'all' ? 'all' : statusFilter}`);
-      const formatted = (data || []).map((r: any) => ({
+      const rows = Array.isArray(data) ? data : [];
+      const formatted = rows.map((r: any) => ({
           id: r.id,
           customer: {
             name: r.reviewer_name || 'Anonymous',
@@ -55,14 +56,14 @@ export default function AdminReviewsPage() {
   };
 
   const filteredReviews = reviews.filter(r =>
-    statusFilter === 'all' || r.status.toLowerCase() === statusFilter
+    statusFilter === 'all' || String(r.status || '').toLowerCase() === statusFilter
   );
 
   const stats = {
     total: reviews.length,
-    pending: reviews.filter(r => r.status.toLowerCase() === 'pending').length,
-    approved: reviews.filter(r => r.status.toLowerCase() === 'approved').length,
-    rejected: reviews.filter(r => r.status.toLowerCase() === 'rejected').length
+    pending: reviews.filter(r => String(r.status || '').toLowerCase() === 'pending').length,
+    approved: reviews.filter(r => String(r.status || '').toLowerCase() === 'approved').length,
+    rejected: reviews.filter(r => String(r.status || '').toLowerCase() === 'rejected').length
   };
 
   const statusColors: any = {

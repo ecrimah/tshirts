@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { asNumber, money } from '@/lib/format-money';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, AreaChart, Area, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function AnalyticsPage() {
@@ -54,7 +55,7 @@ export default function AnalyticsPage() {
       }
 
       // Process Metrics
-      const totalRevenue = orders?.reduce((sum, o) => sum + (o.total || 0), 0) || 0;
+      const totalRevenue = orders?.reduce((sum, o) => sum + asNumber(o.total), 0) || 0;
       const totalOrders = orders?.length || 0;
       const aov = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
@@ -89,7 +90,7 @@ export default function AnalyticsPage() {
       orders?.forEach(o => {
         const dateKey = new Date(o.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         if (salesMap[dateKey]) {
-          salesMap[dateKey].sales += o.total || 0;
+          salesMap[dateKey].sales += asNumber(o.total);
           salesMap[dateKey].orders += 1;
         }
       });
@@ -102,7 +103,9 @@ export default function AnalyticsPage() {
         const catName = item.products?.categories?.name || 'Uncategorized';
         if (!catMap[catName]) catMap[catName] = { name: catName, value: 0 };
         // Use total_price if available, otherwise calculate from unit_price * quantity
-        const itemRevenue = item.total_price || (item.unit_price * item.quantity) || 0;
+        const itemRevenue =
+          asNumber(item.total_price) ||
+          asNumber(item.unit_price) * asNumber(item.quantity);
         catMap[catName].value += itemRevenue;
       });
       // Convert to array for Recharts Pie
@@ -114,9 +117,11 @@ export default function AnalyticsPage() {
       validItems.forEach(item => {
         const pName = item.products?.name || 'Unknown';
         if (!prodMap[pName]) prodMap[pName] = { name: pName, revenue: 0, units: 0 };
-        const itemRevenue = item.total_price || (item.unit_price * item.quantity) || 0;
+        const itemRevenue =
+          asNumber(item.total_price) ||
+          asNumber(item.unit_price) * asNumber(item.quantity);
         prodMap[pName].revenue += itemRevenue;
-        prodMap[pName].units += item.quantity;
+        prodMap[pName].units += asNumber(item.quantity);
       });
       const topProdArray = Object.values(prodMap).sort((a: any, b: any) => b.revenue - a.revenue).slice(0, 5);
       setTopProducts(topProdArray);
@@ -196,7 +201,7 @@ export default function AnalyticsPage() {
               </div>
             </div>
             <p className="text-sm text-gray-600 mb-1">Avg. Order Value</p>
-            <p className="text-3xl font-bold text-gray-900">GH₵{metrics.aov.toFixed(2)}</p>
+            <p className="text-3xl font-bold text-gray-900">GH₵{money(metrics.aov)}</p>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm p-6">

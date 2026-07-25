@@ -22,7 +22,9 @@ RUN addgroup -S nodejs && adduser -S nextjs -G nodejs
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
-RUN mkdir -p /var/www/mamator/uploads && chown -R nextjs:nodejs /var/www/mamator
+# nextjs user must own cache dir or /_next/image throws EACCES and can break pages
+RUN mkdir -p /app/.next/cache /var/www/mamator/uploads \
+  && chown -R nextjs:nodejs /app/.next /var/www/mamator
 USER nextjs
 EXPOSE 3005
 CMD ["node", "server.js"]

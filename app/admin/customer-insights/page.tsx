@@ -3,13 +3,14 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { asNumber } from '@/lib/format-money';
 
 // Helper for currency formatting
-const formatCurrency = (amount: number) => {
+const formatCurrency = (amount: unknown) => {
   return new Intl.NumberFormat('en-GH', {
     style: 'currency',
     currency: 'GHS'
-  }).format(amount);
+  }).format(asNumber(amount));
 };
 
 export default function CustomerInsightsPage() {
@@ -40,7 +41,7 @@ export default function CustomerInsightsPage() {
 
       const aggregated = rows.map((profile: any) => {
         const userOrders = orders?.filter((o) => o.user_id === profile.user_id || o.email === profile.email) || [];
-        const totalSpent = userOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+        const totalSpent = userOrders.reduce((sum, o) => sum + asNumber(o.total), 0);
         const orderCount = userOrders.length;
 
         // Sort orders to find last order
@@ -108,7 +109,7 @@ export default function CustomerInsightsPage() {
 
 
   const filteredCustomers = customers.filter(customer => {
-    const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = (customer.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesSegment = selectedSegment === 'all' || customer.segment === selectedSegment;
     return matchesSearch && matchesSegment;

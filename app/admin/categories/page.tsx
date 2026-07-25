@@ -138,7 +138,7 @@ export default function AdminCategoriesPage() {
     if (showAddModal && formData.name && !editingCategory) {
       setFormData(prev => ({
         ...prev,
-        slug: prev.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
+        slug: (prev.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
       }));
     }
   }, [formData.name, showAddModal, editingCategory]);

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
+import { asNumber, money } from '@/lib/format-money';
 import ProductSalesStats from './ProductSalesStats';
 
 interface Order {
@@ -158,7 +159,7 @@ export default function AdminOrdersPage() {
 
   const getItemCount = (order: Order) => {
     if (!order.order_items) return 0;
-    return order.order_items.reduce((sum, item) => sum + item.quantity, 0);
+    return order.order_items.reduce((sum, item) => sum + asNumber(item.quantity), 0);
   };
 
   const formatDate = (dateString: string) => {
@@ -548,7 +549,7 @@ export default function AdminOrdersPage() {
                     </td>
                     <td className="py-4 px-4 text-gray-700 text-sm whitespace-nowrap">{formatDate(order.created_at)}</td>
                     <td className="py-4 px-4 text-gray-700">{getItemCount(order)}</td>
-                    <td className="py-4 px-4 font-semibold text-gray-900 whitespace-nowrap">GH₵ {order.total?.toFixed(2) || '0.00'}</td>
+                    <td className="py-4 px-4 font-semibold text-gray-900 whitespace-nowrap">GH₵ {money(order.total)}</td>
                     <td className="py-4 px-4 text-sm whitespace-nowrap">
                       <div className="flex flex-col">
                         <span className="text-gray-700">{order.payment_method || 'N/A'}</span>
