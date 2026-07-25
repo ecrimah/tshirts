@@ -184,7 +184,7 @@ export default function Header() {
                 >
                   <i className="ri-heart-line text-xl"></i>
                   {wishlistCount > 0 && (
-                    <span className="absolute top-1 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[10px] font-bold text-white">
+                    <span className="absolute top-1 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-store-primary text-[10px] font-bold text-store-navy">
                       {wishlistCount}
                     </span>
                   )}

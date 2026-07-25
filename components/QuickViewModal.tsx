@@ -217,8 +217,8 @@ export default function QuickViewModal({ product, isOpen, onClose }: QuickViewMo
                     className={`w-full py-4 rounded-lg font-semibold transition-colors whitespace-nowrap ${
                       addedToCart
                         ? 'bg-store-primary text-store-navy'
-                        : product.inStock
-                        ? 'bg-store-navy hover:bg-store-navy-light text-white'
+                        :                       product.inStock
+                        ? 'bg-store-primary hover:bg-store-primary-dark text-store-navy'
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                   >
@@ -237,7 +237,7 @@ export default function QuickViewModal({ product, isOpen, onClose }: QuickViewMo
 
                   <Link
                     href={`/product/${product.slug || product.id}`}
-                    className="block w-full py-4 border-2 border-gray-900 text-gray-900 rounded-lg font-semibold text-center hover:bg-gray-50 transition-colors whitespace-nowrap"
+                    className="block w-full py-4 border-2 border-store-navy text-store-navy rounded-lg font-semibold text-center hover:bg-store-surface transition-colors whitespace-nowrap"
                   >
                     View Full Details
                   </Link>

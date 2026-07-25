@@ -56,7 +56,7 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
             <Link
               href="/shop"
               onClick={onClose}
-              className="px-6 py-3 bg-store-navy text-white rounded-lg font-semibold hover:bg-store-navy-light transition-colors whitespace-nowrap cursor-pointer"
+              className="px-6 py-3 bg-store-primary text-store-navy rounded-lg font-semibold hover:bg-store-primary-dark transition-colors whitespace-nowrap cursor-pointer"
             >
               Continue Shopping
             </Link>
@@ -139,14 +139,14 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
                 <Link
                   href="/checkout"
                   onClick={onClose}
-                  className="block w-full py-4 bg-store-navy text-white text-center rounded-lg font-semibold hover:bg-store-navy-light transition-colors whitespace-nowrap cursor-pointer"
+                  className="block w-full py-4 bg-store-primary text-store-navy text-center rounded-lg font-semibold hover:bg-store-primary-dark transition-colors whitespace-nowrap cursor-pointer"
                 >
                   Proceed to Checkout
                 </Link>
                 <Link
                   href="/cart"
                   onClick={onClose}
-                  className="block w-full py-4 border-2 border-gray-900 text-gray-900 text-center rounded-lg font-semibold hover:bg-gray-50 transition-colors whitespace-nowrap cursor-pointer"
+                  className="block w-full py-4 border-2 border-store-navy text-store-navy text-center rounded-lg font-semibold hover:bg-store-surface transition-colors whitespace-nowrap cursor-pointer"
                 >
                   View Cart
                 </Link>
