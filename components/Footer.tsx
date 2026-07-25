@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useCMS } from '@/context/CMSContext';
 import { resolveSiteLogo } from '@/lib/site-brand';
 
@@ -54,6 +54,7 @@ function phoneTelHref(raw: string): string {
 export default function Footer() {
   const { getSetting } = useCMS();
   const pathname = usePathname();
+  const router = useRouter();
 
   const siteName = getSetting('site_name') || 'Mamator';
   const legalName = getSetting('company_legal_name') || 'Mamator Trading Enterprise';
@@ -180,15 +181,16 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-store-muted text-center md:text-left">
-            <Link
-              href="/admin/login"
-              className="hover:text-store-primary transition-colors"
+          <p className="text-xs text-store-muted text-center md:text-left select-none">
+            <button
+              type="button"
+              onClick={() => router.push('/admin/login')}
+              className="inline p-0 m-0 border-0 bg-transparent text-inherit font-inherit leading-inherit cursor-default hover:text-store-primary transition-colors select-none caret-transparent focus:outline-none focus-visible:text-store-primary"
               aria-label="Admin login"
               title="Admin"
             >
               &copy;
-            </Link>{' '}
+            </button>{' '}
             {new Date().getFullYear()} {legalName}. All rights reserved.
           </p>
           <div className="flex gap-4 text-store-muted text-2xl" aria-label="Accepted payment methods">
