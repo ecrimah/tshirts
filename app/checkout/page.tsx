@@ -9,6 +9,11 @@ import { useCart } from '@/context/CartContext';
 import { api } from '@/lib/api';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
+import {
+  addressToShippingData,
+  shippingDataToAddressInput,
+  type AddressLike,
+} from '@/lib/address-map';
 
 export default function CheckoutPage() {
   usePageTitle('Checkout');
@@ -18,9 +23,11 @@ export default function CheckoutPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [checkoutType, setCheckoutType] = useState<'guest' | 'account'>('guest');
-  const [saveAddress, setSaveAddress] = useState(false);
+  const [saveAddress, setSaveAddress] = useState(true);
   const [savePayment, setSavePayment] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [savedAddresses, setSavedAddresses] = useState<AddressLike[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>('new');
   const { getToken, verifying } = useRecaptcha();
 
   const [shippingData, setShippingData] = useState({
@@ -60,30 +67,38 @@ export default function CheckoutPage() {
 
 
 
-  // Check auth and cart
+  // Check auth, load saved addresses, prefills
   useEffect(() => {
     async function checkUser() {
       try {
         const me = await api<{ user: { id: string; email: string } | null }>('/api/auth/me');
-        if (me.user) {
-          setUser(me.user);
-          setCheckoutType('account');
-          setShippingData((prev) => ({ ...prev, email: me.user!.email || '' }));
+        if (!me.user) return;
+
+        setUser(me.user);
+        setCheckoutType('account');
+        const email = me.user.email || '';
+
+        try {
+          const addresses = await api<AddressLike[]>('/api/addresses');
+          const list = Array.isArray(addresses) ? addresses : [];
+          setSavedAddresses(list);
+          const preferred = list.find((a) => a.is_default) || list[0];
+          if (preferred) {
+            setSelectedAddressId(preferred.id);
+            setShippingData(addressToShippingData(preferred, email));
+            setSaveAddress(false);
+          } else {
+            setShippingData((prev) => ({ ...prev, email }));
+          }
+        } catch {
+          setShippingData((prev) => ({ ...prev, email }));
         }
       } catch {
         /* guest checkout */
       }
     }
     checkUser();
-
-    // Small delay to ensure cart load
-    const timer = setTimeout(() => {
-      if (cart.length === 0 && !isLoading) {
-        // router.push('/cart'); // Optional: redirect if empty
-      }
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [cart, router, isLoading]);
+  }, []);
 
   // Scroll to top when step changes
   useEffect(() => {
@@ -168,6 +183,18 @@ export default function CheckoutPage() {
           tax,
         },
       });
+
+      // Persist address book when logged in and checkbox is on (or first address)
+      if (user && (saveAddress || savedAddresses.length === 0)) {
+        try {
+          await api('/api/addresses', {
+            method: 'POST',
+            json: shippingDataToAddressInput(shippingData, { is_default: savedAddresses.length === 0 || saveAddress }),
+          });
+        } catch (addrErr) {
+          console.warn('Could not save address', addrErr);
+        }
+      }
 
       if (paymentMethod === 'moolre') {
         try {
@@ -309,6 +336,70 @@ export default function CheckoutPage() {
               <>
                 <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
                   <h2 className="text-xl font-bold text-gray-900 mb-6">Shipping Information</h2>
+
+                  {user && savedAddresses.length > 0 && (
+                    <div className="mb-6 space-y-2">
+                      <p className="text-sm font-semibold text-gray-900">Saved addresses</p>
+                      <div className="space-y-2">
+                        {savedAddresses.map((addr) => (
+                          <label
+                            key={addr.id}
+                            className={`flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer ${
+                              selectedAddressId === addr.id
+                                ? 'border-store-navy bg-store-surface'
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="saved-address"
+                              checked={selectedAddressId === addr.id}
+                              onChange={() => {
+                                setSelectedAddressId(addr.id);
+                                setShippingData(addressToShippingData(addr, user.email || shippingData.email));
+                                setSaveAddress(false);
+                              }}
+                              className="mt-1"
+                            />
+                            <span className="text-sm">
+                              <span className="font-semibold block">{addr.full_name}</span>
+                              <span className="text-gray-600">
+                                {addr.address_line1}, {addr.city}, {addr.state}
+                              </span>
+                            </span>
+                          </label>
+                        ))}
+                        <label
+                          className={`flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer ${
+                            selectedAddressId === 'new'
+                              ? 'border-store-navy bg-store-surface'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="saved-address"
+                            checked={selectedAddressId === 'new'}
+                            onChange={() => {
+                              setSelectedAddressId('new');
+                              setSaveAddress(true);
+                              setShippingData((prev) => ({
+                                firstName: '',
+                                lastName: '',
+                                email: user.email || prev.email,
+                                phone: '',
+                                address: '',
+                                city: '',
+                                region: '',
+                              }));
+                            }}
+                            className="mt-1"
+                          />
+                          <span className="text-sm font-semibold">Use a new address</span>
+                        </label>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -78,7 +78,7 @@ export async function getProductBySlug(slug: string) {
       ) AS product_variants
     FROM products p
     LEFT JOIN categories c ON c.id = p.category_id
-    WHERE p.slug = $1
+    WHERE p.slug = $1 OR p.id::text = $1
     LIMIT 1
     `,
     [slug]

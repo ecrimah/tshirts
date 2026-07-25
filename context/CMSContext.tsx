@@ -210,11 +210,8 @@ export function CMSProvider({ children }: { children: ReactNode }) {
 }
 
 export function useCMS() {
-    const context = useContext(CMSContext);
-    if (!context) {
-        throw new Error('useCMS must be used within a CMSProvider');
-    }
-    return context;
+    // Default context is always defined — never white-screen storefront pages
+    return useContext(CMSContext);
 }
 
 export default CMSContext;

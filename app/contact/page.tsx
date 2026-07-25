@@ -1,14 +1,16 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useCMS } from '@/context/CMSContext';
 import PageHero from '@/components/PageHero';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import ContactInfoCards from '@/components/contact/ContactInfoCards';
 import { useRecaptcha } from '@/hooks/useRecaptcha';
 
-export default function ContactPage() {
+function ContactForm() {
   usePageTitle('Contact Us');
+  const searchParams = useSearchParams();
   const { getSetting } = useCMS();
   const contactPhone = getSetting('contact_phone') || '0249628324';
   const contactEmail = getSetting('contact_email') || 'info@mamator.com';
@@ -27,8 +29,17 @@ export default function ContactPage() {
   const { getToken, verifying } = useRecaptcha();
 
   useEffect(() => {
-    /* CMS contact block is managed in code — no remote fetch */
-  }, []);
+    const order = searchParams.get('order') || '';
+    const subject = searchParams.get('subject') || '';
+    if (!order && !subject) return;
+    setFormData((prev) => ({
+      ...prev,
+      subject: subject || (order ? `Help with order ${order}` : prev.subject),
+      message: order
+        ? `Hi, I need help with order ${order}.\n\n`
+        : prev.message,
+    }));
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -245,5 +256,19 @@ export default function ContactPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ContactPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[40vh] flex items-center justify-center">
+          <i className="ri-loader-4-line animate-spin text-3xl text-store-primary" />
+        </div>
+      }
+    >
+      <ContactForm />
+    </Suspense>
   );
 }

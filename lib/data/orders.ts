@@ -219,8 +219,9 @@ export async function getOrderById(id: string, userId?: string | null, isStaff?:
     [id]
   );
   if (!row) return null;
-  if (!isStaff && userId && row.user_id !== userId) {
-    return null;
+  // Customers may only read their own orders; staff may read any
+  if (!isStaff) {
+    if (!userId || row.user_id !== userId) return null;
   }
   return row;
 }

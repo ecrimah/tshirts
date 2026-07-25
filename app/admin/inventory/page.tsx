@@ -81,12 +81,6 @@ export default function InventoryManagementPage() {
     }
   };
 
-  const handleBulkRestock = () => {
-    // Placeholder for bulk restock logic
-    alert("Bulk restock feature coming soon (requires backend logic).");
-    setSelectedProducts([]);
-  };
-
   const handleExportCSV = () => {
     const csvData = [
       ['SKU', 'Product Name', 'Category', 'Current Stock', 'Price', 'Status'],
@@ -234,12 +228,6 @@ export default function InventoryManagementPage() {
                 {selectedProducts.length} product{selectedProducts.length > 1 ? 's' : ''} selected
               </p>
               <div className="flex items-center space-x-3">
-                <button
-                  onClick={handleBulkRestock}
-                  className="bg-store-navy hover:bg-store-navy text-white px-4 py-2 rounded-lg font-semibold transition-colors whitespace-nowrap cursor-pointer"
-                >
-                  Bulk Restock
-                </button>
                 <button
                   onClick={() => setSelectedProducts([])}
                   className="text-gray-600 hover:text-gray-900 font-medium whitespace-nowrap cursor-pointer"

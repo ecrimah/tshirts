@@ -14,18 +14,13 @@ const nextConfig: NextConfig = {
         pathname: '/uploads/**',
       },
       {
-        // Temporary: allow existing Supabase public image URLs until VPS /uploads cutover
         protocol: 'https',
-        hostname: 'ueuggrixyuiviuqpecie.supabase.co',
-        pathname: '/storage/v1/object/public/**',
+        hostname: 'www.mamator.com',
+        pathname: '/uploads/**',
       },
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'via.placeholder.com',
       },
     ],
   },
