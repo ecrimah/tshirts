@@ -17,7 +17,7 @@ interface SEOProps {
 
 export function generateMetadata({
   title = 'Premium Online Shopping in Ghana',
-  description = 'Maries Hair – hair care and beauty at Kpakpo mankralo road 55, Mataheko.',
+  description = 'Mamator – quality products with delivery across Ghana.',
   keywords = [],
   ogImage,
   ogType = 'website',
@@ -29,10 +29,10 @@ export function generateMetadata({
   author,
   noindex = false
 }: SEOProps): Metadata {
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://example.com';
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://mamator.com';
   const defaultOgImage = `${siteUrl}/logo.png`;
   const resolvedOgImage = ogImage || defaultOgImage;
-  const siteName = 'Maries Hair';
+  const siteName = 'Mamator';
   const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
 
   const defaultKeywords = [
@@ -161,11 +161,11 @@ export function generateBreadcrumbSchema(items: { name: string; url: string }[])
 }
 
 export function generateOrganizationSchema() {
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://example.com';
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://mamator.com';
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Maries Hair',
+    name: 'Mamator',
     url: siteUrl,
     logo: `${siteUrl}/logo.png`,
     image: `${siteUrl}/logo.png`,
@@ -181,11 +181,11 @@ export function generateOrganizationSchema() {
 }
 
 export function generateWebsiteSchema() {
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://example.com';
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://mamator.com';
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'Maries Hair',
+    name: 'Mamator',
     url: siteUrl,
     potentialAction: {
       '@type': 'SearchAction',

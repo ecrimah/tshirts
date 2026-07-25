@@ -237,7 +237,7 @@ export default function AdminLayout({
       >
         <div className="h-full px-4 py-6 overflow-y-auto">
           <Link href="/admin" className="flex items-center mb-8 px-2 cursor-pointer">
-            <span className="text-xl font-['Pacifico'] text-stone-700">Maries Hair</span>
+            <span className="text-xl font-['Pacifico'] text-stone-700">{process.env.NEXT_PUBLIC_SITE_NAME || 'Mamator'}</span>
             <span className="ml-3 text-sm font-semibold text-gray-500">ADMIN</span>
           </Link>
 

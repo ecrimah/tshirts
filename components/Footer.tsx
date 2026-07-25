@@ -26,7 +26,7 @@ function FooterSection({ title, children }: { title: string, children: React.Rea
 export default function Footer() {
   const { getSetting } = useCMS();
 
-  const siteName = getSetting('site_name') || 'Maries Hair';
+  const siteName = getSetting('site_name') || process.env.NEXT_PUBLIC_SITE_NAME || 'Mamator';
   const siteTagline = getSetting('site_tagline') || 'Hair care and beauty.';
   const siteLogo = getSetting('site_logo') || '/logo.png';
 

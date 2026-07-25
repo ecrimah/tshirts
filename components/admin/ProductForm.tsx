@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { useRouter } from 'next/navigation';
+import { buildProductSeo, slugifyProduct } from '@/lib/product-seo';
 
 interface ProductFormProps {
     initialData?: any;
@@ -36,7 +37,7 @@ export default function ProductForm({ initialData, isEditMode = false }: Product
 
     // Auto-generate SKU function
     const generateSku = () => {
-        const prefix = 'MH'; // Maries Hair
+        const prefix = 'MH'; // Mamator
         const timestamp = Date.now().toString(36).toUpperCase().slice(-4);
         const random = Math.random().toString(36).substring(2, 6).toUpperCase();
         return `${prefix}-${timestamp}-${random}`;
@@ -241,12 +242,21 @@ export default function ProductForm({ initialData, isEditMode = false }: Product
         fetchCategories();
     }, [categoryId]);
 
-    // Auto-generate slug from name if not manually edited
+    // Auto-generate slug + SEO when empty (new products / blank SEO fields)
     useEffect(() => {
-        if (!isEditMode && productName && !urlSlug) {
-            setUrlSlug(productName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''));
-        }
-    }, [productName, isEditMode, urlSlug]);
+        if (!productName) return;
+        const categoryName = categories.find((c) => c.id === categoryId)?.name || '';
+        const seo = buildProductSeo({
+            name: productName,
+            description,
+            categoryName,
+            siteName: process.env.NEXT_PUBLIC_SITE_NAME || 'Mamator',
+        });
+        if (!isEditMode && !urlSlug) setUrlSlug(seo.slug || slugifyProduct(productName));
+        if (!seoTitle) setSeoTitle(seo.seo_title);
+        if (!metaDescription) setMetaDescription(seo.seo_description);
+        if (!keywords) setKeywords(seo.tags.join(', '));
+    }, [productName, categoryId, categories]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Auto-generate SKU for new products
     useEffect(() => {

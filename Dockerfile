@@ -2,7 +2,9 @@ FROM node:20-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY patches ./patches
-RUN npm ci
+# Coolify may inject NODE_ENV=production at build time, which skips
+# devDependencies (patch-package). Force them in for npm ci/postinstall.
+RUN npm ci --include=dev
 
 FROM node:20-alpine AS builder
 WORKDIR /app

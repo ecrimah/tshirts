@@ -93,6 +93,9 @@ export async function POST(request: Request) {
       featured = false,
       metadata = {},
       sku,
+      seo_title,
+      seo_description,
+      tags,
     } = body;
 
     if (!name || !slug || price === undefined) {
@@ -100,8 +103,16 @@ export async function POST(request: Request) {
     }
 
     const created = await queryOne(
-      `INSERT INTO products (name, slug, price, category_id, status, description, short_description, quantity, sale_price, compare_at_price, featured, metadata, sku)
-       VALUES ($1, $2, $3, $4::uuid, $5::product_status, $6, $7, $8, $9, $10, $11, $12::jsonb, $13)
+      `INSERT INTO products (
+         name, slug, price, category_id, status, description, short_description,
+         quantity, sale_price, compare_at_price, featured, metadata, sku,
+         seo_title, seo_description, tags
+       )
+       VALUES (
+         $1, $2, $3, $4::uuid, $5::product_status, $6, $7,
+         $8, $9, $10, $11, $12::jsonb, $13,
+         $14, $15, $16::text[]
+       )
        RETURNING *`,
       [
         name,
@@ -117,6 +128,9 @@ export async function POST(request: Request) {
         featured,
         JSON.stringify(metadata),
         sku || null,
+        seo_title || null,
+        seo_description || null,
+        Array.isArray(tags) ? tags : [],
       ]
     );
 

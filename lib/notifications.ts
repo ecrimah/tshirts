@@ -3,15 +3,20 @@ import { query } from '@/lib/db';
 import { escapeHtml } from '@/lib/sanitize';
 
 const resend = new Resend(process.env.RESEND_API_KEY || 'missing_api_key');
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@example.com';
-const EMAIL_FROM = process.env.EMAIL_FROM || 'Maries Hair <no-reply@example.com>';
+const SITE_HOST = (process.env.NEXT_PUBLIC_APP_URL || 'https://mamator.com')
+    .replace(/^https?:\/\//, '')
+    .split('/')[0];
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || process.env.MOOLRE_MERCHANT_EMAIL || `admin@${SITE_HOST}`;
+const EMAIL_FROM =
+    process.env.EMAIL_FROM ||
+    `${process.env.NEXT_PUBLIC_SITE_NAME || 'Mamator'} <noreply@${SITE_HOST}>`;
 const BRAND = {
-    name: 'Maries Hair',
+    name: process.env.NEXT_PUBLIC_SITE_NAME || 'Mamator',
     color: '#2563eb',
     colorLight: '#eff6ff',
     colorDark: '#064e3b',
-    url: (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/+$/, ''),
-    phone: '0547742920',
+    url: (process.env.NEXT_PUBLIC_APP_URL || 'https://mamator.com').replace(/\/+$/, ''),
+    phone: process.env.NEXT_PUBLIC_SITE_PHONE || '',
 };
 
 // Reusable branded email layout
@@ -154,7 +159,7 @@ export async function sendSMS({ to, message }: { to: string; message: string }) 
             },
             body: JSON.stringify({
                 type: 1,
-                senderid: 'MariesHair',
+                senderid: process.env.MOOLRE_SMS_SENDER_ID || 'Mamator',
                 messages: [
                     {
                         recipient: recipient,
@@ -442,6 +447,30 @@ ${emailButton('Start Shopping', `${BRAND.url}/shop`)}
             message: `Welcome ${firstName}! Thanks for joining ${BRAND.name}.`
         });
     }
+}
+
+export async function sendNewsletterWelcome(email: string) {
+    if (!process.env.RESEND_API_KEY) {
+        console.warn('[Email] RESEND_API_KEY not configured');
+        return null;
+    }
+    const code = (process.env.NEWSLETTER_PROMO_CODE || 'INSIDER10').trim();
+    const safeCode = escapeHtml(code);
+    return sendEmail({
+        to: email,
+        subject: `Your 10% welcome offer — ${BRAND.name}`,
+        html: emailLayout(`
+<h2 style="margin:0 0 16px;color:#111827;font-size:22px;text-align:center;">Welcome to The Insider Club</h2>
+<p style="color:#374151;font-size:14px;line-height:1.7;margin:16px 0;">Thanks for subscribing. Use this code on your <strong>first order</strong>:</p>
+<div style="background-color:#f0f9ff;border:2px dashed #0ea5e9;border-radius:12px;padding:20px;margin:24px 0;text-align:center;">
+  <p style="margin:0 0 8px;color:#0369a1;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;">Your code</p>
+  <p style="margin:0;color:#0c4a6e;font-size:28px;font-weight:800;letter-spacing:0.15em;">${safeCode}</p>
+  <p style="margin:12px 0 0;color:#64748b;font-size:13px;">10% off your first order</p>
+</div>
+<p style="color:#374151;font-size:14px;line-height:1.7;margin:0 0 16px;">You'll also get updates on new arrivals, restocks, and exclusive deals.</p>
+<p style="text-align:center;margin:24px 0 0;"><a href="${BRAND.url}/shop" style="display:inline-block;background:${BRAND.color};color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;">Shop now</a></p>
+`, `Your welcome code: ${code}`),
+    });
 }
 
 export async function sendPaymentLink(order: any) {

@@ -17,18 +17,18 @@ export const viewport: Viewport = {
   themeColor: '#2563eb',
 };
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://example.com';
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://mamator.com';
 
 // Favicon & OG from public: add favicon.ico, favicon.png, og-image.png (1200×630) to public as needed
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Maries Hair | Hair Care & Beauty",
-    template: "%s | Maries Hair"
+    default: "Mamator | Shop Online in Ghana",
+    template: "%s | Mamator"
   },
-  description: "Maries Hair – hair care and beauty at Kpakpo mankralo road 55, Mataheko. Visit us or call 0547742920.",
+  description: "Mamator – quality products with delivery across Ghana.",
   keywords: [
-    "Maries Hair",
+    "Mamator",
     "Hair care",
     "Beauty",
     "Mataheko",
@@ -37,10 +37,10 @@ export const metadata: Metadata = {
     "E-commerce",
     "Shop online"
   ],
-  authors: [{ name: "Maries Hair" }],
-  creator: "Maries Hair",
-  publisher: "Maries Hair",
-  applicationName: "Maries Hair",
+  authors: [{ name: "Mamator" }],
+  creator: "Mamator",
+  publisher: "Mamator",
+  applicationName: "Mamator",
   referrer: "origin-when-cross-origin",
   robots: {
     index: true,
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Maries Hair',
+    title: 'Mamator',
   },
   formatDetection: {
     telephone: true,
@@ -80,24 +80,24 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_GH",
     url: siteUrl,
-    title: "Maries Hair | Hair Care & Beauty",
-    description: "Maries Hair – hair care and beauty at Kpakpo mankralo road 55, Mataheko. Call 0547742920.",
-    siteName: "Maries Hair",
+    title: "Mamator | Shop Online in Ghana",
+    description: "Mamator – quality products with delivery across Ghana.",
+    siteName: "Mamator",
     images: [
       {
         url: "/logo.png",
         width: 1200,
         height: 630,
-        alt: "Maries Hair - Hair Care & Beauty",
+        alt: "Mamator - Shop Online in Ghana",
         type: "image/png",
       },
-      { url: "/logo.png", width: 1200, height: 630, alt: "Maries Hair", type: "image/png" },
+      { url: "/logo.png", width: 1200, height: 630, alt: "Mamator", type: "image/png" },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Maries Hair | Hair Care & Beauty",
-    description: "Maries Hair – hair care and beauty at Kpakpo mankralo road 55, Mataheko.",
+    title: "Mamator | Shop Online in Ghana",
+    description: "Mamator – quality products with delivery across Ghana.",
     images: ["/logo.png"],
   },
   alternates: {
@@ -123,7 +123,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#2563eb" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Maries Hair" />
+        <meta name="apple-mobile-web-app-title" content="Mamator" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="msapplication-TileColor" content="#2563eb" />
         <meta name="msapplication-tap-highlight" content="no" />
@@ -150,10 +150,10 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
-              "name": "Maries Hair",
+              "name": "Mamator",
               "url": siteUrl,
               "logo": siteUrl + "/logo.png",
-              "description": "Maries Hair – hair care and beauty at Kpakpo mankralo road 55, Mataheko.",
+              "description": "Mamator – quality products with delivery across Ghana.",
               "address": {
                 "@type": "PostalAddress",
                 "streetAddress": "Kpakpo mankralo road 55",

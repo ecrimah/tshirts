@@ -189,3 +189,7 @@ If schema migrations are one-way, rollback = restore old app version + old DB du
 
 ### Legacy
 - Many old `scripts/*.mjs` maintenance tools still mention Supabase; they are not used at runtime. Prefer new `pg` scripts or archive them after cutover.
+
+## Related
+
+- [`STORE_HARDENING_PLAYBOOK.md`](./STORE_HARDENING_PLAYBOOK.md) — production hardening after cutover.

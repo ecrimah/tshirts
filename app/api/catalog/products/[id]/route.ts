@@ -63,6 +63,8 @@ export async function PATCH(request: Request, context: Ctx) {
     'featured',
     'metadata',
     'tags',
+    'seo_title',
+    'seo_description',
     'brand',
     'moq',
   ] as const;
@@ -81,6 +83,9 @@ export async function PATCH(request: Request, context: Ctx) {
       } else if (key === 'category_id') {
         sets.push(`${key} = $${i}::uuid`);
         params.push(fields[key] || null);
+      } else if (key === 'tags') {
+        sets.push(`${key} = $${i}::text[]`);
+        params.push(Array.isArray(fields[key]) ? fields[key] : []);
       } else {
         sets.push(`${key} = $${i}`);
         params.push(fields[key]);

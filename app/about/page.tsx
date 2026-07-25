@@ -11,7 +11,7 @@ export default function AboutPage() {
   const { getSetting } = useCMS();
   const [activeTab, setActiveTab] = useState('story');
 
-  const siteName = getSetting('site_name') || 'Maries Hair';
+  const siteName = getSetting('site_name') || process.env.NEXT_PUBLIC_SITE_NAME || 'Mamator';
 
   const values = [
     {

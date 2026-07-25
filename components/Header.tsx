@@ -25,7 +25,7 @@ export default function Header() {
   const { cartCount, isCartOpen, setIsCartOpen } = useCart();
   const { getSetting } = useCMS();
 
-  const siteName = getSetting('site_name') || 'Maries Hair';
+  const siteName = getSetting('site_name') || process.env.NEXT_PUBLIC_SITE_NAME || 'Mamator';
   const headerLogo = getSetting('site_logo') || '/logo.png';
 
   useEffect(() => {

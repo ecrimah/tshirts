@@ -65,7 +65,7 @@ interface CMSContextType {
 }
 
 const defaultSettings: SiteSettings = {
-    site_name: 'Maries Hair',
+    site_name: process.env.NEXT_PUBLIC_SITE_NAME || 'Mamator',
     site_tagline: 'Hair care and beauty.',
     site_logo: '/logo.png',
     contact_email: '',
@@ -96,7 +96,7 @@ const CMSContext = createContext<CMSContextType>({
 
 export function CMSProvider({ children }: { children: ReactNode }) {
     const [settings, setSettings] = useState<SiteSettings>({
-        site_name: 'Maries Hair',
+        site_name: process.env.NEXT_PUBLIC_SITE_NAME || 'Mamator',
         site_tagline: 'Hair care and beauty.',
         site_logo: '/logo.png',
         contact_email: '',

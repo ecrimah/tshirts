@@ -255,11 +255,12 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
     category: product.category
   });
 
+  const siteUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://mamator.com').replace(/\/+$/, '');
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: 'Home', url: 'https://standardecom.com' },
-    { name: 'Shop', url: 'https://standardecom.com/shop' },
-    { name: product.category, url: `https://standardecom.com/shop?category=${product.category.toLowerCase().replace(/\s+/g, '-')}` },
-    { name: product.name, url: `https://standardecom.com/product/${slug}` }
+    { name: 'Home', url: siteUrl },
+    { name: 'Shop', url: `${siteUrl}/shop` },
+    { name: product.category, url: `${siteUrl}/shop?category=${product.category.toLowerCase().replace(/\s+/g, '-')}` },
+    { name: product.name, url: `${siteUrl}/product/${slug}` }
   ]);
 
   return (

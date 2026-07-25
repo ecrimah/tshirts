@@ -30,12 +30,12 @@ export default function PWASplash() {
       <div className="pwa-splash-logo mb-6">
         <img
           src="/logo.png"
-          alt="Maries Hair"
+          alt="Mamator"
           className="w-24 h-24 object-contain rounded-full"
         />
       </div>
       <div className="z-10 flex flex-col items-center animate-fade-in-up delay-300">
-        <h1 className="text-white text-xl font-bold font-serif mb-2">Maries Hair</h1>
+        <h1 className="text-white text-xl font-bold font-serif mb-2">Mamator</h1>
         <p className="text-stone-200 text-sm font-medium mb-8">Premium hair and luxury extensions</p>
         <div className="flex gap-2">
           <span className="w-2 h-2 bg-white rounded-full" />

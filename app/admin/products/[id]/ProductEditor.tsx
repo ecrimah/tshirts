@@ -409,7 +409,7 @@ export default function ProductEditor({ productId }: { productId: string }) {
                 </label>
                 <div className="flex items-center">
                   <span className="text-gray-600 bg-gray-100 px-4 py-3 border-2 border-r-0 border-gray-300 rounded-l-lg">
-                    elegancemart.com/product/
+                    mamator.com/product/
                   </span>
                   <input
                     type="text"
@@ -425,7 +425,7 @@ export default function ProductEditor({ productId }: { productId: string }) {
                 </label>
                 <input
                   type="text"
-                  defaultValue="Maries Hair, hair care, beauty"
+                  defaultValue="Mamator, Ghana, shop online"
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-stone-500"
                 />
                 <p className="text-sm text-gray-500 mt-2">Separate keywords with commas</p>
