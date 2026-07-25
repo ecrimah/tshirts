@@ -174,7 +174,6 @@ export default function Footer() {
                 <li><Link href="/about" className={footerLinkClass}>Our Story</Link></li>
                 <li><Link href="/privacy" className={footerLinkClass}>Privacy Policy</Link></li>
                 <li><Link href="/terms" className={footerLinkClass}>Terms of Service</Link></li>
-                <li><Link href="/admin" className={footerLinkClass}>Admin Access</Link></li>
               </ul>
             </div>
           </div>
@@ -182,7 +181,15 @@ export default function Footer() {
 
         <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-store-muted text-center md:text-left">
-            &copy; {new Date().getFullYear()} {legalName}. All rights reserved.
+            <Link
+              href="/admin/login"
+              className="hover:text-store-primary transition-colors"
+              aria-label="Admin login"
+              title="Admin"
+            >
+              &copy;
+            </Link>{' '}
+            {new Date().getFullYear()} {legalName}. All rights reserved.
           </p>
           <div className="flex gap-4 text-store-muted text-2xl" aria-label="Accepted payment methods">
             <i className="ri-visa-line" aria-hidden />
