@@ -28,8 +28,8 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-# Local uploads + one-time migration artifacts
-uploads/
+# Local uploads + one-time migration artifacts (root only — keep app/api/uploads)
+/uploads/
 migration-data/
 
 # Vercel
