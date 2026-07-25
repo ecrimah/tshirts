@@ -40,7 +40,15 @@ export const BRAND_ASSETS = {
 } as const;
 
 export function absoluteAsset(path: string): string {
-  return `${getSiteUrl()}${path.startsWith('/') ? path : `/${path}`}`;
+  return `${getSiteUrl()}${path.startsWith('/') ? path : `/${path}`}`}`;
+}
+
+/** Prefer bundled Mamator logo; ignore legacy CMS paths until admin uploads a new one. */
+export function resolveSiteLogo(stored?: string | null): string {
+  const value = stored?.trim();
+  if (!value) return BRAND_ASSETS.logo;
+  if (value === '/logo.svg' || value.includes('supabase.co/storage')) return BRAND_ASSETS.logo;
+  return value;
 }
 
 /** Default contact for structured data (overridden when site_settings are populated). */

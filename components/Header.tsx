@@ -10,6 +10,7 @@ import { useStorePricing } from '@/context/StorePricingContext';
 import { resolveProductPrice } from '@/lib/pricing';
 import { useDebouncedValue } from '@/components/useDebouncedValue';
 import type { StorefrontSearchHit } from '@/lib/storefront-search-types';
+import { resolveSiteLogo } from '@/lib/site-brand';
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -26,7 +27,7 @@ export default function Header() {
   const { getSetting } = useCMS();
 
   const siteName = getSetting('site_name') || process.env.NEXT_PUBLIC_SITE_NAME || 'Mamator';
-  const headerLogo = getSetting('site_logo') || '/logo.png';
+  const headerLogo = resolveSiteLogo(getSetting('site_logo'));
   const contactEmail = getSetting('contact_email') || 'info@mamator.com';
   const contactPhone = getSetting('contact_phone') || '';
 
@@ -134,12 +135,15 @@ export default function Header() {
                 <Link
                   href="/"
                   className="flex items-center select-none shrink-0"
-                  aria-label="Go to homepage"
+                  aria-label={`${siteName} — home`}
                 >
-                  <span className="text-2xl md:text-3xl font-bold text-store-ink tracking-tight">
-                    {siteName}
-                    <span className="text-store-primary">.</span>
-                  </span>
+                  <img
+                    src={headerLogo}
+                    alt={siteName}
+                    width={48}
+                    height={48}
+                    className="h-11 w-11 md:h-12 md:w-12 object-contain"
+                  />
                 </Link>
               </div>
 
@@ -362,7 +366,7 @@ export default function Header() {
           <div className="absolute top-0 left-0 bottom-0 w-4/5 max-w-xs bg-white shadow-xl flex flex-col animate-in slide-in-from-left duration-300">
             <div className="p-4 border-b border-gray-100 flex items-center justify-between">
               <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
-                <img src={headerLogo} alt={siteName} className="h-12 w-auto object-contain drop-shadow-md" style={{ filter: 'contrast(1.2) brightness(0.95)' }} />
+                <img src={headerLogo} alt={siteName} className="h-12 w-12 object-contain" />
               </Link>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}

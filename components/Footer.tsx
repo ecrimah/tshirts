@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCMS } from '@/context/CMSContext';
+import { resolveSiteLogo } from '@/lib/site-brand';
 
 const footerLinkClass =
   'text-white/90 hover:text-store-primary transition-colors text-sm leading-relaxed';
@@ -56,7 +57,7 @@ export default function Footer() {
 
   const siteName = getSetting('site_name') || 'Mamator';
   const legalName = getSetting('company_legal_name') || 'Mamator Trading Enterprise';
-  const siteLogo = getSetting('site_logo') || '/logo.png';
+  const siteLogo = resolveSiteLogo(getSetting('site_logo'));
   const address = getSetting('contact_address') || 'Accra, Kasoa, Koforidua';
   const email = getSetting('contact_email') || 'info@mamator.com';
   const phonePrimary = formatGhanaPhoneDisplay(getSetting('contact_phone') || '0249628324');
