@@ -56,7 +56,7 @@ export async function POST(request: Request) {
           .replace(/\d+/g, ' ')
           .replace(/\s+/g, ' ')
           .trim()
-          .replace(/\b\w/g, (c) => c.toUpperCase()) || 'Newsletter';
+          .replace(/\b\w/g, (c: string) => c.toUpperCase()) || 'Newsletter';
       await query(
         `INSERT INTO customers (email, full_name, tags)
          VALUES ($1, $2, $3::text[])`,
