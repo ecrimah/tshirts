@@ -22,18 +22,28 @@ export default function AdminCustomersPage() {
     try {
       setLoading(true);
       const customerData = await api<any[]>('/api/admin/customers');
-      const processed = customerData.map((customer: any) => {
+      const rows = Array.isArray(customerData) ? customerData : [];
+      const processed = rows.map((customer: any) => {
         let status = 'New';
         const totalSpent = Number(customer.total_spent) || 0;
         const totalOrders = customer.total_orders || 0;
         if (totalSpent > 1000) status = 'VIP';
         else if (totalOrders > 0) status = 'Active';
+        const tags: string[] = Array.isArray(customer.tags) ? customer.tags : [];
+        const isNewsletter = tags.includes('newsletter');
+        const rawName = (customer.full_name || '').trim();
+        const name =
+          !rawName || rawName.toLowerCase() === 'newsletter subscriber'
+            ? isNewsletter
+              ? 'Newsletter'
+              : 'No Name'
+            : rawName;
         return {
           id: customer.id,
-          name: customer.full_name || 'No Name',
+          name,
           email: customer.email,
           phone: customer.phone || 'N/A',
-          avatar: getInitials(customer.full_name || customer.email),
+          avatar: getInitials(name !== 'No Name' && name !== 'Newsletter' ? name : customer.email),
           orders: totalOrders,
           totalSpent,
           joined: customer.created_at ? new Date(customer.created_at).toLocaleDateString() : 'N/A',
@@ -42,6 +52,7 @@ export default function AdminCustomersPage() {
           rawJoined: customer.created_at ? new Date(customer.created_at) : new Date(),
           rawLastOrder: customer.last_order_at ? new Date(customer.last_order_at) : null,
           isGuest: !customer.user_id,
+          isNewsletter,
         };
       });
       setCustomers(processed);
@@ -307,6 +318,11 @@ export default function AdminCustomersPage() {
                         {customer.isGuest && (
                           <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
                             Guest
+                          </span>
+                        )}
+                        {customer.isNewsletter && (
+                          <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-store-primary/15 text-store-ink">
+                            Newsletter
                           </span>
                         )}
                       </div>

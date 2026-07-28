@@ -103,8 +103,8 @@ const defaultSettings: SiteSettings = {
     social_tiktok: '',
     social_snapchat: '',
     social_youtube: '',
-    primary_color: '#6ab0ff',
-    secondary_color: '#0a1931',
+    primary_color: '#c9a227',
+    secondary_color: '#0a0a0a',
     currency: 'GHS',
     currency_symbol: 'GH₵',
 };
@@ -136,8 +136,8 @@ export function CMSProvider({ children }: { children: ReactNode }) {
         social_tiktok: '',
         social_snapchat: '',
         social_youtube: '',
-        primary_color: '#6ab0ff',
-        secondary_color: '#0a1931',
+        primary_color: '#c9a227',
+        secondary_color: '#0a0a0a',
         currency: 'GHS',
         currency_symbol: 'GH₵',
     });

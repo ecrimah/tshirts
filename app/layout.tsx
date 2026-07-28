@@ -28,7 +28,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#0a1931',
+  themeColor: '#0a0a0a',
 };
 
 export const metadata: Metadata = {
@@ -124,12 +124,12 @@ export default function RootLayout({
   return (
     <html lang="en-GH">
       <head>
-        <meta name="theme-color" content="#0a1931" />
+        <meta name="theme-color" content="#0a0a0a" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Mamator" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="msapplication-TileColor" content="#0a1931" />
+        <meta name="msapplication-TileColor" content="#0a0a0a" />
         <meta name="msapplication-TileImage" content={BRAND_ASSETS.icon192} />
         <meta name="msapplication-tap-highlight" content="no" />
 

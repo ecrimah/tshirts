@@ -10,24 +10,24 @@ module.exports = {
       },
       colors: {
         brand: {
-          DEFAULT: '#0a1931',
-          light: '#122547',
-          dark: '#061022',
-          accent: '#6ab0ff',
-          muted: '#5e76a6',
+          DEFAULT: '#0a0a0a',
+          light: '#1a1a1a',
+          dark: '#000000',
+          accent: '#c9a227',
+          muted: '#8a7a4a',
         },
         store: {
-          navy: '#0a1931',
-          'navy-light': '#122547',
-          primary: '#6ab0ff',
-          'primary-dark': '#5298eb',
-          ink: '#0a1931',
-          muted: '#5e76a6',
-          surface: '#f3f4f6',
+          // Token names kept for compatibility; values are black / gold / white
+          navy: '#0a0a0a',
+          'navy-light': '#1f1f1f',
+          primary: '#c9a227',
+          'primary-dark': '#a8861f',
+          ink: '#0a0a0a',
+          muted: '#6b6b6b',
+          surface: '#f7f7f5',
         },
       },
     },
   },
   plugins: [],
 }
-

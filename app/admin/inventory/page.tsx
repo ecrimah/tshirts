@@ -22,28 +22,33 @@ export default function InventoryManagementPage() {
     try {
       setLoading(true);
       const data = await api<any[]>('/api/catalog/products?status=all');
-      const mapped = data
+      const rows = Array.isArray(data) ? data : [];
+      const mapped = rows
         .filter((p) => p.status !== 'archived')
         .map((p: any) => {
-          const stock = p.quantity || 0;
+          const stock = asNumber(p.quantity);
           let status = 'good';
-          if (stock === 0) status = 'out';
+          if (stock <= 0) status = 'out';
           else if (stock < 10) status = 'low';
 
-          // categories is an array from the join
-          const categoryData = p.categories as { name: string }[] | null;
+          // API returns a single category object (or null), not an array
+          const categoryName =
+            p.categories?.name ||
+            (Array.isArray(p.categories) ? p.categories[0]?.name : null) ||
+            'Uncategorized';
+
           return {
             id: p.id,
             name: p.name,
             sku: p.sku || 'N/A',
-            category: categoryData?.[0]?.name || 'Uncategorized',
+            category: categoryName,
             currentStock: stock,
-            reorderLevel: 10, // Default
-            reorderQuantity: 50, // Default
+            reorderLevel: 10,
+            reorderQuantity: 50,
             price: asNumber(p.price),
-            cost: 0, // Not in DB
+            cost: 0,
             status,
-            supplier: 'Standard Supplier' // Default
+            supplier: 'Standard Supplier',
           };
         });
       setProducts(mapped);
@@ -161,14 +166,16 @@ export default function InventoryManagementPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex items-center justify-between">
-              <div>
+          <div className="bg-white rounded-xl shadow-sm p-6 overflow-hidden">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
                 <p className="text-sm text-gray-600 mb-1">Total Retail Value</p>
-                <p className="text-3xl font-bold text-store-muted">GH₵{totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 tabular-nums leading-tight break-all">
+                  GH₵{totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                </p>
               </div>
-              <div className="w-12 h-12 flex items-center justify-center bg-store-surface rounded-lg">
-                <i className="ri-money-dollar-circle-line text-2xl text-store-muted"></i>
+              <div className="w-12 h-12 shrink-0 flex items-center justify-center bg-store-surface rounded-lg">
+                <i className="ri-money-dollar-circle-line text-2xl text-store-primary"></i>
               </div>
             </div>
           </div>

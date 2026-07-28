@@ -79,27 +79,28 @@ export default function POSPage() {
             const salesActive = parseStorePricingValue(settingsRes.settings?.store_pricing).sales_active;
 
             const prodData = await api<any[]>('/api/catalog/products?status=active');
-                const formatted: Product[] = prodData.map((p: any) => ({
-                    id: p.id,
-                    name: p.name,
-                    price: resolveProductPrice({
-                        salesActive,
-                        price: p.price,
-                        salePrice: p.sale_price,
-                        compareAtPrice: p.compare_at_price,
-                    }).effective,
-                    quantity: p.quantity,
-                    category: p.categories?.name || 'Uncategorized',
-                    image: p.product_images?.[0]?.url || 'https://via.placeholder.com/150',
-                    sku: p.sku
-                }));
-                setProducts(formatted);
+            const productList = Array.isArray(prodData) ? prodData : [];
+            const formatted: Product[] = productList.map((p: any) => ({
+                id: p.id,
+                name: p.name,
+                price: resolveProductPrice({
+                    salesActive,
+                    price: p.price,
+                    salePrice: p.sale_price,
+                    compareAtPrice: p.compare_at_price,
+                }).effective,
+                quantity: asNumber(p.quantity),
+                category: p.categories?.name || 'Uncategorized',
+                image: p.product_images?.[0]?.url || '/logo.png',
+                sku: p.sku || '',
+            }));
+            setProducts(formatted);
 
-                const cats = Array.from(new Set(formatted.map(p => p.category))).sort();
-                setCategories(['All', ...cats]);
+            const cats = Array.from(new Set(formatted.map((p) => p.category))).sort();
+            setCategories(['All', ...cats]);
 
             const custData = await api<any[]>('/api/admin/customers');
-            setCustomers(custData.slice(0, 200));
+            setCustomers(Array.isArray(custData) ? custData.slice(0, 200) : []);
 
         } catch (error) {
             console.error('Error fetching POS data:', error);
@@ -110,31 +111,39 @@ export default function POSPage() {
 
     // Cart Functions
     const addToCart = (product: Product) => {
-        setCart(prev => {
-            const existing = prev.find(item => item.id === product.id);
+        const stock = asNumber(product.quantity);
+        if (stock <= 0) return;
+
+        setCart((prev) => {
+            const existing = prev.find((item) => item.id === product.id);
             if (existing) {
-                return prev.map(item =>
+                if (existing.cartQuantity >= stock) return prev;
+                return prev.map((item) =>
                     item.id === product.id
                         ? { ...item, cartQuantity: item.cartQuantity + 1 }
                         : item
                 );
             }
-            return [...prev, { ...product, cartQuantity: 1 }];
+            return [...prev, { ...product, quantity: stock, cartQuantity: 1 }];
         });
     };
 
     const removeFromCart = (productId: string) => {
-        setCart(prev => prev.filter(item => item.id !== productId));
+        setCart((prev) => prev.filter((item) => item.id !== productId));
     };
 
     const updateQuantity = (productId: string, delta: number) => {
-        setCart(prev => prev.map(item => {
-            if (item.id === productId) {
-                const newQty = item.cartQuantity + delta;
-                return newQty > 0 ? { ...item, cartQuantity: newQty } : item;
-            }
-            return item;
-        }));
+        setCart((prev) =>
+            prev
+                .map((item) => {
+                    if (item.id !== productId) return item;
+                    const stock = asNumber(item.quantity);
+                    const next = Math.min(stock, item.cartQuantity + delta);
+                    if (next <= 0) return null;
+                    return { ...item, cartQuantity: next };
+                })
+                .filter((item): item is CartItem => item != null)
+        );
     };
 
     const emptyCart = () => setCart([]);
@@ -167,8 +176,8 @@ export default function POSPage() {
 
     // Get the customer email and phone for the order
     const getOrderEmail = () => {
-        if (selectedCustomer) return selectedCustomer.email;
-        return guestDetails.email || 'pos-walkin@store.local';
+        if (selectedCustomer?.email?.trim()) return selectedCustomer.email.trim();
+        return guestDetails.email.trim() || 'pos-walkin@store.local';
     };
 
     const getOrderPhone = () => {
@@ -239,8 +248,9 @@ export default function POSPage() {
                 settingsRes.settings?.store_pricing
             ).sales_active;
             const checkoutProducts = await api<any[]>('/api/catalog/products?status=active');
+            const checkoutList = Array.isArray(checkoutProducts) ? checkoutProducts : [];
             const checkoutProductMap = new Map(
-                checkoutProducts.filter((p) => cartIds.includes(p.id)).map((p: any) => [p.id, p])
+                checkoutList.filter((p) => cartIds.includes(p.id)).map((p: any) => [p.id, p])
             );
 
             let posSubtotal = 0;
@@ -323,7 +333,7 @@ export default function POSPage() {
             if (upsertEmail) {
                 try {
                     const custData = await api<any[]>('/api/admin/customers');
-                    setCustomers(custData.slice(0, 200));
+                    setCustomers(Array.isArray(custData) ? custData.slice(0, 200) : []);
                 } catch (custErr) {
                     console.error('Customer refresh error (non-fatal):', custErr);
                 }
@@ -454,11 +464,17 @@ export default function POSPage() {
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 pb-20 lg:pb-4">
-                            {filteredProducts.map(product => (
+                            {filteredProducts.map((product) => {
+                                const outOfStock = asNumber(product.quantity) <= 0;
+                                return (
                                 <div
                                     key={product.id}
-                                    onClick={() => addToCart(product)}
-                                    className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden border border-gray-100 group flex flex-col h-full"
+                                    onClick={() => !outOfStock && addToCart(product)}
+                                    className={`bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 group flex flex-col h-full ${
+                                      outOfStock
+                                        ? 'opacity-60 cursor-not-allowed'
+                                        : 'hover:shadow-md transition-shadow cursor-pointer'
+                                    }`}
                                 >
                                     <div className="aspect-square relative bg-gray-50 shrink-0">
                                         <img
@@ -466,21 +482,28 @@ export default function POSPage() {
                                             alt={product.name}
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                         />
-                                        <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
-                                            Qty: {product.quantity}
+                                        <div className={`absolute top-2 right-2 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm ${
+                                          outOfStock ? 'bg-red-600/90' : 'bg-black/60'
+                                        }`}>
+                                            {outOfStock ? 'Out of stock' : `Qty: ${product.quantity}`}
                                         </div>
                                     </div>
                                     <div className="p-3 flex flex-col flex-1">
                                         <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 mb-auto">{product.name}</h3>
                                         <div className="flex items-center justify-between mt-2 pt-2">
                                             <span className="text-store-ink font-bold">GH₵{money(product.price)}</span>
-                                            <button className="w-8 h-8 rounded-full bg-store-surface text-store-ink flex items-center justify-center group-hover:bg-store-navy group-hover:text-white transition-colors">
+                                            <button
+                                              type="button"
+                                              disabled={outOfStock}
+                                              className="w-8 h-8 rounded-full bg-store-surface text-store-ink flex items-center justify-center group-hover:bg-black group-hover:text-store-primary transition-colors disabled:opacity-40"
+                                            >
                                                 <i className="ri-add-line"></i>
                                             </button>
                                         </div>
                                     </div>
                                 </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
                 </div>

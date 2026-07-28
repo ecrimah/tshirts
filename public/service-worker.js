@@ -1,5 +1,5 @@
 // Service Worker — network-first pages; no HTML shell cache (playbook §16)
-const CACHE_VERSION = 'sw-v2.4';
+const CACHE_VERSION = 'sw-v2.5';
 const STATIC_CACHE = `static-${CACHE_VERSION}`;
 const IMAGE_CACHE = `images-${CACHE_VERSION}`;
 const API_CACHE = `api-${CACHE_VERSION}`;
@@ -76,7 +76,7 @@ self.addEventListener('fetch', (event) => {
       event.respondWith(
         fetch(request).catch(() => {
           const html =
-            '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin – Connection required</title><style>body{font-family:system-ui,sans-serif;margin:0;min-height:100vh;display:flex;align-items:center;justify-center;background:#f3f4f6}.box{text-align:center;max-width:24rem;padding:2rem}h1{font-size:1.5rem;color:#0a1931;margin-bottom:.5rem}p{color:#5e76a6;margin-bottom:1.5rem}a{display:inline-block;background:#6ab0ff;color:#0a1931;padding:.75rem 1.5rem;border-radius:.5rem;text-decoration:none;font-weight:600}</style></head><body><div class="box"><h1>Connection required</h1><p>Admin needs an internet connection.</p><a href="/admin">Try again</a></div></body></html>';
+            '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin – Connection required</title><style>body{font-family:system-ui,sans-serif;margin:0;min-height:100vh;display:flex;align-items:center;justify-center;background:#f7f7f5}.box{text-align:center;max-width:24rem;padding:2rem}h1{font-size:1.5rem;color:#0a0a0a;margin-bottom:.5rem}p{color:#6b6b6b;margin-bottom:1.5rem}a{display:inline-block;background:#c9a227;color:#0a0a0a;padding:.75rem 1.5rem;border-radius:.5rem;text-decoration:none;font-weight:600}</style></head><body><div class="box"><h1>Connection required</h1><p>Admin needs an internet connection.</p><a href="/admin">Try again</a></div></body></html>';
           return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
         })
       );

@@ -8,34 +8,84 @@ import {
   type HomeCategory,
   categoryImageUrl,
   categoryShopHref,
-  isCategoryFeatured,
   pickHomeCategories,
 } from '@/lib/home-categories';
 
+type SlideCopy = {
+  script: string;
+  title: string;
+  subtitle: string;
+  cta: string;
+};
+
+/** Brand-led hero copy — category images/links still come from admin categories. */
+const DEFAULT_SLIDE_COPY: SlideCopy = {
+  script: 'Mamator',
+  title: "Ghana's Trusted Plain T-Shirt Supplier",
+  subtitle: 'Wholesale & Retail • Premium Quality • Nationwide Delivery',
+  cta: 'Shop Now',
+};
+
+const SLIDE_COPY_BY_SLUG: { match: RegExp; copy: SlideCopy }[] = [
+  {
+    match: /plain|basic/i,
+    copy: {
+      script: 'Mamator',
+      title: "Ghana's Trusted Plain T-Shirt Supplier",
+      subtitle: 'Wholesale & Retail • Premium Quality • Nationwide Delivery',
+      cta: 'Shop Plains',
+    },
+  },
+  {
+    match: /graphic/i,
+    copy: {
+      script: 'Graphics',
+      title: 'Bold Graphic Tees for Every Brand',
+      subtitle: 'Wholesale & Retail • Custom Prints • Nationwide Delivery',
+      cta: 'Shop Graphics',
+    },
+  },
+  {
+    match: /polo/i,
+    copy: {
+      script: 'Polos',
+      title: 'Polo T-Shirts Built for Business',
+      subtitle: 'Wholesale & Retail • Corporate Ready • Nationwide Delivery',
+      cta: 'Shop Polos',
+    },
+  },
+  {
+    match: /performance|sport|active/i,
+    copy: {
+      script: 'Performance',
+      title: 'Performance Tees That Work Hard',
+      subtitle: 'Wholesale & Retail • Durable Wear • Nationwide Delivery',
+      cta: 'Shop Performance',
+    },
+  },
+];
+
 const FALLBACK_SLIDES = [
   {
-    script: 'Shop',
-    title: 'Mamator Tees',
-    subtitle: 'Quality products from Mamator Trading Enterprise.',
-    cta: 'Shop All',
+    ...DEFAULT_SLIDE_COPY,
     image: TEE_IMAGES.heroFlatLay,
     href: '/shop',
     readMore: '/categories',
   },
   {
-    script: 'New',
-    title: 'Fresh Arrivals',
-    subtitle: 'See the latest styles in our catalog.',
-    cta: 'Browse Shop',
+    script: 'Graphics',
+    title: 'Bold Graphic Tees for Every Brand',
+    subtitle: 'Wholesale & Retail • Custom Prints • Nationwide Delivery',
+    cta: 'Shop Graphics',
     image: TEE_IMAGES.heroGraphic,
     href: '/shop',
     readMore: '/categories',
   },
   {
-    script: 'Collections',
-    title: 'Shop by Category',
-    subtitle: 'Graphic, plain, polo & performance tees.',
-    cta: 'View Categories',
+    script: 'Polos',
+    title: 'Polo T-Shirts Built for Business',
+    subtitle: 'Wholesale & Retail • Corporate Ready • Nationwide Delivery',
+    cta: 'Shop Polos',
     image: TEE_IMAGES.heroPolo,
     href: '/categories',
     readMore: '/about',
@@ -53,21 +103,35 @@ type Slide = {
   readMore: string;
 };
 
+function copyForCategory(cat: HomeCategory, index: number): SlideCopy {
+  const haystack = `${cat.slug} ${cat.name}`;
+  const matched = SLIDE_COPY_BY_SLUG.find((entry) => entry.match.test(haystack));
+  if (matched) return matched.copy;
+  // First slide always gets the flagship supplier message
+  if (index === 0) return DEFAULT_SLIDE_COPY;
+  return {
+    script: 'Mamator',
+    title: cat.name,
+    subtitle: 'Wholesale & Retail • Premium Quality • Nationwide Delivery',
+    cta: 'Shop Now',
+  };
+}
+
 function slidesFromCategories(categories: HomeCategory[]): Slide[] {
   const picked = pickHomeCategories(categories, 3);
   if (picked.length === 0) {
     return FALLBACK_SLIDES.map((s) => ({ ...s, imageClass: 'object-cover object-center' }));
   }
-  return picked.map((cat, i) => ({
-    script: isCategoryFeatured(cat) ? 'Featured' : 'Shop',
-    title: cat.name,
-    subtitle: cat.description?.trim() || `Browse our ${cat.name} collection.`,
-    cta: 'Shop Now',
-    image: categoryImageUrl(cat, i),
-    imageClass: 'object-cover object-center',
-    href: categoryShopHref(cat.slug),
-    readMore: '/categories',
-  }));
+  return picked.map((cat, i) => {
+    const copy = copyForCategory(cat, i);
+    return {
+      ...copy,
+      image: categoryImageUrl(cat, i),
+      imageClass: 'object-cover object-center',
+      href: categoryShopHref(cat.slug),
+      readMore: '/categories',
+    };
+  });
 }
 
 const SLIDE_MS = 6000;
@@ -119,8 +183,8 @@ export default function HomeHeroSlider({ categories = [] }: { categories?: HomeC
                 quality={90}
               />
             )}
-            <div className="absolute inset-0 bg-black/35" />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/25 to-black/50" />
+            <div className="absolute inset-0 bg-black/45" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
           </div>
         ))}
 
@@ -134,21 +198,21 @@ export default function HomeHeroSlider({ categories = [] }: { categories?: HomeC
               {slide.title}
             </h1>
 
-            <p className="mt-5 max-w-lg mx-auto text-base sm:text-lg md:text-xl text-white/80 font-normal leading-relaxed drop-shadow-md">
+            <p className="mt-5 max-w-xl mx-auto text-base sm:text-lg md:text-xl text-white/90 font-normal leading-relaxed drop-shadow-md">
               {slide.subtitle}
             </p>
 
             <div className="mt-9 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
               <Link
                 href={slide.href}
-                className="inline-flex w-full sm:w-auto min-w-[200px] items-center justify-center gap-2 rounded-full bg-store-primary px-10 py-4 text-sm font-bold uppercase tracking-[0.12em] text-store-navy shadow-[0_8px_32px_rgba(106,176,255,0.45)] transition-all hover:bg-white hover:shadow-[0_8px_32px_rgba(255,255,255,0.25)] hover:scale-[1.02] active:scale-[0.98]"
+                className="inline-flex w-full sm:w-auto min-w-[200px] items-center justify-center gap-2 rounded-full bg-store-primary px-10 py-4 text-sm font-bold uppercase tracking-[0.12em] text-black shadow-[0_8px_32px_rgba(201,162,39,0.45)] transition-all hover:bg-white hover:shadow-[0_8px_32px_rgba(255,255,255,0.25)] hover:scale-[1.02] active:scale-[0.98]"
               >
                 {slide.cta}
                 <i className="ri-arrow-right-line text-lg" aria-hidden />
               </Link>
               <Link
                 href={slide.readMore}
-                className="inline-flex w-full sm:w-auto min-w-[200px] items-center justify-center rounded-full border-2 border-white/90 bg-white/10 px-10 py-4 text-sm font-bold uppercase tracking-[0.12em] text-white backdrop-blur-sm transition-all hover:bg-white hover:text-store-navy hover:border-white active:scale-[0.98]"
+                className="inline-flex w-full sm:w-auto min-w-[200px] items-center justify-center rounded-full border-2 border-white/90 bg-white/10 px-10 py-4 text-sm font-bold uppercase tracking-[0.12em] text-white backdrop-blur-sm transition-all hover:bg-white hover:text-black hover:border-white active:scale-[0.98]"
               >
                 Read More
               </Link>

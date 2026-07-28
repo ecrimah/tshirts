@@ -23,14 +23,14 @@ export default function AdminReviewsPage() {
           },
           product: {
             name: r.product_name || 'Unknown Product',
-            image: 'https://via.placeholder.com/150'
+            image: '/logo.png',
           },
           rating: r.rating,
           title: r.title,
           comment: r.content,
           date: new Date(r.created_at).toLocaleDateString(),
           status: r.status || 'pending',
-          helpful: r.helpful_votes || 0
+          helpful: r.helpful_votes || 0,
         }));
       setReviews(formatted);
     } catch (error) {
@@ -38,7 +38,7 @@ export default function AdminReviewsPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [statusFilter]);
 
   useEffect(() => {
     fetchReviews();
@@ -146,7 +146,7 @@ export default function AdminReviewsPage() {
             }`}
         >
           <p className="text-2xl font-bold text-amber-700">{stats.pending}</p>
-          <p className="text-sm text-gray-600 mt-1">Pending Review</p>
+          <p className="text-sm text-gray-600 mt-1">Pending Reviews</p>
         </button>
         <button
           onClick={() => setStatusFilter('approved')}

@@ -49,10 +49,18 @@ export async function POST(request: Request) {
       }
     } else {
       isNewSubscriber = true;
+      const localPart = email.split('@')[0] || 'subscriber';
+      const displayName =
+        localPart
+          .replace(/[._+-]+/g, ' ')
+          .replace(/\d+/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .replace(/\b\w/g, (c) => c.toUpperCase()) || 'Newsletter';
       await query(
         `INSERT INTO customers (email, full_name, tags)
          VALUES ($1, $2, $3::text[])`,
-        [email, 'Newsletter subscriber', [newsletterTag]]
+        [email, displayName, [newsletterTag]]
       );
     }
 

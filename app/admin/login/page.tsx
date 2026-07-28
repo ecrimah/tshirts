@@ -50,7 +50,7 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
-            <span className="inline-flex h-24 w-24 items-center justify-center rounded-full bg-[#0a1931] shadow-lg ring-1 ring-black/10">
+            <span className="inline-flex h-24 w-24 items-center justify-center rounded-full bg-black shadow-lg ring-1 ring-black/10">
               <img
                 src="/logo.png"
                 alt="Mamator Trading Enterprise"
