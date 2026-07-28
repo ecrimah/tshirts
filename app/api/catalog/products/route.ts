@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { query, queryOne } from '@/lib/db';
 import { verifyAuth } from '@/lib/auth';
 import { syncProductMedia } from '@/lib/data/catalog-sync';
+import { PRODUCT_VARIANTS_JSON_SQL } from '@/lib/product-variants';
 
 const PRODUCT_SELECT = `
   p.*,
@@ -11,11 +12,7 @@ const PRODUCT_SELECT = `
      FROM product_images pi WHERE pi.product_id = p.id),
     '[]'::jsonb
   ) AS product_images,
-  COALESCE(
-    (SELECT jsonb_agg(jsonb_build_object('id', pv.id, 'name', pv.name, 'price', pv.price, 'sale_price', pv.sale_price, 'quantity', pv.quantity))
-     FROM product_variants pv WHERE pv.product_id = p.id),
-    '[]'::jsonb
-  ) AS product_variants,
+  ${PRODUCT_VARIANTS_JSON_SQL},
   (SELECT COUNT(*)::int FROM product_variants pv WHERE pv.product_id = p.id) AS variants_count
 `;
 

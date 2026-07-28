@@ -1,4 +1,5 @@
 import { query } from '@/lib/db';
+import { PRODUCT_VARIANTS_JSON_SQL } from '@/lib/product-variants';
 
 export type ProductListOptions = {
   featured?: boolean;
@@ -43,11 +44,7 @@ export async function listProducts(options: ProductListOptions = {}) {
          FROM product_images pi WHERE pi.product_id = p.id),
         '[]'::jsonb
       ) AS product_images,
-      COALESCE(
-        (SELECT jsonb_agg(jsonb_build_object('id', pv.id, 'name', pv.name, 'price', pv.price, 'sale_price', pv.sale_price, 'quantity', pv.quantity))
-         FROM product_variants pv WHERE pv.product_id = p.id),
-        '[]'::jsonb
-      ) AS product_variants
+      ${PRODUCT_VARIANTS_JSON_SQL}
     FROM products p
     LEFT JOIN categories c ON c.id = p.category_id
     ${whereSql}
@@ -71,11 +68,7 @@ export async function getProductBySlug(slug: string) {
          FROM product_images pi WHERE pi.product_id = p.id),
         '[]'::jsonb
       ) AS product_images,
-      COALESCE(
-        (SELECT jsonb_agg(jsonb_build_object('id', pv.id, 'name', pv.name, 'price', pv.price, 'sale_price', pv.sale_price, 'quantity', pv.quantity, 'sku', pv.sku))
-         FROM product_variants pv WHERE pv.product_id = p.id),
-        '[]'::jsonb
-      ) AS product_variants
+      ${PRODUCT_VARIANTS_JSON_SQL}
     FROM products p
     LEFT JOIN categories c ON c.id = p.category_id
     WHERE p.slug = $1 OR p.id::text = $1
