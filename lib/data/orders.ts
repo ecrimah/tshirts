@@ -15,15 +15,18 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 
 async function resolveProductId(idOrSlug: string): Promise<string | null> {
   if (UUID_RE.test(idOrSlug)) {
-    const row = await queryOne<{ id: string }>(`SELECT id FROM products WHERE id = $1::uuid OR slug = $1`, [
-      idOrSlug,
-    ]);
-    return row?.id ?? null;
+    // Cast both sides: a bare $1 after $1::uuid is typed as uuid, so slug = $1 becomes text = uuid.
+    const row = await queryOne<{ id: string }>(
+      `SELECT id FROM products WHERE id = $1::uuid OR slug = $1::text`,
+      [idOrSlug]
+    );
+    return row?.id ? String(row.id) : null;
   }
-  const row = await queryOne<{ id: string }>(`SELECT id FROM products WHERE slug = $1 OR id::text = $1`, [
-    idOrSlug,
-  ]);
-  return row?.id ?? null;
+  const row = await queryOne<{ id: string }>(
+    `SELECT id FROM products WHERE slug = $1::text OR id::text = $1::text`,
+    [idOrSlug]
+  );
+  return row?.id ? String(row.id) : null;
 }
 
 export async function createOrderFromCheckout(input: {
@@ -66,7 +69,7 @@ export async function createOrderFromCheckout(input: {
     [uniqueIds]
   );
 
-  const productMap = new Map(productsResult.rows.map((p) => [p.id, p]));
+  const productMap = new Map(productsResult.rows.map((p) => [String(p.id), p]));
 
   let computedSubtotal = 0;
   const orderItemsPayload: Record<string, unknown>[] = [];
@@ -216,7 +219,7 @@ export async function getOrderById(id: string, userId?: string | null, isStaff?:
          FROM order_items oi WHERE oi.order_id = o.id),
         '[]'::jsonb
       ) AS order_items
-     FROM orders o WHERE o.id = $1::uuid OR o.order_number = $1`,
+     FROM orders o WHERE o.id = $1::uuid OR o.order_number = $1::text`,
     [id]
   );
   if (!row) return null;

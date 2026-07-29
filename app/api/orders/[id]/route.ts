@@ -57,7 +57,7 @@ export async function PATCH(request: Request, context: Ctx) {
 
   try {
     const updated = await queryOne(
-      `UPDATE orders SET ${sets.join(', ')} WHERE id = $1::uuid OR order_number = $1 RETURNING *`,
+      `UPDATE orders SET ${sets.join(', ')} WHERE id = $1::uuid OR order_number = $1::text RETURNING *`,
       params
     );
     if (!updated) {
@@ -67,7 +67,7 @@ export async function PATCH(request: Request, context: Ctx) {
     if (body.status) {
       await query(
         `INSERT INTO order_status_history (order_id, status, notes, created_by)
-         SELECT id, $2::order_status, $3, $4::uuid FROM orders WHERE id = $1::uuid OR order_number = $1`,
+         SELECT id, $2::order_status, $3, $4::uuid FROM orders WHERE id = $1::uuid OR order_number = $1::text`,
         [id, body.status, body.status_note || null, auth.user?.id || null]
       );
     }

@@ -44,9 +44,9 @@ export async function POST(req: Request) {
     const order = await queryOne<OrderRow>(
       isUUID
         ? `SELECT id, order_number, total, email, payment_status::text AS payment_status
-           FROM orders WHERE id = $1::uuid OR order_number = $1 LIMIT 1`
+           FROM orders WHERE id = $1::uuid OR order_number = $1::text LIMIT 1`
         : `SELECT id, order_number, total, email, payment_status::text AS payment_status
-           FROM orders WHERE order_number = $1 LIMIT 1`,
+           FROM orders WHERE order_number = $1::text LIMIT 1`,
       [orderId]
     );
 
