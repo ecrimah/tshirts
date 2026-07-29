@@ -2,16 +2,23 @@ import Link from 'next/link';
 import PageHero from '@/components/PageHero';
 import { listCategories } from '@/lib/data/products';
 
-export const revalidate = 300;
+/** Runtime-only: build containers often lack DATABASE_URL. */
+export const dynamic = 'force-dynamic';
 
 export default async function CategoriesPage() {
-  const categoriesData = (await listCategories(true)) as Array<{
+  let categoriesData: Array<{
     id: string;
     slug: string;
     name: string;
     description?: string | null;
     image_url?: string | null;
-  }>;
+  }> = [];
+
+  try {
+    categoriesData = (await listCategories(true)) as typeof categoriesData;
+  } catch (err) {
+    console.error('[categories] Failed to load categories:', err);
+  }
 
   const palette = [
     { color: 'from-store-navy-light to-store-navy', icon: 'ri-store-2-line' },
