@@ -37,8 +37,8 @@ export async function createOrderFromCheckout(input: {
   shippingCost?: number;
   tax?: number;
 }) {
-  const shippingCost = input.shippingCost ?? 0;
-  const tax = input.tax ?? 0;
+  const shippingCost = Math.max(0, Number(input.shippingCost) || 0);
+  const tax = Math.max(0, Number(input.tax) || 0);
 
   const pricingRow = await queryOne<{ value: unknown }>(
     `SELECT value FROM site_settings WHERE key = 'store_pricing' LIMIT 1`
@@ -72,6 +72,7 @@ export async function createOrderFromCheckout(input: {
   const orderItemsPayload: Record<string, unknown>[] = [];
 
   for (const { item, productId } of resolvedLines) {
+    const qty = Math.max(1, Math.floor(Number(item.quantity) || 0));
     const p = productMap.get(productId) as Record<string, unknown> | undefined;
     if (!p) {
       throw new Error(`Product not found: ${item.name}. Please remove it from your cart and try again.`);
@@ -81,15 +82,15 @@ export async function createOrderFromCheckout(input: {
       item.variant,
       salesActive
     );
-    computedSubtotal += unit * item.quantity;
+    computedSubtotal += unit * qty;
     const prodMeta = (p.metadata || {}) as Record<string, unknown>;
     orderItemsPayload.push({
       product_id: productId,
       product_name: item.name,
       variant_name: item.variant || null,
-      quantity: item.quantity,
+      quantity: qty,
       unit_price: unit,
-      total_price: unit * item.quantity,
+      total_price: unit * qty,
       metadata: {
         image: item.image,
         slug: item.slug,

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { queryOne } from '@/lib/db';
+import { query, queryOne } from '@/lib/db';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
 
 type OrderRow = {
@@ -93,11 +93,24 @@ export async function POST(req: Request) {
         'X-API-PUBKEY': process.env.MOOLRE_API_PUBKEY,
       },
       body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(15_000),
     });
 
     const result = await response.json();
 
     if (result.status === 1 && result.data?.authorization_url) {
+      await query(
+        `UPDATE orders SET metadata = COALESCE(metadata, '{}'::jsonb) || $2::jsonb WHERE id = $1::uuid`,
+        [
+          order.id,
+          JSON.stringify({
+            moolre_externalref: uniqueRef,
+            moolre_reference: result.data.reference || uniqueRef,
+            payment_link_created_at: new Date().toISOString(),
+          }),
+        ]
+      );
+
       return NextResponse.json({
         success: true,
         url: result.data.authorization_url,

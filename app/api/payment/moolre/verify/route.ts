@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { query, queryOne } from '@/lib/db';
 import { sendOrderConfirmation } from '@/lib/notifications';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
+import { resolveMoolreExternalRefForOrder, verifyMoolrePayment } from '@/lib/payment/moolre';
 
 type OrderRow = {
   id: string;
@@ -73,40 +74,10 @@ export async function POST(req: Request) {
       }, { status: 503 });
     }
 
-    let moolreApiVerified = false;
+    const externalRef = await resolveMoolreExternalRefForOrder(orderNumber);
+    const apiCheck = await verifyMoolrePayment(externalRef, Number(order.total));
 
-    try {
-      const checkResponse = await fetch('https://api.moolre.com/embed/status', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-USER': process.env.MOOLRE_API_USER,
-          'X-API-PUBKEY': process.env.MOOLRE_API_PUBKEY,
-        },
-        body: JSON.stringify({ externalref: orderNumber }),
-      });
-
-      const checkResult = await checkResponse.json();
-      const statusStr = String(checkResult.data?.status || '').toLowerCase();
-      moolreApiVerified =
-        checkResult.status === 1 &&
-        checkResult.data &&
-        (statusStr === 'success' ||
-          statusStr === 'successful' ||
-          statusStr === 'completed' ||
-          statusStr === 'paid');
-
-      if (moolreApiVerified && checkResult.data?.amount) {
-        const paidAmount = parseFloat(checkResult.data.amount);
-        if (Math.abs(paidAmount - Number(order.total)) > 0.01) {
-          moolreApiVerified = false;
-        }
-      }
-    } catch (moolreError: unknown) {
-      console.warn('[Verify] Moolre API check failed:', moolreError);
-    }
-
-    if (!moolreApiVerified) {
+    if (!apiCheck.verified) {
       return NextResponse.json({
         success: false,
         status: order.status,
@@ -115,9 +86,10 @@ export async function POST(req: Request) {
       });
     }
 
+    const wasAlreadyPaid = meta.confirmation_sent_at;
     const paidRow = await queryOne<{ result: OrderJson }>(
       `SELECT mark_order_paid($1, $2) AS result`,
-      [orderNumber, 'moolre-api-verify']
+      [orderNumber, externalRef]
     );
     const orderJson = paidRow?.result;
 
@@ -136,10 +108,16 @@ export async function POST(req: Request) {
       }
     }
 
-    try {
-      await sendOrderConfirmation(orderJson);
-    } catch (notifyError: unknown) {
-      console.error('[Verify] Notification failed:', notifyError);
+    if (!wasAlreadyPaid && orderJson.payment_status === 'paid') {
+      try {
+        await sendOrderConfirmation(orderJson);
+        await query(
+          `UPDATE orders SET metadata = COALESCE(metadata, '{}'::jsonb) || $2::jsonb WHERE order_number = $1`,
+          [orderNumber, JSON.stringify({ confirmation_sent_at: new Date().toISOString() })]
+        );
+      } catch (notifyError: unknown) {
+        console.error('[Verify] Notification failed:', notifyError);
+      }
     }
 
     return NextResponse.json({

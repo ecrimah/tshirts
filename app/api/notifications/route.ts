@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { queryOne } from '@/lib/db';
+import { queryOne, query } from '@/lib/db';
 import { verifyAuth } from '@/lib/auth';
 import { escapeHtml } from '@/lib/sanitize';
 import {
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Type and payload required' }, { status: 400 });
     }
 
-    const adminOnlyTypes = ['campaign', 'order_updated', 'order_status', 'payment_link', 'welcome'];
+    const adminOnlyTypes = ['campaign', 'order_updated', 'order_status', 'payment_link', 'welcome', 'order_created'];
     if (adminOnlyTypes.includes(type)) {
       const auth = await verifyAuth(request, { requireAdmin: true });
       if (!auth.authenticated) {
@@ -48,13 +48,18 @@ export async function POST(request: Request) {
     }
 
     if (type === 'order_created') {
+      const auth = await verifyAuth(request, { requireAdmin: true });
+      if (!auth.authenticated) {
+        return NextResponse.json({ error: auth.error || 'Unauthorized' }, { status: 401 });
+      }
+
       if (!payload.order_number && !payload.id) {
         return NextResponse.json({ error: 'Missing order identifier' }, { status: 400 });
       }
 
       const orderRef = payload.order_number || payload.id;
-      const order = await queryOne<{ id: string; created_at: string }>(
-        `SELECT id, created_at FROM orders WHERE order_number = $1 OR id::text = $1 LIMIT 1`,
+      const order = await queryOne<Record<string, unknown>>(
+        `SELECT * FROM orders WHERE order_number = $1 OR id::text = $1 LIMIT 1`,
         [String(orderRef)]
       );
 
@@ -62,12 +67,16 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Order not found' }, { status: 404 });
       }
 
-      const orderAge = Date.now() - new Date(order.created_at).getTime();
-      if (orderAge > 10 * 60 * 1000) {
-        return NextResponse.json({ error: 'Order confirmation can only be sent for recent orders' }, { status: 400 });
+      const meta = (order.metadata || {}) as Record<string, unknown>;
+      if (meta.confirmation_sent_at) {
+        return NextResponse.json({ success: true, message: 'Confirmation already sent' });
       }
 
-      await sendOrderConfirmation(payload);
+      await sendOrderConfirmation(order);
+      await query(
+        `UPDATE orders SET metadata = COALESCE(metadata, '{}'::jsonb) || $2::jsonb WHERE id = $1::uuid`,
+        [order.id, JSON.stringify({ confirmation_sent_at: new Date().toISOString() })]
+      );
       return NextResponse.json({ success: true, message: 'Order confirmation sent' });
     }
 

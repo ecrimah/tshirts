@@ -2,6 +2,14 @@ import { NextResponse } from 'next/server';
 import { query, queryOne } from '@/lib/db';
 import { sendOrderConfirmation } from '@/lib/notifications';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
+import {
+  assertCallbackSecretConfigured,
+  callbackIndicatesSuccess,
+  extractOrderRefFromCallback,
+  resolveMoolreExternalRefForOrder,
+  validateCallbackSecret,
+  verifyMoolrePayment,
+} from '@/lib/payment/moolre';
 
 type OrderJson = Record<string, unknown> & {
   id?: string;
@@ -9,6 +17,7 @@ type OrderJson = Record<string, unknown> & {
   email?: string;
   total?: number;
   payment_status?: string;
+  metadata?: Record<string, unknown> | null;
 };
 
 async function markOrderPaid(orderRef: string, moolreRef: string): Promise<OrderJson | null> {
@@ -20,7 +29,12 @@ async function markOrderPaid(orderRef: string, moolreRef: string): Promise<Order
 }
 
 export async function POST(req: Request) {
-  console.log('[Callback] POST received at', new Date().toISOString());
+  try {
+    assertCallbackSecretConfigured();
+  } catch (configErr) {
+    console.error('[Callback]', configErr);
+    return NextResponse.json({ success: false, message: 'Payment callback not configured' }, { status: 503 });
+  }
 
   try {
     const clientId = getClientIdentifier(req);
@@ -51,47 +65,26 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, message: 'Invalid Request Body' }, { status: 400 });
     }
 
-    const expectedSecret = process.env.MOOLRE_CALLBACK_SECRET;
-    if (expectedSecret) {
-      if (!body.secret || body.secret !== expectedSecret) {
-        return NextResponse.json({ success: false, message: 'Invalid callback signature' }, { status: 403 });
-      }
+    if (!validateCallbackSecret(body)) {
+      return NextResponse.json({ success: false, message: 'Invalid callback signature' }, { status: 403 });
     }
 
-    const data = (body.data || {}) as Record<string, unknown>;
-    const rawExternalRef =
-      data.externalref ||
-      data.external_reference ||
-      data.orderRef ||
-      body.externalref ||
-      body.orderRef ||
-      body.external_reference;
-
-    const rawRefStr = rawExternalRef ? String(rawExternalRef) : '';
-    const metadata = (data.metadata || body.metadata || {}) as Record<string, unknown>;
-    const merchantOrderRef = rawRefStr
-      ? rawRefStr.replace(/-R\d+$/, '')
-      : String(metadata.original_order_number || '');
-
-    const moolreReference = String(
-      data.transactionid || data.thirdpartyref || body.reference || 'callback'
-    );
-
-    const apiStatus = body.status;
-    const txStatus = data.txtstatus;
-    const messageStr = String(body.message || '').toLowerCase();
+    const { merchantOrderRef, moolreReference, rawExternalRef } = extractOrderRefFromCallback(body);
 
     if (!merchantOrderRef) {
       return NextResponse.json({ success: false, message: 'Missing order reference' }, { status: 400 });
     }
 
-    const apiOk = apiStatus === 1 || apiStatus === '1';
-    const txOk = txStatus === 1 || txStatus === '1';
-    const isSuccess = (apiOk || txOk) && !messageStr.includes('fail') && !messageStr.includes('error');
+    const isSuccess = callbackIndicatesSuccess(body);
 
     if (isSuccess) {
-      const existingOrder = await queryOne<{ id: string; payment_status: string; total: number }>(
-        `SELECT id, payment_status::text AS payment_status, total FROM orders WHERE order_number = $1`,
+      const existingOrder = await queryOne<{
+        id: string;
+        payment_status: string;
+        total: number;
+        metadata: Record<string, unknown> | null;
+      }>(
+        `SELECT id, payment_status::text AS payment_status, total, metadata FROM orders WHERE order_number = $1`,
         [merchantOrderRef]
       );
 
@@ -103,21 +96,37 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: true, message: 'Order already processed' });
       }
 
+      const data = (body.data || {}) as Record<string, unknown>;
       const callbackAmount = data.amount
         ? parseFloat(String(data.amount))
         : body.amount
           ? parseFloat(String(body.amount))
           : null;
-      if (callbackAmount !== null) {
-        const expectedAmount = Number(existingOrder.total);
-        if (Math.abs(callbackAmount - expectedAmount) > 0.01) {
+
+      const externalRef =
+        rawExternalRef ||
+        String(existingOrder.metadata?.moolre_externalref || '') ||
+        (await resolveMoolreExternalRefForOrder(merchantOrderRef));
+
+      const apiCheck = await verifyMoolrePayment(externalRef, Number(existingOrder.total));
+      if (!apiCheck.verified) {
+        if (callbackAmount != null) {
+          const expectedAmount = Number(existingOrder.total);
+          if (Math.abs(callbackAmount - expectedAmount) > 0.01) {
+            return NextResponse.json(
+              { success: false, message: 'Payment amount does not match order total' },
+              { status: 400 }
+            );
+          }
+        } else {
           return NextResponse.json(
-            { success: false, message: 'Payment amount does not match order total' },
+            { success: false, message: 'Payment could not be verified with provider' },
             { status: 400 }
           );
         }
       }
 
+      const wasAlreadyPaid = existingOrder.metadata?.confirmation_sent_at;
       const orderJson = await markOrderPaid(merchantOrderRef, moolreReference);
       if (!orderJson?.id) {
         return NextResponse.json({ success: false, message: 'Database update failed' }, { status: 500 });
@@ -134,10 +143,16 @@ export async function POST(req: Request) {
         }
       }
 
-      try {
-        await sendOrderConfirmation(orderJson);
-      } catch (notifyError: unknown) {
-        console.error('[Callback] Notification failed:', notifyError);
+      if (!wasAlreadyPaid && orderJson.payment_status === 'paid') {
+        try {
+          await sendOrderConfirmation(orderJson);
+          await query(
+            `UPDATE orders SET metadata = COALESCE(metadata, '{}'::jsonb) || $2::jsonb WHERE order_number = $1`,
+            [merchantOrderRef, JSON.stringify({ confirmation_sent_at: new Date().toISOString() })]
+          );
+        } catch (notifyError: unknown) {
+          console.error('[Callback] Notification failed:', notifyError);
+        }
       }
 
       return NextResponse.json({ success: true, message: 'Payment verified and Order Updated' });
@@ -146,7 +161,7 @@ export async function POST(req: Request) {
     await query(
       `UPDATE orders SET payment_status = 'failed'::payment_status,
        metadata = COALESCE(metadata, '{}'::jsonb) || $2::jsonb
-       WHERE order_number = $1`,
+       WHERE order_number = $1 AND payment_status <> 'paid'::payment_status`,
       [
         merchantOrderRef,
         JSON.stringify({

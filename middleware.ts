@@ -20,9 +20,7 @@ export async function middleware(request: NextRequest) {
       return response;
     }
 
-    const token =
-      request.cookies.get(COOKIE_NAME)?.value ||
-      request.cookies.get('sb-access-token')?.value;
+    const token = request.cookies.get(COOKIE_NAME)?.value;
 
     if (!token) {
       const loginUrl = new URL('/admin/login', request.url);
