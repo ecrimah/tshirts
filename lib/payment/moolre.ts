@@ -73,10 +73,8 @@ export async function getStoredMoolreExternalRef(orderNumber: string): Promise<s
   return row?.externalref ?? null;
 }
 
-export async function verifyMoolrePayment(
-  externalRef: string,
-  expectedTotal?: number
-): Promise<MoolreVerifyResult> {
+/** Fetch gateway status without requiring amount match (for reconciliation). */
+export async function fetchMoolrePaymentStatus(externalRef: string): Promise<MoolreVerifyResult> {
   const creds = moolreCredentials();
   if (!creds || !externalRef) {
     return { verified: false };
@@ -98,33 +96,41 @@ export async function verifyMoolrePayment(
     });
 
     const checkResult = await checkResponse.json();
-    const statusStr = String(checkResult.data?.status || '').toLowerCase();
+    const statusStr = String(checkResult.data?.status || checkResult.message || '').toLowerCase();
     const verified =
       checkResult.status === 1 &&
-      checkResult.data &&
+      !!checkResult.data &&
       (statusStr === 'success' ||
         statusStr === 'successful' ||
         statusStr === 'completed' ||
         statusStr === 'paid');
 
-    if (!verified) {
-      return { verified: false, raw: checkResult };
-    }
-
     const amount = checkResult.data?.amount ? parseFloat(String(checkResult.data.amount)) : undefined;
-    if (expectedTotal != null && amount != null) {
-      if (Math.abs(amount - expectedTotal) > 0.01) {
-        return { verified: false, amount, status: statusStr, raw: checkResult };
-      }
-    }
-
-    return { verified: true, amount, status: statusStr, raw: checkResult };
+    return { verified, amount, status: statusStr || undefined, raw: checkResult };
   } catch (err) {
-    console.warn('[Moolre] verify failed:', err instanceof Error ? err.message : err);
+    console.warn('[Moolre] status fetch failed:', err instanceof Error ? err.message : err);
     return { verified: false };
   } finally {
     clearTimeout(timeout);
   }
+}
+
+export async function verifyMoolrePayment(
+  externalRef: string,
+  expectedTotal?: number
+): Promise<MoolreVerifyResult> {
+  const result = await fetchMoolrePaymentStatus(externalRef);
+  if (!result.verified) {
+    return result;
+  }
+
+  if (expectedTotal != null && result.amount != null) {
+    if (Math.abs(result.amount - expectedTotal) > 0.01) {
+      return { ...result, verified: false };
+    }
+  }
+
+  return result;
 }
 
 export async function resolveMoolreExternalRefForOrder(orderNumber: string): Promise<string> {

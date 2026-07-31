@@ -140,6 +140,11 @@ export default function AdminLayout({
       badge: ''
     },
     {
+      title: 'Payment Reconcile',
+      icon: 'ri-refund-2-line',
+      path: '/admin/payments/reconcile',
+    },
+    {
       title: 'POS System',
       icon: 'ri-store-3-line',
       path: '/admin/pos'
