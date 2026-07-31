@@ -23,7 +23,8 @@ export function isCategoryFeatured(cat: HomeCategory): boolean {
 }
 
 export function sortCategoriesForHome(categories: HomeCategory[]): HomeCategory[] {
-  return [...categories].sort((a, b) => (a.position ?? 999) - (b.position ?? 999));
+  const list = Array.isArray(categories) ? categories : [];
+  return [...list].sort((a, b) => (a.position ?? 999) - (b.position ?? 999));
 }
 
 /** Featured categories first (admin “Feature on homepage”), then by position. */

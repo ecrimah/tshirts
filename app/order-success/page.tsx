@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useState, useEffect } from 'react';
+import { Suspense, useState, useEffect, useMemo } from 'react';
 import { api } from '@/lib/api';
+import { asNumber, money } from '@/lib/format-money';
 
 function OrderSuccessContent() {
   const searchParams = useSearchParams();
@@ -13,6 +14,20 @@ function OrderSuccessContent() {
   const [loading, setLoading] = useState(true);
   const [showConfetti, setShowConfetti] = useState(true);
   const [verifying, setVerifying] = useState(false);
+
+  // Stable confetti positions — Math.random() in render causes hydration crashes.
+  const confetti = useMemo(
+    () =>
+      Array.from({ length: 50 }, (_, i) => ({
+        left: ((i * 37) % 100) + (i % 7),
+        top: -((i * 13) % 20),
+        delay: (i % 30) / 10,
+        duration: 3 + (i % 20) / 10,
+        icon: (['heart', 'star', 'gift'] as const)[i % 3],
+        color: (['blue', 'amber', 'blue'] as const)[i % 3],
+      })),
+    []
+  );
 
   useEffect(() => {
     async function fetchOrder() {
@@ -111,24 +126,26 @@ function OrderSuccessContent() {
 
   const orderDate = new Date(order.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   const estimatedDelivery = new Date(new Date(order.created_at).getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-  const pointsEarned = Math.floor(order.total / 10); // Example logic: 1 point per 10 currency units
+  const pointsEarned = Math.floor(asNumber(order.total) / 10);
+  const orderItems = Array.isArray(order.order_items) ? order.order_items : [];
+  const balanceDue = asNumber(order.metadata?.balance_due, asNumber(order.total) / 2);
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-store-surface via-white to-store-surface">
       {showConfetti && (
         <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
-          {[...Array(50)].map((_, i) => (
+          {confetti.map((piece, i) => (
             <div
               key={i}
               className="absolute animate-fall"
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `-${Math.random() * 20}%`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${3 + Math.random() * 2}s`
+                left: `${piece.left}%`,
+                top: `${piece.top}%`,
+                animationDelay: `${piece.delay}s`,
+                animationDuration: `${piece.duration}s`,
               }}
             >
-              <i className={`ri-${['heart', 'star', 'gift'][Math.floor(Math.random() * 3)]}-fill text-${['blue', 'amber', 'blue'][Math.floor(Math.random() * 3)]}-500 text-xl opacity-70`}></i>
+              <i className={`ri-${piece.icon}-fill text-${piece.color}-500 text-xl opacity-70`}></i>
             </div>
           ))}
         </div>
@@ -146,7 +163,7 @@ function OrderSuccessContent() {
             </h1>
             <p className="text-xl text-gray-600 mb-8">
               {order.payment_status === 'partially_paid'
-                ? `Thank you. Half payment received. Remaining GH₵ ${Number(order.metadata?.balance_due || order.total / 2).toFixed(2)} is due before pickup or delivery.`
+                ? `Thank you. Half payment received. Remaining GH₵ ${money(balanceDue)} is due before pickup or delivery.`
                 : order.payment_status === 'paid'
                   ? "Thank you for your purchase. We're processing your order now."
                   : 'Thank you. Your order was placed — complete payment if you have not already.'}
@@ -219,7 +236,7 @@ function OrderSuccessContent() {
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Order Items</h2>
               <div className="space-y-4">
-                {order.order_items.map((item: any) => (
+                {orderItems.map((item: any) => (
                   <div key={item.id} className="flex items-center space-x-4">
                     <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200">
                       <img
@@ -240,23 +257,23 @@ function OrderSuccessContent() {
                         </p>
                       )}
                     </div>
-                    <p className="font-bold text-gray-900">GH₵{item.unit_price.toFixed(2)}</p>
+                    <p className="font-bold text-gray-900">GH₵{money(item.unit_price)}</p>
                   </div>
                 ))}
               </div>
               <div className="border-t border-gray-200 mt-4 pt-4">
                 <div className="flex justify-between text-sm text-gray-600 mb-2">
                   <span>Subtotal</span>
-                  <span>GH₵{order.subtotal.toFixed(2)}</span>
+                  <span>GH₵{money(order.subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm text-gray-600 mb-2">
                   <span>Shipping</span>
-                  <span>GH₵{order.shipping_total.toFixed(2)}</span>
+                  <span>GH₵{money(order.shipping_total)}</span>
                 </div>
 
                 <div className="flex justify-between text-xl font-bold text-gray-900 border-t border-gray-200 pt-2">
                   <span>Total Paid</span>
-                  <span>GH₵{order.total.toFixed(2)}</span>
+                  <span>GH₵{money(order.total)}</span>
                 </div>
               </div>
             </div>

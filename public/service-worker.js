@@ -1,5 +1,5 @@
 // Service Worker — network-first pages; no HTML shell cache (playbook §16)
-const CACHE_VERSION = 'sw-v2.5';
+const CACHE_VERSION = 'sw-v2.6';
 const STATIC_CACHE = `static-${CACHE_VERSION}`;
 const IMAGE_CACHE = `images-${CACHE_VERSION}`;
 const API_CACHE = `api-${CACHE_VERSION}`;
@@ -130,7 +130,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Hashed static assets: cache-first
+  // Next/hashed assets: network-first so deploys are not stuck on stale chunks
   if (
     url.pathname.startsWith('/_next/static') ||
     url.pathname.match(/\.(js|css|woff2?|ttf|eot)$/) ||
@@ -138,12 +138,8 @@ self.addEventListener('fetch', (event) => {
     url.hostname === 'fonts.gstatic.com'
   ) {
     event.respondWith(
-      caches.match(request).then((cached) => {
-        if (cached) {
-          const ct = cached.headers.get('Content-Type') || '';
-          if (!ct.includes('text/html')) return cached;
-        }
-        return fetch(request).then((response) => {
+      fetch(request)
+        .then((response) => {
           const ct = response.headers.get('Content-Type') || '';
           const isAsset =
             response.ok &&
@@ -157,8 +153,16 @@ self.addEventListener('fetch', (event) => {
             caches.open(STATIC_CACHE).then((cache) => cache.put(request, clone));
           }
           return response;
-        });
-      })
+        })
+        .catch(() =>
+          caches.match(request).then((cached) => {
+            if (cached) {
+              const ct = cached.headers.get('Content-Type') || '';
+              if (!ct.includes('text/html')) return cached;
+            }
+            return Response.error();
+          })
+        )
     );
     return;
   }

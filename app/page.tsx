@@ -28,7 +28,8 @@ export default function Home() {
         ]);
 
         if (categoriesRes.ok) {
-          setCategories(await categoriesRes.json());
+          const data = await categoriesRes.json();
+          setCategories(Array.isArray(data) ? data : []);
         }
         if (featuredRes.ok) {
           setFeaturedProducts(await featuredRes.json());
