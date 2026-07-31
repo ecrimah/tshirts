@@ -15,3 +15,11 @@ CREATE INDEX IF NOT EXISTS idx_payment_reconciliation_log_created
 
 CREATE INDEX IF NOT EXISTS idx_payment_reconciliation_log_order
   ON public.payment_reconciliation_log (order_number);
+
+-- App connects as store_mamator (not postgres); match orders table privileges.
+DO $$
+BEGIN
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.payment_reconciliation_log TO store_mamator;
+EXCEPTION
+  WHEN undefined_object THEN NULL;
+END $$;

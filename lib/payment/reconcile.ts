@@ -405,12 +405,17 @@ export async function writeReconcileLog(input: {
 }
 
 export async function listReconcileLogs(limit = 30) {
-  const result = await query(
-    `SELECT id, order_number, action, result, admin_email, details, created_at
-     FROM payment_reconciliation_log
-     ORDER BY created_at DESC
-     LIMIT $1`,
-    [limit]
-  );
-  return result.rows;
+  try {
+    const result = await query(
+      `SELECT id, order_number, action, result, admin_email, details, created_at
+       FROM payment_reconciliation_log
+       ORDER BY created_at DESC
+       LIMIT $1`,
+      [limit]
+    );
+    return result.rows;
+  } catch (err) {
+    console.error('[Reconcile] list logs failed:', err);
+    return [];
+  }
 }

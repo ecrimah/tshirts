@@ -20,10 +20,15 @@ export async function GET(request: Request) {
     const limit = parseInt(url.searchParams.get('limit') || '50', 10);
     const includeLogs = url.searchParams.get('logs') !== '0';
 
-    const [candidates, logs] = await Promise.all([
-      listReconcileCandidates({ olderThanMinutes, limit }),
-      includeLogs ? listReconcileLogs(25) : Promise.resolve([]),
-    ]);
+    let candidates;
+    try {
+      candidates = await listReconcileCandidates({ olderThanMinutes, limit });
+    } catch (scanErr: unknown) {
+      console.error('[reconcile GET] scan failed:', scanErr);
+      return NextResponse.json({ error: 'Failed to load reconciliation queue' }, { status: 500 });
+    }
+
+    const logs = includeLogs ? await listReconcileLogs(25) : [];
 
     return NextResponse.json({
       candidates,
