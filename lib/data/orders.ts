@@ -1,6 +1,11 @@
 import { query, queryOne, withTransaction } from '@/lib/db';
 import { getSessionFromRequest } from '@/lib/auth/session';
 import { parseStorePricingValue, resolveCartLineUnitPrice } from '@/lib/pricing';
+import {
+  computePaymentPlan,
+  normalizePaymentOption,
+  type PaymentOption,
+} from '@/lib/payment/plan';
 
 export type CartLineInput = {
   id: string;
@@ -36,12 +41,14 @@ export async function createOrderFromCheckout(input: {
   shippingData: Record<string, string>;
   deliveryMethod: string;
   paymentMethod: string;
+  paymentOption?: PaymentOption | string;
   cart: CartLineInput[];
   shippingCost?: number;
   tax?: number;
 }) {
   const shippingCost = Math.max(0, Number(input.shippingCost) || 0);
   const tax = Math.max(0, Number(input.tax) || 0);
+  const paymentOption = normalizePaymentOption(input.paymentOption);
 
   const pricingRow = await queryOne<{ value: unknown }>(
     `SELECT value FROM site_settings WHERE key = 'store_pricing' LIMIT 1`
@@ -103,6 +110,7 @@ export async function createOrderFromCheckout(input: {
   }
 
   const checkoutTotal = computedSubtotal + shippingCost + tax;
+  const plan = computePaymentPlan(checkoutTotal, paymentOption);
   const shipping = input.shippingData;
 
   return withTransaction(async (client) => {
@@ -124,7 +132,7 @@ export async function createOrderFromCheckout(input: {
         computedSubtotal,
         tax,
         shippingCost,
-        checkoutTotal,
+        plan.orderTotal,
         input.deliveryMethod,
         input.paymentMethod,
         JSON.stringify(shipping),
@@ -135,6 +143,11 @@ export async function createOrderFromCheckout(input: {
           last_name: shipping.lastName,
           tracking_number: input.trackingNumber,
           payment_method: input.paymentMethod,
+          payment_option: plan.option,
+          amount_paid: 0,
+          balance_due: plan.option === 'half' ? plan.balanceDue : 0,
+          due_now: plan.dueNow,
+          balance_due_before: 'pickup_or_delivery',
         }),
       ]
     );

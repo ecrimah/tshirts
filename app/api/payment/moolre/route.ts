@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query, queryOne } from '@/lib/db';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
+import { getChargeAmountForOrder } from '@/lib/payment/plan';
 
 type OrderRow = {
   id: string;
@@ -8,6 +9,7 @@ type OrderRow = {
   total: number;
   email: string;
   payment_status: string;
+  metadata: Record<string, unknown> | null;
 };
 
 export async function POST(req: Request) {
@@ -43,9 +45,9 @@ export async function POST(req: Request) {
     const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(orderId);
     const order = await queryOne<OrderRow>(
       isUUID
-        ? `SELECT id, order_number, total, email, payment_status::text AS payment_status
+        ? `SELECT id, order_number, total, email, payment_status::text AS payment_status, metadata
            FROM orders WHERE id = $1::uuid OR order_number = $1::text LIMIT 1`
-        : `SELECT id, order_number, total, email, payment_status::text AS payment_status
+        : `SELECT id, order_number, total, email, payment_status::text AS payment_status, metadata
            FROM orders WHERE order_number = $1::text LIMIT 1`,
       [orderId]
     );
@@ -59,7 +61,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, message: 'Order is already paid' }, { status: 400 });
     }
 
-    const amount = Number(order.total);
+    const amount = getChargeAmountForOrder(order);
     if (!amount || amount <= 0) {
       return NextResponse.json({ success: false, message: 'Invalid order amount' }, { status: 400 });
     }
@@ -68,6 +70,7 @@ export async function POST(req: Request) {
     const requestUrl = new URL(req.url);
     const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin).replace(/\/+$/, '');
     const uniqueRef = `${orderRef}-R${Date.now()}`;
+    const isBalancePayment = order.payment_status === 'partially_paid';
 
     const payload = {
       type: 1,
@@ -82,6 +85,8 @@ export async function POST(req: Request) {
       metadata: {
         customer_email: customerEmail || order.email,
         original_order_number: orderRef,
+        charge_amount: amount,
+        payment_phase: isBalancePayment ? 'balance' : 'initial',
       },
     };
 
@@ -107,6 +112,7 @@ export async function POST(req: Request) {
             moolre_externalref: uniqueRef,
             moolre_reference: result.data.reference || uniqueRef,
             payment_link_created_at: new Date().toISOString(),
+            pending_charge_amount: amount,
           }),
         ]
       );
@@ -115,6 +121,8 @@ export async function POST(req: Request) {
         success: true,
         url: result.data.authorization_url,
         reference: result.data.reference,
+        amount,
+        payment_phase: isBalancePayment ? 'balance' : 'initial',
       });
     }
 

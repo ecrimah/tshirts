@@ -53,6 +53,19 @@ export async function PATCH(request: Request, context: Ctx) {
     return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
   }
 
+  if (body.status === 'shipped' || body.status === 'delivered') {
+    const current = await queryOne<{ payment_status: string }>(
+      `SELECT payment_status::text AS payment_status FROM orders WHERE id = $1::uuid OR order_number = $1::text`,
+      [id]
+    );
+    if (current && current.payment_status !== 'paid') {
+      return NextResponse.json(
+        { error: 'Order must be fully paid before packaged/delivered status' },
+        { status: 400 }
+      );
+    }
+  }
+
   sets.push('updated_at = now()');
 
   try {

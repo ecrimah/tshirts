@@ -29,7 +29,7 @@ export async function GET(request: Request) {
     }>(
       `SELECT id, order_number, email, phone, total, shipping_address, metadata
        FROM orders
-       WHERE payment_status <> 'paid'::payment_status
+       WHERE payment_status IN ('pending'::payment_status, 'failed'::payment_status, 'partially_paid'::payment_status)
          AND payment_reminder_sent = false
          AND created_at < $1::timestamptz
        ORDER BY created_at ASC

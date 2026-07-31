@@ -3,6 +3,7 @@ import { query, queryOne } from '@/lib/db';
 import { sendOrderConfirmation } from '@/lib/notifications';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
 import { resolveMoolreExternalRefForOrder, verifyMoolrePayment } from '@/lib/payment/moolre';
+import { getChargeAmountForOrder } from '@/lib/payment/plan';
 
 type OrderRow = {
   id: string;
@@ -74,8 +75,9 @@ export async function POST(req: Request) {
       }, { status: 503 });
     }
 
+    const expectedCharge = getChargeAmountForOrder(order);
     const externalRef = await resolveMoolreExternalRefForOrder(orderNumber);
-    const apiCheck = await verifyMoolrePayment(externalRef, Number(order.total));
+    const apiCheck = await verifyMoolrePayment(externalRef, expectedCharge);
 
     if (!apiCheck.verified) {
       return NextResponse.json({
@@ -86,10 +88,12 @@ export async function POST(req: Request) {
       });
     }
 
-    const wasAlreadyPaid = meta.confirmation_sent_at;
+    const chargedAmount = apiCheck.amount ?? expectedCharge;
+    const prevStatus = order.payment_status;
+    const wasAlreadyConfirmed = meta.confirmation_sent_at;
     const paidRow = await queryOne<{ result: OrderJson }>(
-      `SELECT mark_order_paid($1, $2) AS result`,
-      [orderNumber, externalRef]
+      `SELECT record_order_payment($1, $2, $3) AS result`,
+      [orderNumber, externalRef, chargedAmount]
     );
     const orderJson = paidRow?.result;
 
@@ -97,7 +101,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, message: 'Failed to update order' }, { status: 500 });
     }
 
-    if (orderJson.email) {
+    if (orderJson.payment_status === 'paid' && orderJson.email && prevStatus !== 'paid') {
       try {
         await query(`SELECT update_customer_stats($1, $2)`, [
           String(orderJson.email),
@@ -108,7 +112,10 @@ export async function POST(req: Request) {
       }
     }
 
-    if (!wasAlreadyPaid && orderJson.payment_status === 'paid') {
+    if (
+      !wasAlreadyConfirmed &&
+      (orderJson.payment_status === 'paid' || orderJson.payment_status === 'partially_paid')
+    ) {
       try {
         await sendOrderConfirmation(orderJson);
         await query(
@@ -122,9 +129,13 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      status: 'processing',
-      payment_status: 'paid',
-      message: 'Payment verified and order updated',
+      status: orderJson.status || 'processing',
+      payment_status: orderJson.payment_status,
+      message:
+        orderJson.payment_status === 'partially_paid'
+          ? 'Deposit verified. Remaining balance is due before pickup or delivery.'
+          : 'Payment verified and order updated',
+      balance_due: (orderJson.metadata as Record<string, unknown> | undefined)?.balance_due ?? 0,
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Internal error';

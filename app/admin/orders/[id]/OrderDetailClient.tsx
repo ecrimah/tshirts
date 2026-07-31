@@ -77,6 +77,17 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
       setStatusUpdating(true);
       const statusToUpdate = newStatus || order.status;
 
+      if (
+        (statusToUpdate === 'shipped' || statusToUpdate === 'delivered') &&
+        order.payment_status !== 'paid'
+      ) {
+        alert(
+          'Cannot mark as packaged/delivered until the order is fully paid. Remaining balance is due before pickup or delivery.'
+        );
+        setStatusUpdating(false);
+        return;
+      }
+
       await api(`/api/orders/${order.id}`, {
         method: 'PATCH',
         json: {
@@ -200,7 +211,14 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
   // Derive timeline from status (simplified logic as we don't have full history table joined here yet)
   const timeline = [
     { status: 'Order Placed', date: new Date(order.created_at).toLocaleString(), completed: true },
-    { status: 'Payment', date: order.payment_status, completed: order.payment_status === 'paid' },
+    {
+      status: 'Payment',
+      date:
+        order.payment_status === 'partially_paid'
+          ? `Half paid · GH₵ ${Number(order.metadata?.balance_due || 0).toFixed(2)} due before pickup/delivery`
+          : order.payment_status,
+      completed: order.payment_status === 'paid' || order.payment_status === 'partially_paid',
+    },
     { status: 'Processing', date: '', completed: ['processing', 'shipped', 'delivered'].includes(order.status) },
     { status: 'Packaged', date: '', completed: ['shipped', 'delivered'].includes(order.status) },
     { status: 'Delivered', date: '', completed: order.status === 'delivered' }
@@ -494,16 +512,47 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Status</span>
                   <span className="px-3 py-1 bg-store-surface text-store-ink rounded-full text-sm font-semibold whitespace-nowrap capitalize">
-                    {order.payment_status}
+                    {order.payment_status === 'partially_paid' ? 'Half paid' : order.payment_status}
                   </span>
                 </div>
+                {order.metadata?.payment_option && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Plan</span>
+                    <span className="font-semibold text-gray-900 capitalize">
+                      {String(order.metadata.payment_option)} payment
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between">
-                  {/* Transaction ID might be in metadata depending on callback */}
+                  <span className="text-gray-600">Amount paid</span>
+                  <span className="font-semibold text-gray-900">
+                    GH₵ {money(order.metadata?.amount_paid || (order.payment_status === 'paid' ? order.total : 0))}
+                  </span>
+                </div>
+                {order.payment_status === 'partially_paid' && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Balance due</span>
+                    <span className="font-semibold text-amber-700">
+                      GH₵ {money(order.metadata?.balance_due)}
+                    </span>
+                  </div>
+                )}
+                <div className="flex justify-between">
                   <span className="text-gray-600">Transaction</span>
                   <span className="text-sm text-gray-900 font-mono truncate max-w-[150px]">
                     {order.metadata?.moolre_reference || order.payment_transaction_id || 'N/A'}
                   </span>
                 </div>
+                {order.payment_status === 'partially_paid' && (
+                  <a
+                    href={`/pay/${order.order_number}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block text-center mt-2 text-sm font-semibold text-store-ink hover:underline"
+                  >
+                    Customer balance payment link →
+                  </a>
+                )}
               </div>
             </div>
 

@@ -10,6 +10,7 @@ import {
   validateCallbackSecret,
   verifyMoolrePayment,
 } from '@/lib/payment/moolre';
+import { getChargeAmountForOrder } from '@/lib/payment/plan';
 
 type OrderJson = Record<string, unknown> & {
   id?: string;
@@ -20,10 +21,14 @@ type OrderJson = Record<string, unknown> & {
   metadata?: Record<string, unknown> | null;
 };
 
-async function markOrderPaid(orderRef: string, moolreRef: string): Promise<OrderJson | null> {
+async function recordPayment(
+  orderRef: string,
+  moolreRef: string,
+  chargedAmount: number
+): Promise<OrderJson | null> {
   const row = await queryOne<{ result: OrderJson }>(
-    `SELECT mark_order_paid($1, $2) AS result`,
-    [orderRef, moolreRef]
+    `SELECT record_order_payment($1, $2, $3) AS result`,
+    [orderRef, moolreRef, chargedAmount]
   );
   return row?.result ?? null;
 }
@@ -96,6 +101,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: true, message: 'Order already processed' });
       }
 
+      const expectedCharge = getChargeAmountForOrder(existingOrder);
       const data = (body.data || {}) as Record<string, unknown>;
       const callbackAmount = data.amount
         ? parseFloat(String(data.amount))
@@ -108,13 +114,12 @@ export async function POST(req: Request) {
         String(existingOrder.metadata?.moolre_externalref || '') ||
         (await resolveMoolreExternalRefForOrder(merchantOrderRef));
 
-      const apiCheck = await verifyMoolrePayment(externalRef, Number(existingOrder.total));
+      const apiCheck = await verifyMoolrePayment(externalRef, expectedCharge);
       if (!apiCheck.verified) {
         if (callbackAmount != null) {
-          const expectedAmount = Number(existingOrder.total);
-          if (Math.abs(callbackAmount - expectedAmount) > 0.01) {
+          if (Math.abs(callbackAmount - expectedCharge) > 0.01) {
             return NextResponse.json(
-              { success: false, message: 'Payment amount does not match order total' },
+              { success: false, message: 'Payment amount does not match expected charge' },
               { status: 400 }
             );
           }
@@ -126,13 +131,15 @@ export async function POST(req: Request) {
         }
       }
 
-      const wasAlreadyPaid = existingOrder.metadata?.confirmation_sent_at;
-      const orderJson = await markOrderPaid(merchantOrderRef, moolreReference);
+      const chargedAmount = apiCheck.amount ?? callbackAmount ?? expectedCharge;
+      const prevStatus = existingOrder.payment_status;
+      const wasConfirmed = existingOrder.metadata?.confirmation_sent_at;
+      const orderJson = await recordPayment(merchantOrderRef, moolreReference, chargedAmount);
       if (!orderJson?.id) {
         return NextResponse.json({ success: false, message: 'Database update failed' }, { status: 500 });
       }
 
-      if (orderJson.email) {
+      if (orderJson.payment_status === 'paid' && orderJson.email && prevStatus !== 'paid') {
         try {
           await query(`SELECT update_customer_stats($1, $2)`, [
             String(orderJson.email),
@@ -143,7 +150,7 @@ export async function POST(req: Request) {
         }
       }
 
-      if (!wasAlreadyPaid && orderJson.payment_status === 'paid') {
+      if (!wasConfirmed && (orderJson.payment_status === 'paid' || orderJson.payment_status === 'partially_paid')) {
         try {
           await sendOrderConfirmation(orderJson);
           await query(
@@ -155,13 +162,20 @@ export async function POST(req: Request) {
         }
       }
 
-      return NextResponse.json({ success: true, message: 'Payment verified and Order Updated' });
+      return NextResponse.json({
+        success: true,
+        message:
+          orderJson.payment_status === 'partially_paid'
+            ? 'Deposit verified; balance due before pickup/delivery'
+            : 'Payment verified and Order Updated',
+        payment_status: orderJson.payment_status,
+      });
     }
 
     await query(
       `UPDATE orders SET payment_status = 'failed'::payment_status,
        metadata = COALESCE(metadata, '{}'::jsonb) || $2::jsonb
-       WHERE order_number = $1 AND payment_status <> 'paid'::payment_status`,
+       WHERE order_number = $1 AND payment_status IN ('pending'::payment_status, 'failed'::payment_status)`,
       [
         merchantOrderRef,
         JSON.stringify({

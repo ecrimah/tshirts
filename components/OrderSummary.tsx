@@ -13,9 +13,23 @@ interface OrderSummaryProps {
   shipping: number;
   tax: number;
   total: number;
+  dueNow?: number;
+  balanceDue?: number;
+  paymentOption?: 'full' | 'half';
 }
 
-export default function OrderSummary({ items, subtotal, shipping, tax, total }: OrderSummaryProps) {
+export default function OrderSummary({
+  items,
+  subtotal,
+  shipping,
+  tax,
+  total,
+  dueNow,
+  balanceDue = 0,
+  paymentOption = 'full',
+}: OrderSummaryProps) {
+  const payNow = dueNow ?? total;
+
   return (
     <div className="bg-white rounded-xl shadow-sm p-6 sticky top-4">
       <h2 className="text-xl font-bold text-gray-900 mb-6">Order Summary</h2>
@@ -53,14 +67,25 @@ export default function OrderSummary({ items, subtotal, shipping, tax, total }: 
             {shipping === 0 ? 'FREE' : `GH₵ ${shipping.toFixed(2)}`}
           </span>
         </div>
-
       </div>
 
-      <div className="border-t border-gray-200 mt-4 pt-4">
+      <div className="border-t border-gray-200 mt-4 pt-4 space-y-2">
         <div className="flex justify-between items-center">
-          <span className="text-lg font-bold text-gray-900">Total</span>
+          <span className="text-lg font-bold text-gray-900">Order Total</span>
           <span className="text-2xl font-bold text-store-ink">GH₵ {total.toFixed(2)}</span>
         </div>
+        {paymentOption === 'half' && (
+          <>
+            <div className="flex justify-between text-sm text-gray-700">
+              <span>Pay now (50%)</span>
+              <span className="font-semibold text-store-ink">GH₵ {payNow.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-sm text-amber-700">
+              <span>Balance before pickup/delivery</span>
+              <span className="font-semibold">GH₵ {balanceDue.toFixed(2)}</span>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="mt-6 p-4 bg-store-surface border border-gray-200 rounded-lg">

@@ -38,6 +38,7 @@ export async function POST(request: Request) {
       shippingData,
       deliveryMethod = 'pickup',
       paymentMethod = 'moolre',
+      paymentOption = 'full',
       cart,
       shippingCost = 0,
       tax = 0,
@@ -45,6 +46,10 @@ export async function POST(request: Request) {
 
     if (!orderNumber || !trackingNumber || !shippingData || !Array.isArray(cart) || !cart.length) {
       return NextResponse.json({ error: 'Invalid checkout payload' }, { status: 400 });
+    }
+
+    if (paymentOption !== 'full' && paymentOption !== 'half') {
+      return NextResponse.json({ error: 'Invalid payment option' }, { status: 400 });
     }
 
     const userId = await getUserIdFromRequest(request);
@@ -56,6 +61,7 @@ export async function POST(request: Request) {
       shippingData,
       deliveryMethod,
       paymentMethod,
+      paymentOption,
       cart,
       shippingCost,
       tax,

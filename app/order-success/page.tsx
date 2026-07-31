@@ -141,10 +141,24 @@ function OrderSuccessContent() {
               <i className="ri-checkbox-circle-fill text-6xl text-store-muted"></i>
             </div>
 
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Order Confirmed!</h1>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              {order.payment_status === 'partially_paid' ? 'Deposit Received!' : 'Order Confirmed!'}
+            </h1>
             <p className="text-xl text-gray-600 mb-8">
-              Thank you for your purchase. We're processing your order now.
+              {order.payment_status === 'partially_paid'
+                ? `Thank you. Half payment received. Remaining GH₵ ${Number(order.metadata?.balance_due || order.total / 2).toFixed(2)} is due before pickup or delivery.`
+                : order.payment_status === 'paid'
+                  ? "Thank you for your purchase. We're processing your order now."
+                  : 'Thank you. Your order was placed — complete payment if you have not already.'}
             </p>
+            {order.payment_status === 'partially_paid' && (
+              <Link
+                href={`/pay/${order.order_number}`}
+                className="inline-flex items-center bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-lg font-semibold mb-8"
+              >
+                Pay Remaining Balance
+              </Link>
+            )}
 
             <div className="bg-store-surface rounded-xl p-6 mb-8">
               <div className="grid md:grid-cols-3 gap-6 text-center">

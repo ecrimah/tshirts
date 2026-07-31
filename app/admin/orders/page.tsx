@@ -83,9 +83,13 @@ export default function AdminOrdersPage() {
       });
       setAvailableProducts(Array.from(productNames).sort());
 
-      // Separate confirmed (paid) from abandoned (pending payment)
-      const confirmedOrders = ordersData?.filter(o => o.payment_status === 'paid') || [];
-      const abandonedOrders = ordersData?.filter(o => o.payment_status !== 'paid') || [];
+      // Confirmed = paid or half-paid deposit; abandoned = unpaid / failed
+      const confirmedOrders =
+        ordersData?.filter((o) => o.payment_status === 'paid' || o.payment_status === 'partially_paid') ||
+        [];
+      const abandonedOrders =
+        ordersData?.filter((o) => o.payment_status !== 'paid' && o.payment_status !== 'partially_paid') ||
+        [];
       
       setConfirmedCount(confirmedOrders.length);
       setAbandonedCount(abandonedOrders.length);
@@ -282,7 +286,8 @@ export default function AdminOrdersPage() {
     const orderId = (order.order_number || order.id).toLowerCase();
 
     // First filter by view tab (confirmed vs abandoned)
-    const isConfirmed = order.payment_status === 'paid';
+    const isConfirmed =
+      order.payment_status === 'paid' || order.payment_status === 'partially_paid';
     const matchesViewTab = orderViewTab === 'confirmed' ? isConfirmed : !isConfirmed;
 
     const matchesSearch = orderId.includes(searchQuery.toLowerCase()) ||
@@ -558,6 +563,11 @@ export default function AdminOrdersPage() {
                             {order.payment_status === 'failed' ? 'Failed' : 'Pending'}
                           </span>
                         )}
+                        {order.payment_status === 'partially_paid' && (
+                          <span className="text-xs mt-1 text-amber-700 font-semibold">
+                            Half paid · GH₵ {Number(order.metadata?.balance_due || 0).toFixed(2)} due
+                          </span>
+                        )}
                       </div>
                     </td>
                     <td className="py-4 px-4">
@@ -574,7 +584,8 @@ export default function AdminOrdersPage() {
                         >
                           <i className="ri-eye-line text-lg w-4 h-4 flex items-center justify-center"></i>
                         </Link>
-                        {orderViewTab === 'abandoned' && order.payment_status !== 'paid' && (
+                        {(orderViewTab === 'abandoned' || order.payment_status === 'partially_paid') &&
+                          order.payment_status !== 'paid' && (
                           <button
                             onClick={() => handleResendPaymentLink(order)}
                             disabled={sendingPaymentLink === order.id}
