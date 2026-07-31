@@ -4,14 +4,16 @@ export type MoolreVerifyResult = {
   verified: boolean;
   amount?: number;
   status?: string;
+  transactionId?: string;
   raw?: unknown;
 };
 
-function moolreCredentials(): { user: string; pubkey: string } | null {
+function moolreCredentials(): { user: string; pubkey: string; account: string } | null {
   const user = process.env.MOOLRE_API_USER;
   const pubkey = process.env.MOOLRE_API_PUBKEY;
-  if (!user || !pubkey) return null;
-  return { user, pubkey };
+  const account = process.env.MOOLRE_ACCOUNT_NUMBER;
+  if (!user || !pubkey || !account) return null;
+  return { user, pubkey, account };
 }
 
 export function isProductionEnv(): boolean {
@@ -73,7 +75,51 @@ export async function getStoredMoolreExternalRef(orderNumber: string): Promise<s
   return row?.externalref ?? null;
 }
 
-/** Fetch gateway status without requiring amount match (for reconciliation). */
+function parseTxPayload(checkResult: Record<string, unknown>): {
+  verified: boolean;
+  amount?: number;
+  status?: string;
+  transactionId?: string;
+} {
+  const data = checkResult.data as Record<string, unknown> | unknown[] | null | undefined;
+  const tx = Array.isArray(data)
+    ? (data[0] as Record<string, unknown> | undefined)
+    : data && typeof data === 'object'
+      ? (data as Record<string, unknown>)
+      : undefined;
+
+  const txStatus = tx?.txstatus ?? tx?.txtstatus ?? tx?.status;
+  const statusStr = String(txStatus ?? checkResult.message ?? '').toLowerCase();
+  const txOk =
+    txStatus === 1 ||
+    txStatus === '1' ||
+    statusStr === 'success' ||
+    statusStr === 'successful' ||
+    statusStr === 'completed' ||
+    statusStr === 'paid';
+
+  const verified = checkResult.status === 1 && !!tx && txOk;
+  const amountRaw = tx?.amount ?? tx?.value;
+  const amount = amountRaw != null ? parseFloat(String(amountRaw)) : undefined;
+  const transactionId =
+    tx?.transactionid != null
+      ? String(tx.transactionid)
+      : tx?.thirdpartyref != null
+        ? String(tx.thirdpartyref)
+        : undefined;
+
+  return {
+    verified,
+    amount: Number.isFinite(amount as number) ? amount : undefined,
+    status: statusStr || undefined,
+    transactionId,
+  };
+}
+
+/**
+ * Fetch gateway status via official Payment Status API.
+ * Docs: POST https://api.moolre.com/open/transact/status
+ */
 export async function fetchMoolrePaymentStatus(externalRef: string): Promise<MoolreVerifyResult> {
   const creds = moolreCredentials();
   if (!creds || !externalRef) {
@@ -84,29 +130,32 @@ export async function fetchMoolrePaymentStatus(externalRef: string): Promise<Moo
   const timeout = setTimeout(() => controller.abort(), 15_000);
 
   try {
-    const checkResponse = await fetch('https://api.moolre.com/embed/status', {
+    const checkResponse = await fetch('https://api.moolre.com/open/transact/status', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-API-USER': creds.user,
         'X-API-PUBKEY': creds.pubkey,
       },
-      body: JSON.stringify({ externalref: externalRef }),
+      body: JSON.stringify({
+        type: 1,
+        idtype: '1',
+        id: externalRef,
+        accountnumber: creds.account,
+      }),
       signal: controller.signal,
     });
 
-    const checkResult = await checkResponse.json();
-    const statusStr = String(checkResult.data?.status || checkResult.message || '').toLowerCase();
-    const verified =
-      checkResult.status === 1 &&
-      !!checkResult.data &&
-      (statusStr === 'success' ||
-        statusStr === 'successful' ||
-        statusStr === 'completed' ||
-        statusStr === 'paid');
+    const contentType = checkResponse.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      const text = await checkResponse.text();
+      console.warn('[Moolre] non-JSON status response:', checkResponse.status, text.slice(0, 200));
+      return { verified: false, status: `http_${checkResponse.status}` };
+    }
 
-    const amount = checkResult.data?.amount ? parseFloat(String(checkResult.data.amount)) : undefined;
-    return { verified, amount, status: statusStr || undefined, raw: checkResult };
+    const checkResult = (await checkResponse.json()) as Record<string, unknown>;
+    const parsed = parseTxPayload(checkResult);
+    return { ...parsed, raw: checkResult };
   } catch (err) {
     console.warn('[Moolre] status fetch failed:', err instanceof Error ? err.message : err);
     return { verified: false };
@@ -142,7 +191,7 @@ export async function resolveMoolreExternalRefForOrder(orderNumber: string): Pro
 export function callbackIndicatesSuccess(body: Record<string, unknown>): boolean {
   const data = (body.data || {}) as Record<string, unknown>;
   const apiStatus = body.status;
-  const txStatus = data.txtstatus;
+  const txStatus = data.txtstatus ?? data.txstatus;
   const messageStr = String(body.message || '').toLowerCase();
   const apiOk = apiStatus === 1 || apiStatus === '1';
   const txOk = txStatus === 1 || txStatus === '1';
