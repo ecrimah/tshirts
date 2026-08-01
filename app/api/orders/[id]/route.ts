@@ -36,8 +36,10 @@ export async function PATCH(request: Request, context: Ctx) {
     if (key in body) {
       if (key === 'status') {
         sets.push(`${key} = $${i}::order_status`);
+        params.push(body[key]);
       } else if (key === 'payment_status') {
         sets.push(`${key} = $${i}::payment_status`);
+        params.push(body[key]);
       } else if (key === 'metadata' || key === 'shipping_address') {
         sets.push(`${key} = $${i}::jsonb`);
         params.push(JSON.stringify(body[key]));

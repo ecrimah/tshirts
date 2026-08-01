@@ -137,9 +137,10 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
 
       alert('Order updated successfully');
       setShowStatusMenu(false);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Error updating order:', err);
-      alert('Failed to update order');
+      const message = err instanceof Error ? err.message : 'Failed to update order';
+      alert(message || 'Failed to update order');
     } finally {
       setStatusUpdating(false);
     }

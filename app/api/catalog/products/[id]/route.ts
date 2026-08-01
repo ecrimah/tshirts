@@ -24,7 +24,11 @@ export async function GET(_request: Request, context: Ctx) {
   const { id } = await context.params;
   try {
     const row = await queryOne(
-      `SELECT ${PRODUCT_SELECT} FROM products p LEFT JOIN categories c ON c.id = p.category_id WHERE p.id = $1::uuid`,
+      `SELECT ${PRODUCT_SELECT}
+       FROM products p
+       LEFT JOIN categories c ON c.id = p.category_id
+       WHERE p.id::text = $1 OR p.slug = $1
+       LIMIT 1`,
       [id]
     );
     if (!row) {
@@ -77,6 +81,7 @@ export async function PATCH(request: Request, context: Ctx) {
     if (key in fields) {
       if (key === 'status') {
         sets.push(`${key} = $${i}::product_status`);
+        params.push(fields[key]);
       } else if (key === 'metadata') {
         sets.push(`${key} = $${i}::jsonb`);
         params.push(JSON.stringify(fields[key]));
