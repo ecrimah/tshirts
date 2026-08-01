@@ -44,7 +44,7 @@ export function buildContactCards({
       icon: 'ri-phone-line',
       title: 'Call Us',
       detail: displayPhone(e164),
-      subtext: 'Mon-Fri, 8am-6pm GMT',
+      subtext: 'Mon-Sat, 6am-6pm GMT',
       href: `tel:${e164.replace(/\s/g, '')}`,
     },
     {
@@ -66,7 +66,7 @@ export function buildContactCards({
       icon: 'ri-map-pin-line',
       title: 'Visit Us',
       detail: address,
-      subtext: 'Mon-Sat, 9am-6pm',
+      subtext: 'Mon-Sat, 6am-6pm',
     },
   ];
 }

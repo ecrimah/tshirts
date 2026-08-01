@@ -210,8 +210,8 @@ export default function MyTicketsPage() {
                 <i className="ri-customer-service-line text-2xl text-store-primary"></i>
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Support Hours</h3>
-              <p className="text-2xl font-bold text-store-primary mb-1">24/7</p>
-              <p className="text-sm text-gray-600">Always here to help</p>
+              <p className="text-2xl font-bold text-store-primary mb-1">6am–6pm</p>
+              <p className="text-sm text-gray-600">Monday to Saturday</p>
             </div>
           </div>
         </div>
