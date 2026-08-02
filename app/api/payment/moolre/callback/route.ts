@@ -102,12 +102,6 @@ export async function POST(req: Request) {
       }
 
       const expectedCharge = getChargeAmountForOrder(existingOrder);
-      const data = (body.data || {}) as Record<string, unknown>;
-      const callbackAmount = data.amount
-        ? parseFloat(String(data.amount))
-        : body.amount
-          ? parseFloat(String(body.amount))
-          : null;
 
       const externalRef =
         rawExternalRef ||
@@ -116,27 +110,50 @@ export async function POST(req: Request) {
 
       const apiCheck = await verifyMoolrePayment(externalRef, expectedCharge);
       if (!apiCheck.verified) {
-        if (callbackAmount != null) {
-          if (Math.abs(callbackAmount - expectedCharge) > 0.01) {
-            return NextResponse.json(
-              { success: false, message: 'Payment amount does not match expected charge' },
-              { status: 400 }
-            );
-          }
-        } else {
-          return NextResponse.json(
-            { success: false, message: 'Payment could not be verified with provider' },
-            { status: 400 }
-          );
+        return NextResponse.json(
+          { success: false, message: 'Payment could not be verified with provider' },
+          { status: 400 }
+        );
+      }
+
+      const chargedAmount = apiCheck.amount ?? expectedCharge;
+      const prevStatus = existingOrder.payment_status;
+      const wasConfirmed = existingOrder.metadata?.confirmation_sent_at;
+
+      // Deduplicate already-processed gateway references
+      if (moolreReference) {
+        const prior = await queryOne<{ id: string }>(
+          `SELECT id FROM payment_callback_events
+           WHERE gateway = 'moolre' AND gateway_reference = $1 AND processing_status = 'processed'
+           LIMIT 1`,
+          [moolreReference]
+        );
+        if (prior) {
+          return NextResponse.json({ success: true, message: 'Callback already processed' });
         }
       }
 
-      const chargedAmount = apiCheck.amount ?? callbackAmount ?? expectedCharge;
-      const prevStatus = existingOrder.payment_status;
-      const wasConfirmed = existingOrder.metadata?.confirmation_sent_at;
       const orderJson = await recordPayment(merchantOrderRef, moolreReference, chargedAmount);
       if (!orderJson?.id) {
         return NextResponse.json({ success: false, message: 'Database update failed' }, { status: 500 });
+      }
+
+      try {
+        await query(
+          `INSERT INTO payment_callback_events
+             (gateway, order_number, external_ref, gateway_reference, event_type, processing_status, amount, currency, details, processed_at)
+           VALUES
+             ('moolre', $1, $2, $3, 'callback', 'processed', $4, 'GHS', $5::jsonb, now())`,
+          [
+            merchantOrderRef,
+            externalRef || null,
+            moolreReference || null,
+            chargedAmount,
+            JSON.stringify({ payment_status: orderJson.payment_status }),
+          ]
+        );
+      } catch (eventErr: unknown) {
+        console.error('[Callback] event log failed:', eventErr);
       }
 
       if (orderJson.payment_status === 'paid' && orderJson.email && prevStatus !== 'paid') {

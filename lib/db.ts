@@ -56,9 +56,14 @@ export async function withTransaction<T>(fn: (client: PoolClient) => Promise<T>)
   }
 }
 
+const RPC_FN_NAME_PATTERN = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+
 export async function rpc<T = unknown>(fnName: string, args: unknown[] = []): Promise<T> {
+  if (!RPC_FN_NAME_PATTERN.test(fnName)) {
+    throw new Error('Invalid RPC function name');
+  }
   const placeholders = args.map((_, i) => `$${i + 1}`).join(', ');
-  const result = await query(`SELECT * FROM ${fnName}(${placeholders}) AS result`, args);
+  const result = await query(`SELECT * FROM "public".${fnName}(${placeholders}) AS result`, args);
   const row = result.rows[0] as { result?: T } | undefined;
   return (row?.result ?? row) as T;
 }

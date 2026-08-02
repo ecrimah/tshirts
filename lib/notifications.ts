@@ -1,5 +1,6 @@
 import { Resend } from 'resend';
 import { query } from '@/lib/db';
+import { getChargeAmountForOrder } from '@/lib/payment/plan';
 import { escapeHtml } from '@/lib/sanitize';
 
 const resend = new Resend(process.env.RESEND_API_KEY || 'missing_api_key');
@@ -474,7 +475,9 @@ export async function sendNewsletterWelcome(email: string) {
 }
 
 export async function sendPaymentLink(order: any) {
-    const { id, email, phone: orderPhone, shipping_address, total, order_number, metadata } = order;
+    const { id, email, phone: orderPhone, shipping_address, total, order_number, metadata, payment_status } = order;
+
+    const amountDue = getChargeAmountForOrder({ total, payment_status, metadata });
 
     const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/+$/, '');
     const paymentUrl = `${baseUrl}/pay/${id}`;
@@ -512,12 +515,12 @@ export async function sendPaymentLink(order: any) {
 
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f9fafb;border-radius:12px;overflow:hidden;margin:20px 0;">
   ${emailInfoRow('Order Number', `#${order_number}`)}
-  ${emailInfoRow('Amount Due', `<span style="color:${BRAND.color};font-size:18px;font-weight:700;">GH₵${Number(total).toFixed(2)}</span>`)}
+  ${emailInfoRow('Amount Due', `<span style="color:${BRAND.color};font-size:18px;font-weight:700;">GH₵${Number(amountDue).toFixed(2)}</span>`)}
 </table>
 
 <p style="color:#374151;font-size:14px;line-height:1.6;margin:16px 0;">Click the button below to securely complete your payment. This link will remain active until your order is completed or cancelled.</p>
 
-${emailButton('Pay Now — GH₵' + Number(total).toFixed(2), paymentUrl, '#d97706')}
+${emailButton('Pay Now — GH₵' + Number(amountDue).toFixed(2), paymentUrl, '#d97706')}
 
 <p style="color:#9ca3af;font-size:12px;text-align:center;margin:0;">Or copy this link: <a href="${paymentUrl}" style="color:${BRAND.color};">${paymentUrl}</a></p>
 `, `Complete payment for order #${order_number}`)
@@ -525,7 +528,7 @@ ${emailButton('Pay Now — GH₵' + Number(total).toFixed(2), paymentUrl, '#d977
 
     // SMS with payment link
     if (phone) {
-        const smsMessage = `Hi ${name}, complete your order #${order_number} (GH₵${Number(total).toFixed(2)}) here: ${paymentUrl}`;
+        const smsMessage = `Hi ${name}, complete your order #${order_number} (GH₵${Number(amountDue).toFixed(2)}) here: ${paymentUrl}`;
 
         await sendSMS({
             to: phone,

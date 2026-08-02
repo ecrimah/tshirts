@@ -24,10 +24,11 @@ export async function GET(request: Request) {
       email: string;
       phone: string | null;
       total: number;
+      payment_status: string;
       shipping_address: unknown;
       metadata: unknown;
     }>(
-      `SELECT id, order_number, email, phone, total, shipping_address, metadata
+      `SELECT id, order_number, email, phone, total, payment_status::text AS payment_status, shipping_address, metadata
        FROM orders
        WHERE payment_status IN ('pending'::payment_status, 'failed'::payment_status, 'partially_paid'::payment_status)
          AND payment_reminder_sent = false

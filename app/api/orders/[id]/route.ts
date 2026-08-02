@@ -27,7 +27,14 @@ export async function PATCH(request: Request, context: Ctx) {
   const { id } = await context.params;
   const body = await request.json();
 
-  const allowed = ['status', 'payment_status', 'notes', 'metadata', 'shipping_address'] as const;
+  if ('payment_status' in body) {
+    return NextResponse.json(
+      { error: 'payment_status cannot be changed via order PATCH; use Payment Reconcile instead' },
+      { status: 400 }
+    );
+  }
+
+  const allowed = ['status', 'notes', 'metadata', 'shipping_address'] as const;
   const sets: string[] = [];
   const params: unknown[] = [id];
   let i = 2;
@@ -36,9 +43,6 @@ export async function PATCH(request: Request, context: Ctx) {
     if (key in body) {
       if (key === 'status') {
         sets.push(`${key} = $${i}::order_status`);
-        params.push(body[key]);
-      } else if (key === 'payment_status') {
-        sets.push(`${key} = $${i}::payment_status`);
         params.push(body[key]);
       } else if (key === 'metadata' || key === 'shipping_address') {
         sets.push(`${key} = $${i}::jsonb`);
